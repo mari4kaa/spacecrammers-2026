@@ -159,6 +159,7 @@ body{padding-bottom:90px}
     <a href="#compare">Compare</a>
     <a href="#gaps">Gaps &amp; partial gravity</a>
     <a href="#boundary">Flammability boundary</a>
+    <a href="#evidence">Safety evidence</a>
     <a href="#data">Data &amp; export</a>
     <a href="#quality">Data quality</a>
     <a href="#incidents">Incidents &amp; Earth benefits</a>
@@ -284,6 +285,41 @@ body{padding-bottom:90px}
     </div>
   </section>
 
+  <!-- SAFETY EVIDENCE -->
+  <section class="view" id="v-evidence">
+    <div class="panel" style="display:grid;gap:8px">
+      <h2>Fire-safety evidence from the experiments</h2>
+      <p class="small" style="margin:0;max-width:90ch">Three questions a habitat designer asks, answered with measured flight data copied from the reports and papers behind the cards: will a small fire keep burning (prevention), how far must a suppressant cut the oxygen (suppression), and will the smoke be seen (detection). The data are fixed published measurements; your scenario from the bar above is compared against them (oxygen and pressure for prevention, oxygen for suppression), and each panel says when your conditions were never tested.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <div class="rhead" style="flex-wrap:wrap"><h2>Prevention: do small flames keep burning in still air?</h2>
+        <label class="small muted">Horizontal axis <select id="evbrex"><option value="flux">Fuel flow (bigger flame →)</option><option value="p">Pressure</option></select></label></div>
+      <p class="small" style="margin:0;max-width:90ch">ACME BRE on the ISS: a 25 mm gas burner set up to burn like a solid material, with no air flow. 83 tests, each either burned until the fuel was shut off or put itself out. Oxygen and pressure were not varied independently: most 1-bar tests ran at 18-25% O₂.</p>
+      <div class="gapgrid" id="evbreread"></div>
+      <div id="evbre" style="height:430px" role="img" aria-label="BRE ISS tests: oxygen versus fuel flow or pressure, by outcome"></div>
+      <div class="small muted" id="evbrenote"></div>
+      <div class="chips" id="evbredl"></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>Suppression: how low must a suppressant push the oxygen?</h2>
+      <p class="small" style="margin:0;max-width:90ch">FLEX on the ISS: the lowest oxygen at which a burning fuel droplet can keep going (limiting oxygen index) at 1 atm, with the air diluted by nitrogen, carbon dioxide or helium. A suppressant works only if it brings the oxygen below the bar.</p>
+      <div class="cols2">
+        <div id="evloi" style="height:360px" role="img" aria-label="FLEX limiting oxygen index by fuel and diluent"></div>
+        <div class="small" style="display:grid;gap:8px;align-content:start" id="evloitext"></div>
+      </div>
+      <div class="chips" id="evloidl"></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>Detection: will a smoke detector see it?</h2>
+      <p class="small" style="margin:0;max-width:90ch">SAME on the ISS: smoke from four spacecraft materials heated short of ignition, measured fresh and after aging. The lines mark the ISS smoke detector's stated limits: minimum reported sensitivity 0.3 µm, most sensitive above 1 µm.</p>
+      <div class="cols2">
+        <div id="evsmoke" style="height:380px" role="img" aria-label="SAME smoke particle sizes by material, fresh and aged, against ISS detector limits"></div>
+        <div class="small" style="display:grid;gap:8px;align-content:start" id="evsmoketext"></div>
+      </div>
+      <div class="chips" id="evsmokedl"></div>
+    </div>
+  </section>
+
   <!-- DATA -->
   <section class="view" id="v-data">
     <div class="panel" style="display:grid;gap:10px">
@@ -298,6 +334,18 @@ body{padding-bottom:90px}
       <div class="chips" id="exportbtns"></div>
       <div class="small muted" id="dcount"></div>
       <div class="tablewrap" style="max-height:560px;overflow:auto"><table id="dtable"></table></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>Search the reports</h2>
+      <p class="small" style="margin:0;max-width:85ch">Full-text search of the public reports and papers behind the cards (PSI final reports, NASA and NTRS papers, NASA's Researcher's Guide) and of every card's findings and data-quality notes. Results show the document and page. Journal papers supplied for this project are not included (copyright); their findings are on the cards.</p>
+      <form id="rsform" style="display:flex;gap:8px;flex-wrap:wrap">
+        <label for="rsq" style="position:absolute;left:-9999px">Search terms</label>
+        <input type="text" id="rsq" style="flex:1;min-width:220px" placeholder="e.g. helium limiting oxygen index, smoke detector particle size, quenching 1 cm/s">
+        <select id="rsinv" aria-label="Limit to investigation"><option value="">All investigations</option></select>
+        <button class="btn primary" type="submit">Search</button>
+      </form>
+      <div class="small muted" id="rsstatus"></div>
+      <ol class="refs" id="rsresults" style="max-height:620px;overflow:auto"></ol>
     </div>
   </section>
 
@@ -902,6 +950,120 @@ function renderFbExport(){
 }
 ["fbmat", "fbpub", "fbpred"].forEach(id => $("#" + id).addEventListener("change", renderBoundary));
 
+/* ---------------- safety evidence ---------------- */
+const EV = B.evidence || {bre:[], loi:[], smoke:[], detector:null};
+const BAR_PER_PSI = 1 / 14.5038;
+const num = v => v === "" || v == null ? null : +v;
+const breKept = r => r.end_condition !== "SE";
+const pGroup = p => p < 0.65 ? "0.57-0.62 bar (8.2-9.0 psi)" : p < 0.9 ? "0.70-0.75 bar (10.2-10.9 psi)" : "1.0-1.06 bar (14.6-15.3 psi)";
+const plotBase = () => ({margin:{l:58, r:16, t:10, b:48}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)", font:{family:"IBM Plex Sans", color:css("--ink"), size:12}, hovermode:"closest", legend:{orientation:"h", y:-0.22, font:{size:11}}});
+const axis = (t, extra = {}) => ({title:{text:t, font:{color:css("--muted")}}, gridcolor:css("--line"), zerolinecolor:css("--line"), color:css("--muted"), ...extra});
+function breNear(o2, psi){
+  const pb = psi * BAR_PER_PSI;
+  return EV.bre.filter(r => Math.abs(+r.o2_before * 100 - o2) <= 3 && +r.p_bar <= pb * 1.3 && +r.p_bar >= pb / 1.3);
+}
+function evDownloads(el, items){
+  el.innerHTML = items.map(([n], k) => `<button class="btn" data-k="${k}" data-a="dl">Download ${n}</button><button class="btn" data-k="${k}" data-a="cp">Copy ${n}</button>`).join("");
+  el.querySelectorAll("button").forEach(b => b.onclick = () => { const it = items[+b.dataset.k]; const t = it[2](); b.dataset.a === "dl" ? saveFile(it[1], t, b) : copy(t, b); });
+}
+function renderEvidence(){
+  if (!EV.bre.length) return;
+  /* prevention: BRE */
+  const near = breNear(S.o2, S.psi), kept = near.filter(breKept).length;
+  const lowKept = EV.bre.filter(breKept).reduce((a, r) => +r.o2_before < +a.o2_before ? r : a, EV.bre.filter(breKept)[0]);
+  const maxSE = EV.bre.filter(r => +r.o2_before < 0.23);
+  $("#evbreread").innerHTML = `
+    <div class="gap ${near.length ? (kept ? "bad" : "ok") : "mid"}"><div class="small muted">Tests near your scenario (±3 O₂ points, ±30% pressure)</div><div class="st">${near.length ? `${kept} of ${near.length} kept burning` : "none"}</div>
+      <div class="small">${near.length ? `At about ${fmt(S.o2)}% O₂ and ${fmt(S.psi * BAR_PER_PSI, 2)} bar. ${kept ? "Some small flames burned until the fuel was cut: a small fire can persist with no ventilation at all." : "All put themselves out."}` : `No BRE test ran near ${fmt(S.o2)}% O₂ and ${fmt(S.psi)} psi.`}</div></div>
+    <div class="gap"><div class="small muted">Lowest O₂ with a flame that kept burning</div><div class="st num">${fmt(+lowKept.o2_before * 100, 1)}%</div>
+      <div class="small">Test ${esc(lowKept.test_id)} at ${fmt(+lowKept.p_bar, 2)} bar (${fmt(+lowKept.p_psi)} psi), a small flame (fuel flow ${esc(lowKept.mass_flux_g_m2s)} g/m²·s).</div></div>
+    <div class="gap ok"><div class="small muted">Below 23% O₂ (all near 1 bar)</div><div class="st">${maxSE.filter(r => !breKept(r)).length} of ${maxSE.length} went out</div>
+      <div class="small">Every BRE flame near normal air put itself out, the longest after 37 s.</div></div>
+    <div class="gap"><div class="small muted">Big flames</div><div class="st">Go out by radiation</div>
+      <div class="small">At 31% O₂ and above, every flame with fuel flow over 5 g/m²·s put itself out and every one under 3 g/m²·s kept burning: large flames lose too much heat as radiation.</div></div>`;
+  const xm = $("#evbrex").value, X = r => xm === "p" ? +r.p_bar : +r.mass_flux_g_m2s;
+  const groups = ["0.57-0.62 bar (8.2-9.0 psi)", "0.70-0.75 bar (10.2-10.9 psi)", "1.0-1.06 bar (14.6-15.3 psi)"], gc = [css("--o2"), css("--accent"), css("--ph-gas")];
+  const traces = [];
+  groups.forEach((g, gi) => [true, false].forEach(k => {
+    const pts = EV.bre.filter(r => pGroup(+r.p_bar) === g && breKept(r) === k); if (!pts.length) return;
+    traces.push({type:"scatter", mode:"markers", name:`${k ? "kept burning" : "self-extinguished"}, ${g}`, x:pts.map(X), y:pts.map(r => +r.o2_before * 100),
+      text:pts.map(r => `<b>${r.test_id}</b> ${r.outcome}<br>O₂ ${fmt(+r.o2_before * 100, 1)}% → ${fmt(+r.o2_after * 100, 1)}% · ${r.p_bar} bar (${r.p_psi} psi)<br>${r.fuel}, fuel flow ${r.mass_flux_g_m2s} g/m²·s<br>flame ${r.flame_height_mm} mm tall · end ${r.end_time_s} s`),
+      hovertemplate:"%{text}<extra></extra>", marker:k ? {symbol:"circle", size:10, color:gc[gi], line:{color:css("--surface"), width:1}} : {symbol:"x-thin", size:10, color:gc[gi], line:{color:gc[gi], width:2}}});
+  }));
+  const sx = xm === "p" ? S.psi * BAR_PER_PSI : null;
+  const shapes = [{type:"line", xref:"paper", x0:0, x1:1, y0:S.o2, y1:S.o2, line:{color:css("--accent"), width:1.5, dash:"dot"}}];
+  if (sx) shapes.push({type:"line", yref:"paper", y0:0, y1:1, x0:sx, x1:sx, line:{color:css("--accent"), width:1.5, dash:"dot"}});
+  Plotly.react("evbre", traces, {...plotBase(), shapes,
+    annotations:[{xref:"paper", x:1, xanchor:"right", y:S.o2, yanchor:"bottom", text:`your O₂ ${fmt(S.o2)}%`, showarrow:false, font:{color:css("--accent"), size:11}}],
+    xaxis:axis(xm === "p" ? "Pressure (bar)" : "Fuel flow, g/m²·s (log; larger = bigger flame)", xm === "p" ? {} : {type:"log", tickvals:[1, 1.5, 2, 3, 5, 7, 10], ticktext:["1", "1.5", "2", "3", "5", "7", "10"]}), yaxis:axis("Oxygen before the test (%)", {range:[16, Math.max(42, Math.min(S.o2 + 3, 101))]})}, {displayModeBar:false, responsive:true});
+  $("#evbrenote").textContent = `Dots: burned until the fuel was shut off (one oscillated). Crosses: put itself out. Colour: test pressure. Source: Dehghani & Quintiere (2023), Combustion and Flame, Table A.1, 83 tests; 25 mm burner with ethylene or ethylene/nitrogen. The paper concludes that oxygen fraction dominated over 0.56-1 bar.`;
+  evDownloads($("#evbredl"), [["BRE ISS tests (CSV)", "firesight_bre_iss_tests.csv", () => toCSV(Object.keys(EV.bre[0]), EV.bre)]]);
+  /* suppression: FLEX LOI */
+  const dil = ["nitrogen (O2/N2 only)", "carbon dioxide", "helium"], dl = ["N₂ only (no suppressant)", "+ CO₂", "+ helium"], dcol = [css("--muted"), css("--accent"), css("--o2")];
+  const fuels = ["methanol", "heptane"];
+  Plotly.react("evloi", dil.map((d, k) => ({type:"bar", name:dl[k], x:fuels, y:fuels.map(f => +EV.loi.find(r => r.fuel === f && r.diluent_added_to_air === d).limiting_o2_pct),
+    marker:{color:dcol[k]}, text:fuels.map(f => EV.loi.find(r => r.fuel === f && r.diluent_added_to_air === d).limiting_o2_pct + "%"), textposition:"outside",
+    hovertext:fuels.map(f => { const r = EV.loi.find(q => q.fuel === f && q.diluent_added_to_air === d); return `${f}, ${dl[k]}: limit ${r.limiting_o2_pct}% O₂<br>${r.atmosphere_at_limit}, ${r.pressure_atm} atm`; }), hovertemplate:"%{hovertext}<extra></extra>"})),
+    {...plotBase(), barmode:"group", xaxis:axis("Droplet fuel"), yaxis:axis("Limiting oxygen (%)", {range:[0, Math.max(24, Math.min(S.o2, 40) + 2)]}),
+     shapes:[{type:"line", xref:"paper", x0:0, x1:1, y0:20.95, y1:20.95, line:{color:css("--muted"), dash:"dash", width:1}}, ...(S.o2 <= 40 ? [{type:"line", xref:"paper", x0:0, x1:1, y0:S.o2, y1:S.o2, line:{color:css("--accent"), dash:"dot", width:1.5}}] : [])],
+     annotations:[{xref:"paper", x:0, xanchor:"left", y:20.95, yanchor:"bottom", text:"Earth air 20.9%", showarrow:false, font:{size:11, color:css("--muted")}}, (S.o2 <= 40 ? {xref:"paper", x:1, xanchor:"right", y:S.o2, yanchor:"bottom", text:`your O₂ ${fmt(S.o2)}%`, showarrow:false, font:{size:11, color:css("--accent")}} : {xref:"paper", x:1, xanchor:"right", yref:"paper", y:1, yanchor:"bottom", text:`your O₂ ${fmt(S.o2)}% is off this scale (above 40%)`, showarrow:false, font:{size:11, color:css("--accent")}})]}, {displayModeBar:false, responsive:true});
+  const lim = d => Math.min(...EV.loi.filter(r => r.diluent_added_to_air === d).map(r => +r.limiting_o2_pct));
+  const lCO2 = lim("carbon dioxide"), lHe = lim("helium"), lN2 = lim("nitrogen (O2/N2 only)"), gap = S.o2 - lCO2;
+  const supCls = S.o2 > lCO2 ? "bad" : S.o2 > lN2 ? "mid" : "ok";
+  const supSt = S.o2 > lCO2 ? `${fmt(gap, 1)} points below your ${fmt(S.o2)}%` : S.o2 > lN2 ? `your ${fmt(S.o2)}% is at or below it` : `your ${fmt(S.o2)}% is below every measured limit`;
+  const supTx = S.o2 > lCO2 ? `With helium the target is also about ${lHe}%; with nitrogen alone, ${lN2}%.`
+    : S.o2 > lN2 ? `But this is not safe by itself: with only nitrogen diluting the air, methanol droplets kept burning down to ${lN2}% O₂.`
+    : `Below the lowest limit measured for these droplets (${lN2}%, methanol with nitrogen). Other fuels and solids were not tested here.`;
+  const pNote = Math.abs(S.psi - 14.7) > 1.5 ? ` These limits were measured at 1 atm (14.7 psi); your ${fmt(S.psi)} psi was not tested, so they may shift.` : " Measured at 1 atm, as in your scenario.";
+  $("#evloitext").innerHTML = `
+    <div class="gap ${supCls}"><div class="small muted">To stop both droplet fuels with CO₂, oxygen must fall below about ${lCO2}%</div><div class="st num">${supSt}</div><div class="small">${supTx}${pNote} Droplet limits only: other materials differ.</div></div>
+    <ul style="margin:0;padding-left:18px;display:grid;gap:4px">
+      <li>CO₂ raised heptane's limit to about 17%, helium only to about 15%: at these mixtures CO₂ was the stronger suppressant for heptane; for methanol both gave about 14%.</li>
+      <li>More CO₂ pushed methanol flames toward radiative extinction, as expected from its strong infrared emission [Nayagam et al. 2011].</li>
+      <li>Large heptane droplets kept burning invisibly as a "cool flame" after the visible flame went out: a fire can look extinguished when it is not [Dietrich et al. 2014].</li>
+      <li>On BASS, at 17% O₂ and under 1 cm/s flow, a nitrogen jet did not put out a burning PMMA sphere; the flame went out only when the air flow was stopped [BASS overview 2013].</li>
+    </ul>
+    <div class="muted">Source: Dietrich et al. (2014), Microgravity Sci. Technol. 26:65-76 (open access); 1 atm; CO₂ mixtures 0.14 O₂/0.56 N₂/0.30 CO₂ (methanol) and 0.17/0.63/0.20 (heptane).</div>`;
+  evDownloads($("#evloidl"), [["FLEX limits (CSV)", "firesight_flex_loi_by_diluent.csv", () => toCSV(Object.keys(EV.loi[0]), EV.loi)]]);
+  /* detection: SAME */
+  const cats = EV.smoke.map(r => `${r.material} ${r.state}`);
+  Plotly.react("evsmoke", [
+    {type:"scatter", mode:"markers", name:"Geometric mean (counts every particle)", x:cats, y:EV.smoke.map(r => +r.geometric_mean_diameter_nm), marker:{size:11, color:css("--o2")}, hovertemplate:"%{x}: %{y} nm geometric mean<extra></extra>"},
+    {type:"scatter", mode:"markers", name:"Diameter of average mass (what light scattering sees most)", x:cats, y:EV.smoke.map(r => +r.diameter_of_average_mass_nm), marker:{size:11, symbol:"diamond", color:css("--accent")}, hovertemplate:"%{x}: %{y} nm, diameter of average mass<extra></extra>"}],
+    {...plotBase(), xaxis:axis("", {tickangle:-30}), yaxis:axis("Particle diameter (nm, log)", {type:"log", range:[Math.log10(50), Math.log10(1500)], tickvals:[50, 100, 200, 300, 500, 1000], ticktext:["50", "100", "200", "300", "500", "1000"]}),
+     shapes:[300, 1000].map((y, k) => ({type:"line", xref:"paper", x0:0, x1:1, y0:y, y1:y, line:{color:k ? css("--good") : css("--bad"), dash:"dash", width:1.2}})),
+     annotations:[{xref:"paper", x:1, xanchor:"right", y:Math.log10(300), yanchor:"bottom", text:"ISS detector: minimum 0.3 µm", showarrow:false, font:{size:11, color:css("--bad")}},
+                  {xref:"paper", x:1, xanchor:"right", y:Math.log10(1000), yanchor:"bottom", text:"most sensitive above 1 µm", showarrow:false, font:{size:11, color:css("--good")}}]}, {displayModeBar:false, responsive:true});
+  const below = EV.smoke.filter(r => +r.diameter_of_average_mass_nm < 300).map(r => `${r.material} ${r.state}`);
+  $("#evsmoketext").innerHTML = `
+    <div class="gap bad"><div class="small muted">Below the ISS detector's 0.3 µm minimum (by diameter of average mass)</div><div class="st">${below.length} of ${EV.smoke.length}</div><div class="small">${esc(below.join(", "))}. None of the eight reached 1 µm, where the detector is most sensitive.</div></div>
+    ${Math.abs(S.o2 - 21) > 1.5 || Math.abs(S.psi - 14.7) > 1.5 ? `<div class="qnote">These sizes were measured only in ISS cabin air (about 21% O₂, 14.7 psi). No smoke-size data exist for your ${fmt(S.o2)}% O₂ and ${fmt(S.psi)} psi, so treat them as a reference, not a prediction for your habitat.</div>` : `<div class="small muted">Measured in ISS cabin air (about 21% O₂, 14.7 psi), close to your scenario.</div>`}
+    <ul style="margin:0;padding-left:18px;display:grid;gap:4px">
+      <li>Kapton and Teflon smoke is very small, so light-scattering detectors will struggle; lamp wick and silicone make larger particles. The report concludes a detector must measure more than one moment of the size distribution [SAME Final Report, p. 27].</li>
+      <li>Aging (smoke drifting from a closed space) grows particles: Kapton's mass-weighted size rose from 179 to 267 nm.</li>
+      <li>SAME-R flew a two-moment detector (MPASS) that can reject dust, important with lunar dust [SAME-R card].</li>
+      <li>Flames are sootier in microgravity: SLICE methane flames had about 4-8 times the peak soot of the same flames on Earth, and CLD flames several times more [Ma et al. 2014; Stocker 2022].</li>
+      <li>Cool flames give off little light or heat, a detection gap for liquid-fuel fires [CFI card].</li>
+      <li>The ISS cabin was very clean of background particles, which helps detectors separate smoke from background [Urban et al. 2007].</li>
+    </ul>
+    <div class="muted">Sources: SAME Final Science Report (PSI-102), Table 1; ISS detector limits from Urban et al. (2007), NTRS 20070031686.</div>`;
+  evDownloads($("#evsmokedl"), [["SAME particle sizes (CSV)", "firesight_same_particle_sizes.csv", () => toCSV(Object.keys(EV.smoke[0]), EV.smoke)]]);
+}
+$("#evbrex").addEventListener("change", renderEvidence);
+
+/* ---------------- visible report search ---------------- */
+fillSelect($("#rsinv"), INV.map(i => [i.id, `${i.acr} (${i.id})`]));
+$("#rsform").addEventListener("submit", async e => {
+  e.preventDefault(); const q = $("#rsq").value.trim(); if (!q) return;
+  $("#rsstatus").textContent = "Searching…"; $("#rsresults").innerHTML = "";
+  const r = await searchReports({query:q, psi_id:$("#rsinv").value || undefined, max_results:8});
+  if (r.error) { $("#rsstatus").textContent = r.error; return; }
+  const words = [...new Set(toks(q))].filter(w => w.length > 2).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const hl = t => { let h = esc(t); if (words.length) h = h.replace(new RegExp(`\\b(${words.join("|")})`, "gi"), "<mark>$1</mark>"); return h; };
+  $("#rsstatus").textContent = r.results.length ? `${r.results.length} best passages${r.filtered_to !== "all documents" ? " in " + (BYID[r.filtered_to]?.acr || r.filtered_to) : ""}.` : "No matching passages.";
+  $("#rsresults").innerHTML = r.results.map(h => `<li><div><b>${esc(h.cite)}</b> <a href="${esc(h.url)}">${esc(h.document)}</a> <span class="muted">${esc(h.investigations.join(", "))}</span></div><div class="used">${hl(h.text)}</div></li>`).join("");
+});
+
 /* ---------------- data table + export ---------------- */
 function fillSelect(sel, vals){ sel.insertAdjacentHTML("beforeend", vals.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join("")); }
 fillSelect($("#dinv"), INV.filter(i => i.ntests).map(i => [i.id, `${i.acr} (${i.id})`]));
@@ -1079,9 +1241,19 @@ const TOOLS = [
   {name:"search_reports", description:"Full-text search of the report files and papers behind the investigation cards (PSI final reports, NASA reports and NTRS papers, NASA Researcher's Guide), plus every card's findings and data-quality notes. Use it for what a report says: methods, explanations, findings, conditions not in the tables. Returns passages with document title and page number.",
    inputSchema:{type:"object", properties:{query:{type:"string", description:"keywords, e.g. 'helium limiting oxygen index heptane'"}, psi_id:{type:"string", description:"optional: limit to one investigation (PSI-69 or FLEX)"}, max_results:{type:"number"}}, required:["query"]},
    execute:(q) => searchReports(q)},
+  {name:"safety_evidence", description:"Measured fire-safety datasets from the papers: 'bre' = 83 ACME BRE ISS tests (O2, pressure, fuel flow, kept burning or self-extinguished), filtered near a given O2/pressure; 'suppressant' = FLEX limiting oxygen by diluent (N2, CO2, helium); 'smoke' = SAME smoke particle sizes by material vs ISS detector limits.",
+   inputSchema:{type:"object", properties:{topic:{type:"string", enum:["bre", "suppressant", "smoke"]}, o2_pct:{type:"number", description:"only for topic bre"}, psi:{type:"number", description:"only for topic bre"}}, required:["topic"]},
+   execute:({topic, o2_pct, psi}) => {
+     if (topic === "suppressant") return {source:"Dietrich et al. 2014, Microgravity Sci. Technol. 26:65-76 (FLEX, ISS, 1 atm)", cite:"[Dietrich et al. 2014]", test_conditions:"Free-floating droplets in the ISS Combustion Integrated Rack, quiescent, 1 atm, CO2 or helium dispersed into air. These are limits for droplets, not for your scenario atmosphere.", rows:EV.loi, note:"A suppressant must bring O2 below the limit: with CO2 about 14% (methanol) and 17% (heptane); with helium about 14% and 15%; nitrogen only 12% and 15%."};
+     if (topic === "smoke") return {source:"SAME Final Science Report (PSI-102) Table 1; ISS detector limits from Urban et al. 2007 (NTRS 20070031686)", cite:"[SAME Final Report, p. 27] for particle sizes", test_conditions:"Materials heated short of ignition in ISS cabin air (about 21% O2, 1 atm) inside the Microgravity Science Glovebox. Not measured at other oxygen levels or pressures.", rows:EV.smoke, detector:{minimum_reported_sensitivity_um:0.3, most_sensitive_above_um:1.0, cite:"[Urban et al. 2007]"}};
+     const O = o2_pct ?? S.o2, P = psi ?? S.psi, near = breNear(O, P);
+     return {source:"Dehghani & Quintiere 2023, Combustion and Flame, Table A.1 (ACME BRE, 25 mm burner, ISS)", cite:"[Dehghani & Quintiere 2023, Table A.1]", scenario:{o2_pct:O, psi:P, bar:+(P * BAR_PER_PSI).toFixed(3)}, window:"O2 within 3 points, pressure within 30%",
+       near_tests:{count:near.length, kept_burning:near.filter(breKept).length, self_extinguished:near.filter(r => !breKept(r)).length, rows:near.slice(0, 25).map(r => ({test:r.test_id, o2_pct:+(r.o2_before * 100).toFixed(1), p_bar:+r.p_bar, fuel_flow_g_m2s:+r.mass_flux_g_m2s, outcome:r.outcome}))},
+       all_tests:{count:EV.bre.length, kept_burning:EV.bre.filter(breKept).length, lowest_o2_kept_burning_pct:25.1, below_23pct_o2:"all 10 self-extinguished (near 1 bar)"},
+       caveat:"Oxygen and pressure were not varied independently; the paper concludes oxygen fraction dominated over 0.56-1 bar. Large flames (high fuel flow) self-extinguish by radiation."}; }},
   {name:"quality_issues", description:"Data-quality log entries, optionally for one investigation.", inputSchema:{type:"object", properties:{psi_id:{type:"string"}}},
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
-const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Investigation IDs: ${"${IDS}"}. To compare groups of tests (diluents, fuels, materials, outcomes), call summarize_tests with group_by and the right psi_id. For an investigation's headline results, call get_investigation first. For what a report or paper says (explanations, methods, details), call search_reports and copy its cite field. Passages marked "other" often summarize earlier studies: present a number as this investigation's own result only if the passage says so. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. Copy numbers exactly as the tools return them; never compute, round into new ranges, or invent uncertainty values. If a tool result has a summary field, take its numbers from there. Mention at most the two caveats that matter most for the question. Never state a result or ranking (which is better, more effective, more flammable) unless a tool returned it; you may add general physics to explain why, but start that sentence with "In general,". Use row numbers only for rows returned by query_tests; cite grouped summaries as [PSI-xx]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
+const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Investigation IDs: ${"${IDS}"}. To compare groups of tests (diluents, fuels, materials, outcomes), call summarize_tests with group_by and the right psi_id. For BRE burning at a given O2/pressure, suppressant limits, or smoke particle sizes, call safety_evidence. For an investigation's headline results, call get_investigation first. For what a report or paper says (explanations, methods, details), call search_reports and copy its cite field. Passages marked "other" often summarize earlier studies: present a number as this investigation's own result only if the passage says so. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. Copy numbers exactly as the tools return them; never compute, round into new ranges, or invent uncertainty values. If a tool result has a summary field, take its numbers from there. Mention at most the two caveats that matter most for the question, and only caveats or data-quality notes that a tool returned. Never describe test conditions from the user's scenario; use the conditions the tool reports. Never state a result or ranking (which is better, more effective, more flammable) unless a tool returned it; you may add general physics to explain why, but start that sentence with "In general,". Use row numbers only for rows returned by query_tests; cite grouped summaries as [PSI-xx]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
 function addMsg(role, text){ const d = document.createElement("div"); d.className = "msg " + (role === "user" ? "u" : "a"); d.textContent = text; $("#msgs").appendChild(d); $("#msgs").scrollTop = 1e9; return d; }
 // Gemini generateContent call through the FireSight proxy (it holds the API key).
 async function callGemini(body){
@@ -1122,7 +1294,7 @@ async function runAgent(system, history, onStep){
   }
   return "I needed too many lookups for this question. Try asking something narrower.";
 }
-const TOOL_LABEL = {search_reports:"searching the reports", summarize_tests:"summarizing test groups", flammability_boundary:"reading the flammability boundary", list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
+const TOOL_LABEL = {safety_evidence:"reading the safety evidence data", search_reports:"searching the reports", summarize_tests:"summarizing test groups", flammability_boundary:"reading the flammability boundary", list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
 $("#askform").addEventListener("submit", async e => {
   e.preventDefault(); const q = $("#askq").value.trim(); if (!q) return;
   const route = aiRoute();
@@ -1197,7 +1369,7 @@ function renderStamp(){
   const nq = B.quality.reduce((a, q) => a + +q.count, 0);
   $("#stamp").innerHTML = `<span class="pill"><b>${INV.length}</b> investigations</span><span class="pill"><b>${ROWS.length.toLocaleString()}</b> test rows</span><span class="pill"><b>${nq}</b> data fixes &amp; flags</span><span class="pill">PSI snapshot <b>${B.built}</b></span>`;
 }
-const VIEWS = ["explore", "compare", "gaps", "boundary", "data", "quality", "incidents", "ask", "method"];
+const VIEWS = ["explore", "compare", "gaps", "boundary", "evidence", "data", "quality", "incidents", "ask", "method"];
 function route(){
   const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "explore";
   VIEWS.forEach(x => $("#v-" + x).classList.toggle("on", x === v));
@@ -1207,6 +1379,7 @@ function route(){
   if (v === "compare") renderCompare();
   if (v === "gaps") renderGaps();
   if (v === "boundary") renderBoundary();
+  if (v === "evidence") renderEvidence();
   if (v === "data") renderData();
   if (v === "quality") renderQuality();
 }

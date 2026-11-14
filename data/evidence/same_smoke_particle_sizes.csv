@@ -1,0 +1,9 @@
+material,state,geometric_mean_diameter_nm,arithmetic_mean_diameter_nm,diameter_of_average_mass_nm,geometric_std_dev,source
+Kapton,fresh,80,105,179,2.08,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Kapton,aged,155,186,267,1.82,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Lamp wick,fresh,186,227,341,1.89,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Lamp wick,aged,258,308,438,1.81,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Silicone,fresh,189,257,472,2.18,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Silicone,aged,352,422,606,1.83,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Teflon,fresh,170,205,297,1.84,"SAME Final Science Report (PSI-102), Table 1, p. 27"
+Teflon,aged,228,273,392,1.82,"SAME Final Science Report (PSI-102), Table 1, p. 27"

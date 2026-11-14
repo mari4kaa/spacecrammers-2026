@@ -60,9 +60,15 @@ for t in tests:
 fbp = D / "boundary" / "flammability_boundary.json"
 boundary = json.load(open(fbp)) if fbp.exists() else None
 
+def _csv(n):
+    f = D / "evidence" / n
+    return list(csv.DictReader(open(f))) if f.exists() else []
+evidence = {"bre": _csv("bre_iss_tests.csv"), "loi": _csv("flex_loi_by_diluent.csv"), "smoke": _csv("same_smoke_particle_sizes.csv"),
+            "detector": {"min_um": 0.3, "best_above_um": 1.0, "src": "ntrs-detector-2007"}}
+
 bundle = {"built": "2026-11-14", "about": cur["_about"], "sources": cur["sources"], "inv": inv, "cols": cols, "rows": rows,
           "quality": qlog, "incidents": cur["incidents"], "spinoffs": cur["spinoffs"], "gaps_external": cur["gaps_external"], "boundary": boundary,
-          "families": cur.get("families", {}), "shared_links": cur.get("shared_links", []), "references": cur.get("references", [])}
+          "families": cur.get("families", {}), "shared_links": cur.get("shared_links", []), "references": cur.get("references", []), "evidence": evidence}
 s = json.dumps(bundle, separators=(",", ":"), ensure_ascii=False)
 OUT.write_text(s)
 print("bundle KB", len(s) // 1024, "inv", len(inv), "rows", len(rows), "quality", len(qlog))

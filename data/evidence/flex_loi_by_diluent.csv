@@ -1,0 +1,7 @@
+fuel,diluent_added_to_air,limiting_o2_pct,atmosphere_at_limit,pressure_atm,source
+methanol,nitrogen (O2/N2 only),12,O2/N2,1.0,"Dietrich et al. 2014, Microgravity Sci. Technol. 26:65-76, abstract"
+methanol,carbon dioxide,14,0.14 O2 / 0.56 N2 / 0.30 CO2,1.0,"Dietrich et al. 2014, abstract"
+methanol,helium,14,helium dispersed into air,1.0,"Dietrich et al. 2014, abstract"
+heptane,nitrogen (O2/N2 only),15,O2/N2,1.0,"Dietrich et al. 2014, abstract"
+heptane,carbon dioxide,17,0.17 O2 / 0.63 N2 / 0.20 CO2,1.0,"Dietrich et al. 2014, abstract"
+heptane,helium,15,helium dispersed into air,1.0,"Dietrich et al. 2014, abstract"

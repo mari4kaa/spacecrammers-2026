@@ -30,7 +30,9 @@
   "liu2016": "Liu, Xu, Hicks, Avedisian, Comprehensive study of initial diameter effects ... n-heptane, n-octane, and n-decane, Combust. Flame 171 (2016) 27-41",
   "xu2017": "Xu, Hicks, Avedisian, The combustion of iso-octane droplets with initial diameters from 0.5 to 5 mm, Proc. Combust. Inst. 36 (2017) 2541-2548",
   "xu2020": "Xu, Farouk, Hicks, Avedisian, Initial diameter effects on combustion of unsupported equi-volume n-heptane/iso-octane mixture droplets, Combust. Flame 220 (2020) 82-91",
-  "dehghani2023": "Dehghani, Quintiere, Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient, Combust. Flame (2023), accepted manuscript"
+  "dehghani2023": "Dehghani, Quintiere, Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient, Combust. Flame (2023), accepted manuscript",
+  "rpt-bass-fabric": "PSI-26 file: Ferkul, Olson, Johnston, T'ien, Flammability Aspects of Fabric in Opposed and Concurrent Air Flow in Microgravity, 8th U.S. National Combustion Meeting (2013)",
+  "ntrs-detector-2007": "Urban et al., Particle and Smoke Detection on ISS for Next Generation Smoke Detectors (2007), NTRS 20070031686"
  },
  "inv": {
   "PSI-26": {
@@ -53,8 +55,16 @@
      "src": "rpt-bass-ovw"
     },
     {
-     "t": "Thin fabric in concurrent flow: spread rate rose roughly linearly with flow; quenching extinction near 1 cm/s. In opposed flow, spread was fastest at an intermediate flow speed.",
-     "src": "rpt-bass-ovw"
+     "t": "In normal-gravity air this cotton-fiberglass fabric self-extinguishes when the flame must spread downward against the flow, but in microgravity it spread steadily in opposed flow, fastest at about 10-15 cm/s: enhanced flammability in space.",
+     "src": "rpt-bass-fabric"
+    },
+    {
+     "t": "At 10 cm/s the flame spreading with the air flow (concurrent) moved 2.55 mm/s, twice the 1.21 mm/s of the flame spreading against it. Flames reached a steady length only below 10 cm/s, and concurrent flames went out (quenching) only when the flow dropped below about 1 cm/s.",
+     "src": "rpt-bass-fabric"
+    },
+    {
+     "t": "Compared side by side, the normal-gravity concurrent flame was much longer and sootier and was still accelerating, while the microgravity flame nearly reached a steady state.",
+     "src": "rpt-bass-fabric"
     },
     {
      "t": "At 17% O2 and under 1 cm/s flow, a nitrogen jet failed to put out a burning 15-mm PMMA sphere; the flame went out only when the airflow was stopped. In a separate test in air, a 500 cc/min nitrogen jet weakened but did not extinguish a burning PMMA sphere.",
@@ -1042,7 +1052,7 @@
   {
    "group": "Investigation cards (outside PSI)",
    "cite": "Dietrich, D.L.; Nayagam, V.; Hicks, M.C.; Ferkul, P.V.; Dryer, F.L.; Farouk, T.; Shaw, B.D.; Suh, H.K.; Choi, M.Y.; Liu, Y.C.; Avedisian, C.T.; Williams, F.A.: Droplet Combustion Experiments Aboard the International Space Station. Microgravity Science and Technology 26 (2014) 65-76. Open access (CC BY 4.0).",
-   "used": "FLEX limiting oxygen index with nitrogen, CO2 and helium (FLEX card).",
+   "used": "FLEX limiting oxygen index with nitrogen, CO2 and helium (FLEX card). Also the suppressant chart on the Safety evidence tab (data/evidence/flex_loi_by_diluent.csv).",
    "links": [
     [
      "Springer (open access)",
@@ -1186,11 +1196,33 @@
   {
    "group": "Investigation cards (outside PSI)",
    "cite": "Dehghani, P.; Quintiere, J.G.: Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient. Combustion and Flame (2023), article S0010218023001803. Accepted manuscript under the Elsevier user license.",
-   "used": "ACME BRE ISS results: O2 versus pressure effect, flammability window, critical flame temperature, external-radiation effect. Copy supplied by the project owner; not in the public report-search file.",
+   "used": "ACME BRE ISS results: O2 versus pressure effect, flammability window, critical flame temperature, external-radiation effect. Copy supplied by the project owner; not in the public report-search file. Its Table A.1 (83 ISS tests) is the BRE flammability map on the Safety evidence tab (data/evidence/bre_iss_tests.csv).",
    "links": [
     [
      "Version of record",
      "https://www.sciencedirect.com/science/article/pii/S0010218023001803"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Ferkul, P.V.; Olson, S.L.; Johnston, M.C.; T'ien, J.S.: Flammability Aspects of Fabric in Opposed and Concurrent Air Flow in Microgravity. 8th U.S. National Combustion Meeting, 2013 (file in PSI-26).",
+   "used": "BASS fabric findings (opposed vs concurrent spread, 1 g comparison, quenching near 1 cm/s) and the report search.",
+   "links": [
+    [
+     "PSI-26 investigation",
+     "https://psi.nasa.gov/physci/repo/data/investigations/PSI-26"
+    ]
+   ]
+  },
+  {
+   "group": "Safety evidence tab",
+   "cite": "Urban, D.L.; Ruff, G.; Yuan, Z.; Sheredy, W.; Funk, G.: Particle and Smoke Detection on ISS for Next Generation Smoke Detectors. Presentation, International Space Development Conference, 2007.",
+   "used": "ISS smoke detector reference lines on the smoke particle chart: most sensitive to particles above 1 um, minimum reported sensitivity 0.3 um.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20070031686"
     ]
    ]
   }
