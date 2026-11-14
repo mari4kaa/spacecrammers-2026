@@ -16,7 +16,8 @@
   "rpt-cfig": "PSI-159 file: ACME CFI-G Final Report (2022)",
   "rpt-sflame": "PSI-23 file: s-Flame Final Report (2021)",
   "rpt-cfi": "PSI-39 file: CFI Science Final Report",
-  "rpt-115": "PSI-115 file: Final Report NNX17AF08A (smoke simulation)"
+  "rpt-115": "PSI-115 file: Final Report NNX17AF08A (smoke simulation)",
+  "ext-hirsch": "Hirsch, D., et al. (2003), ASTM STP1454, pp. 21-26: 1-g upward flame-spread limit for PMMA, as cited in the BASS-II Summary Report (ref. 23, ch. 6)"
  },
  "inv": {
   "PSI-26": {
@@ -729,14 +730,14 @@
   {
    "year": 2026,
    "name": "Artemis II",
-   "what": "A smoke detector alarm on Orion near the end of the lunar flyby mission. The commander called it a tense moment.",
+   "what": "A smoke detector tripped on Orion on the second-to-last day of the lunar flyby mission, with the crew still about 80,000 miles from home.",
    "lessons": "Detection reliability and false-alarm handling matter in deep space.",
    "links": [
     "PSI-102",
     "PSI-101",
     "PSI-47"
    ],
-   "src": "https://newswav.com/article/artemis-ii-astronaut-describes-tense-moment-inside-spaceship-A2604_NXmh6Y"
+   "src": "https://aerospaceamerica.aiaa.org/artemis-ii-astronauts-praise-orion-capsule-reflect-on-mission-impact/"
   }
  ],
  "spinoffs": [
@@ -831,6 +832,118 @@
     "PSI-39"
    ],
    "note": "Three droplet investigations with the same apparatus; CFI followed up the cool flames FLEX discovered."
+  }
+ ],
+ "references": [
+  {
+   "group": "Flammability boundary",
+   "cite": "Olson, S.L.; Ferkul, P.V.; Bhattacharjee, S.; Miller, F.J.; Fernandez-Pello, C.; Link, S.; T'ien, J.S.; Wichman, I.: Burning and Suppression of Solids-II (BASS-II) Summary Report. NASA/TM-20210011385, NASA Glenn Research Center, October 2021.",
+   "used": "All boundary data. PMMA rods: Figure 6.10 (digitized, every marker checked by eye) and the report's fitted equation, Eq. 6.1 (shown as a dashed line). Cotton-fiberglass (SIBAL) fabric: Table 7.1. Thin PMMA sheet: Table 2.1. Test conditions and caveats: chapters 2, 6 and 7. Read from the copy in PSI investigation PSI-25.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20210011385"
+    ],
+    [
+     "PSI-25 investigation",
+     "https://psi.nasa.gov/physci/repo/data/investigations/PSI-25"
+    ],
+    [
+     "DOI 10.60555/4qc4-de67",
+     "https://doi.org/10.60555/4qc4-de67"
+    ]
+   ]
+  },
+  {
+   "group": "Flammability boundary",
+   "cite": "Hirsch, D., et al.: Issues Related to the Flammability Assessment of Polymers for Hazard Analyses of Oxygen Systems. In Flammability and Sensitivity of Materials in Oxygen-Enriched Atmospheres, 10th Vol., ASTM STP1454, 2003, pp. 21-26.",
+   "used": "Only the 15.4% O2 normal-gravity upward flame-spread limit for PMMA (with an extra 4 cm/s forced flow), taken as quoted in the BASS-II report (ref. 23 of chapter 6). The paper itself was not read.",
+   "links": []
+  },
+  {
+   "group": "Flammability boundary",
+   "cite": "FireSight: digitized points, fitting script and method notes (this project).",
+   "used": "How the points were captured and checked, the refit (same equation form as the report, 3,000 bootstrap resamples, 90% bands, leave-one-out check) and all results.",
+   "links": [
+    [
+     "Method notes (README)",
+     "https://github.com/mari4kaa/spacecrammers-2026/blob/main/data/boundary/README.md"
+    ],
+    [
+     "Points (CSV)",
+     "https://github.com/mari4kaa/spacecrammers-2026/blob/main/data/boundary/bass2_boundary_points.csv"
+    ],
+    [
+     "Fitting script",
+     "https://github.com/mari4kaa/spacecrammers-2026/blob/main/scripts/flammability_boundary.py"
+    ]
+   ]
+  },
+  {
+   "group": "Data and summaries",
+   "cite": "NASA Physical Sciences Informatics (PSI) repository, psi.nasa.gov. Data licensed CC0; each investigation is cited by its DOI on its card.",
+   "used": "Investigation metadata, 19 experiment tables (1,958 cleaned rows) and the report files listed below.",
+   "links": [
+    [
+     "PSI repository",
+     "https://psi.nasa.gov/physci/repo/search?q=combustion"
+    ]
+   ]
+  },
+  {
+   "group": "Data and summaries",
+   "cite": "NASA: A Researcher's Guide to International Space Station Combustion Science (NP-2015-10-034-JSC), 2015.",
+   "used": "Background physics and some findings marked [NASA, A Researcher's Guide ...] on the cards.",
+   "links": [
+    [
+     "PDF",
+     "https://www.nasa.gov/wp-content/uploads/2016/05/np-2015-10-034-jsc_combustion_in_reduced_gravity-iss-mini-book-011116-508.pdf"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Sheredy, W.A.: Fundamental Research Applied To Enable Hardware Performance in Microgravity. NASA Glenn Research and Technology 2004 (published 2005). NTRS 20050215648.",
+   "used": "Confirms DAFT was flown to check the P-Trak particle counter, a key SAME instrument, in microgravity (DAFT card objective, shared-instrument link).",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20050215648"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Smoking Out Space Fires. NASA story republished by phys.org, 29 September 2006.",
+   "used": "Confirms DAFT was run by the crew (Jeff Williams, Expedition 13) on the ISS, used to move DAFT into its own hardware group (hand-held counters in the ISS cabin). The DAFT 30-Day Post-Flight Report in PSI-47 says the same.",
+   "links": [
+    [
+     "Article (PDF)",
+     "https://phys.org/news/2006-09-space.pdf"
+    ]
+   ]
+  },
+  {
+   "group": "Background (read during planning, not cited on the page)",
+   "cite": "NASA Glenn: Combustion Science (Physical Sciences program page).",
+   "used": "Overview of current and upcoming combustion investigations (FM2, SoFIE, FLARE) while planning. The page cites the NTRS papers for these instead.",
+   "links": [
+    [
+     "NASA page",
+     "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/"
+    ]
+   ]
+  },
+  {
+   "group": "Background (read during planning, not cited on the page)",
+   "cite": "The power of studying combustion on the ISS. NASA ScienceCasts text, republished by phys.org, March 2018.",
+   "used": "General overview of ACME, FLEX and SoFIE, read in place of the YouTube video (blocked). Nothing on the page depends on it.",
+   "links": [
+    [
+     "Article",
+     "https://phys.org/news/2018-03-power-combustion-iss.amp"
+    ]
+   ]
   }
  ]
 }

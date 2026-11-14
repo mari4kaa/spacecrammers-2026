@@ -119,6 +119,7 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
 .msg{padding:10px 12px;border-radius:9px;max-width:80ch;white-space:pre-wrap}
 .msg.u{background:var(--o2-soft);justify-self:end}
 .msg.a{background:var(--chip)}
+.refs{margin:0;padding-left:20px;display:grid;gap:8px}.refs li .used{color:var(--muted)}
 .msg .lvl{display:block;margin-top:6px;font-size:11.5px;color:var(--muted);white-space:normal}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:var(--surface);color:var(--ink);padding:5px 12px;font-size:13px}
@@ -262,7 +263,7 @@ body{padding-bottom:90px}
           <option value="pmma_rod">PMMA rods, stagnation flow (Olson): fitted model</option>
           <option value="sibal_22">Cotton-fiberglass fabric (SIBAL), concurrent flow (T'ien)</option>
           <option value="pmma_thin">Thin PMMA sheet, opposed flow (Bhattacharjee)</option></select></label></div>
-      <p class="small" style="margin:0;max-width:95ch">Below the boundary a flame cannot survive; above it the material keeps burning. The curve is the lowest oxygen level at which a burning sample stays lit, as a function of how fast air moves past it. Data: BASS-II on the ISS (PSI-25), about 1 atm. Air speed sets the scenario value; change it in the bar above.</p>
+      <p class="small" style="margin:0;max-width:95ch">Below the boundary a flame cannot survive; above it the material keeps burning. The curve is the lowest oxygen level at which a burning sample stays lit, as a function of how fast air moves past it. Data: BASS-II on the ISS (PSI-25), about 1 atm, from the BASS-II Summary Report (NASA/TM-20210011385, 2021); see Sources below. Air speed sets the scenario value; change it in the bar above.</p>
       <div class="gapgrid" id="fbreadout"></div>
       <div class="maptools" id="fbtoggles"><label><input type="checkbox" id="fbpub" checked> Show the report's own equation</label><label><input type="checkbox" id="fbpred" checked> Show 90% prediction band</label></div>
       <div id="fbchart" style="width:100%;height:500px" role="img" aria-label="Flammability boundary: oxygen percentage versus air speed, with test outcomes"></div>
@@ -276,6 +277,10 @@ body{padding-bottom:90px}
       <h2>Boundary data points</h2>
       <div class="chips" id="fbexport"></div>
       <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="fbtable"></table></div>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h2>Sources</h2>
+      <ol class="small refs" id="fbrefs"></ol>
     </div>
   </section>
 
@@ -351,6 +356,10 @@ body{padding-bottom:90px}
         <h2>Where the data comes from</h2>
         <div class="small" id="methoddata"></div>
       </div>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h2>Sources</h2>
+      <div class="small" id="methodrefs"></div>
     </div>
     <div class="panel" style="display:grid;gap:8px">
       <h2>Roadmap</h2>
@@ -1112,6 +1121,18 @@ $("#askform").addEventListener("submit", async e => {
 });
 
 /* ---------------- method ---------------- */
+function refItem(r){ return `<li><div>${esc(r.cite)}</div><div class="used">Used for: ${esc(r.used)}</div>${r.links.length ? `<div>${r.links.map(([t, u]) => `<a href="${esc(u)}">${esc(t)}</a>`).join(" · ")}</div>` : ""}</li>`; }
+function renderRefs(){
+  const R = B.references || [];
+  $("#fbrefs").innerHTML = R.filter(r => r.group === "Flammability boundary").map(refItem).join("");
+  const groups = [...new Set(R.map(r => r.group))];
+  const rpts = Object.entries(B.sources).filter(([k]) => /^rpt-/.test(k)).map(([, v]) => `<li>${esc(v)}</li>`).join("");
+  const link = x => `<li>${esc(x.name || x.year + " " + x.name)}: <a href="${esc(x.src)}">${esc(x.src.replace(/^https?:\/\//, "").split("/")[0])}</a></li>`;
+  $("#methodrefs").innerHTML = groups.map(g => `<h3 style="margin:6px 0 4px">${esc(g)}</h3><ol class="refs">${R.filter(r => r.group === g).map(refItem).join("")}</ol>`).join("") +
+    `<h3 style="margin:10px 0 4px">PSI report files read for the cards (open them from each investigation's PSI page)</h3><ul class="refs">${rpts}</ul>` +
+    `<h3 style="margin:10px 0 4px">Outside PSI (partial gravity and upcoming work)</h3><ul class="refs">${B.gaps_external.map(link).join("")}</ul>` +
+    `<h3 style="margin:10px 0 4px">Incidents and Earth benefits</h3><ul class="refs">${[...B.incidents, ...B.spinoffs].map(x => `<li>${esc(x.year ? x.year + " · " : "")}${esc(x.name)}: <a href="${esc(x.src)}">${esc(x.src.replace(/^https?:\/\//, "").split("/")[0])}</a></li>`).join("")}</ul>`;
+}
 function renderMethod(){
   $("#methodscore").innerHTML = `<p style="margin-top:0">Each investigation gets seven sub-scores from 0 to 1, multiplied by the weights you set (default shown) and scaled to 100. Numbers are computed in your browser from the data; only the wording of summaries was written by AI.</p>
   <table><thead><tr><th>Part</th><th class="n">Weight</th><th>How it is computed</th></tr></thead><tbody>
@@ -1128,7 +1149,7 @@ function renderMethod(){
   <li>${nq} row-level issues were found and logged (see Data quality).</li>
   <li>Findings come from 13 PSI report files read for this build, plus NASA's 2015 Researcher's Guide. Every finding was fact-checked against its cited passage or recomputed from the PSI table on 2026-11-14. Some PSI document links are broken and are listed as quality issues.</li>
   <li>${esc(B.about)}</li>
-  <li>Flammability boundary: 74 points from the BASS-II report (Figure 6.10 digitized at 400 dpi and checked marker by marker; Tables 7.1 and 2.1 copied). PMMA-rod boundary refitted with 3,000 bootstrap resamples and checked against the report's own equation.</li>
+  <li>Flammability boundary: 74 points from the BASS-II Summary Report, NASA/TM-20210011385 (Figure 6.10 digitized at 400 dpi and checked marker by marker; Tables 7.1 and 2.1 copied). PMMA-rod boundary refitted with 3,000 bootstrap resamples and checked against the report's own equation.</li>
   <li>Cite PSI datasets by DOI, as PSI requires. Each investigation card links its DOI.</li></ul>`;
   $("#roadmap").innerHTML = [
     "Add findings from NASA NTRS papers for FLEX, FLEX-2, E-FIELD and BRE, which have no reports in PSI.",
@@ -1158,7 +1179,7 @@ function route(){
 window.addEventListener("hashchange", route);
 function update(){ save(); renderPresets(); renderReadout(); renderRank(); route(); }
 
-syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderFbExport(); renderMethod(); update();
+syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderFbExport(); renderMethod(); renderRefs(); update();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { renderMap(); if (location.hash === "#boundary") renderBoundary(); });
 new MutationObserver(() => { renderMap(); if (location.hash === "#boundary") renderBoundary(); }).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
 
