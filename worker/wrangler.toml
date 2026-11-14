@@ -1,14 +1,22 @@
 name = "firesight-ai"
 main = "src/index.js"
 compatibility_date = "2025-06-01"
+# Serve at https://firesight-ai.spacecrammers.workers.dev (the address the site uses).
+workers_dev = true
+# No extra per-version preview addresses: one public address is enough.
+preview_urls = false
 
 [vars]
 # Sites allowed to call this proxy (comma-separated, no trailing slash).
 ALLOWED_ORIGINS = "https://mari4kaa.github.io,http://localhost:8000"
-MODEL = "claude-haiku-5-5"
-MAX_TOKENS = "1200"
+# Gemini models. Both have a free tier with separate quotas; if MODEL hits its limit (429),
+# the proxy retries once with FALLBACK_MODEL. Set FALLBACK_MODEL = "" to turn that off.
+MODEL = "gemini-3.5-flash-lite"
+FALLBACK_MODEL = "gemini-3.1-flash-lite"
+MAX_OUTPUT_TOKENS = "2048"
 RATE_PER_MINUTE = "12"
 
-# The API key is NOT stored here. Set it once with:
-#   npx wrangler secret put ANTHROPIC_API_KEY
-# For local testing put ANTHROPIC_API_KEY=... in worker/.dev.vars (git-ignored).
+# The API key is NOT stored here. Put it in worker/.env (git-ignored):
+#   GEMINI_API_KEY=your-key
+# then upload it to Cloudflare as an encrypted secret with:  npm run set-key
+# `npm run dev` reads worker/.env automatically for local testing.

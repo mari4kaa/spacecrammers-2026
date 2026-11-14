@@ -266,13 +266,13 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
   <section class="view" id="v-ask">
     <div class="panel chat">
       <h2>Ask the data</h2>
-      <p class="small" style="margin:0;max-width:80ch">Answers come from Claude, using only this dashboard's PSI data through lookup tools, and cite investigation IDs and table rows.</p>
+      <p class="small" style="margin:0;max-width:80ch">Answers come from an AI model (Gemini on the public site) that may only use this dashboard's PSI data through lookup tools, and cite investigation IDs and table rows.</p>
       <div class="small" id="aistatus" role="status"></div>
-      <details id="keybox"><summary>Use my own Anthropic API key</summary>
+      <details id="keybox"><summary>Use my own Gemini API key</summary>
         <div style="display:grid;gap:6px;margin-top:8px;max-width:70ch" class="small">
-          <span class="muted">Optional. The key stays in this browser tab only (session storage) and is sent straight to api.anthropic.com, never to this site. Use a key with a spending limit.</span>
+          <span class="muted">Optional. The key stays in this browser tab only (session storage) and is sent straight to Google's Gemini API, never to this site. Get a free key at aistudio.google.com.</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap"><label for="userkey" style="position:absolute;left:-9999px">API key</label>
-            <input type="password" id="userkey" autocomplete="off" placeholder="sk-ant-..." style="flex:1;min-width:220px">
+            <input type="password" id="userkey" autocomplete="off" placeholder="Gemini API key" style="flex:1;min-width:220px">
             <button class="btn" type="button" id="savekey">Use this key</button><button class="btn" type="button" id="forgetkey">Forget key</button></div>
         </div></details>
       <div class="chips" id="askexamples"></div>
@@ -633,18 +633,18 @@ function renderIncidents(){
 /* ---------------- ask (Claude via page capability) ---------------- */
 let SAMPLE = null; const HIST = [];
 const AI_PROXY_URL = "/*__AI_PROXY__*/".trim();   // set at build time from site.config.json
-const BYOK_MODEL = "claude-haiku-5-5";             // model used when a visitor brings their own key
-let USERKEY = ""; try { USERKEY = sessionStorage.getItem("firesight-key") || ""; } catch (e) {}
+const BYOK_MODEL = "gemini-3.5-flash-lite";        // Gemini model used when a visitor brings their own key
+let USERKEY = ""; try { USERKEY = sessionStorage.getItem("firesight-gemini-key") || ""; } catch (e) {}
 function aiRoute(){ return SAMPLE ? "claude.ai" : USERKEY ? "own key" : (AI_PROXY_URL && !AI_PROXY_URL.startsWith("/*")) ? "proxy" : ""; }
 function renderAIStatus(){
   const r = aiRoute();
   $("#aistatus").innerHTML = r === "claude.ai" ? '<span class="tag s">live</span> Connected through claude.ai.'
     : r === "proxy" ? '<span class="tag s">live</span> Connected to the FireSight AI service.'
-    : r === "own key" ? '<span class="tag s">live</span> Using your own API key for this tab.'
-    : '<span class="tag p">offline</span> No AI service is configured for this copy of the page. Add your own API key below, or read the cards, which were generated in advance.';
+    : r === "own key" ? '<span class="tag s">live</span> Using your own Gemini API key for this tab.'
+    : '<span class="tag p">offline</span> No AI service is configured for this copy of the page. Add your own Gemini API key below, or read the cards, which were generated in advance.';
 }
-$("#savekey").onclick = () => { USERKEY = $("#userkey").value.trim(); $("#userkey").value = ""; try { sessionStorage.setItem("firesight-key", USERKEY); } catch (e) {} renderAIStatus(); };
-$("#forgetkey").onclick = () => { USERKEY = ""; try { sessionStorage.removeItem("firesight-key"); } catch (e) {} renderAIStatus(); };
+$("#savekey").onclick = () => { USERKEY = $("#userkey").value.trim(); $("#userkey").value = ""; try { sessionStorage.setItem("firesight-gemini-key", USERKEY); } catch (e) {} renderAIStatus(); };
+$("#forgetkey").onclick = () => { USERKEY = ""; try { sessionStorage.removeItem("firesight-gemini-key"); } catch (e) {} renderAIStatus(); };
 const EXAMPLES = ["Which tests come closest to 34% O2 at 8.2 psi?", "What did BASS-II find about minimum O2 for PMMA rods?", "How did FLEX compare CO2 and helium as suppressants?", "Which smoke materials are hardest for the ISS detector?"];
 $("#askexamples").innerHTML = EXAMPLES.map(e => `<button class="chipbtn">${esc(e)}</button>`).join("");
 $("#askexamples").querySelectorAll("button").forEach(b => b.onclick = () => { $("#askq").value = b.textContent; $("#askform").requestSubmit(); });
@@ -665,14 +665,15 @@ const TOOLS = [
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
 const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
 function addMsg(role, text){ const d = document.createElement("div"); d.className = "msg " + (role === "user" ? "u" : "a"); d.textContent = text; $("#msgs").appendChild(d); $("#msgs").scrollTop = 1e9; return d; }
-async function callMessages(body){
+// Gemini generateContent call: through the FireSight proxy, or straight to Google with the visitor's own key.
+async function callGemini(body){
   const r = aiRoute();
   let res;
   if (r === "own key") {
-    res = await fetch("https://api.anthropic.com/v1/messages", {method:"POST", headers:{"content-type":"application/json", "x-api-key":USERKEY,
-      "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true"}, body:JSON.stringify({...body, model:BYOK_MODEL})});
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${BYOK_MODEL}:generateContent`,
+      {method:"POST", headers:{"content-type":"application/json", "x-goog-api-key":USERKEY}, body:JSON.stringify(body)});
   } else {
-    res = await fetch(AI_PROXY_URL.replace(/\/+$/, "") + "/v1/messages", {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body)});
+    res = await fetch(AI_PROXY_URL.replace(/\/+$/, "") + "/v1/generate", {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body)});
   }
   if (!res.ok) {
     let msg = res.status + ""; try { const j = await res.json(); msg = j.error?.message || j.error || msg; } catch (e) {}
@@ -680,23 +681,33 @@ async function callMessages(body){
   }
   return res.json();
 }
-// Tool loop for the Messages API: Claude asks for a lookup, the page runs it on the embedded data, sends the result back.
+// Tool loop: Gemini asks for a lookup (functionCall), the page runs it on the embedded data, sends back a functionResponse.
 async function runAgent(system, history, onStep){
-  const tools = TOOLS.map(t => ({name:t.name, description:t.description, input_schema:t.inputSchema}));
-  const msgs = history.map(m => ({...m}));
+  const decl = TOOLS.map(t => {
+    const d = {name:t.name, description:t.description};
+    if (t.inputSchema && Object.keys(t.inputSchema.properties || {}).length) d.parameters = t.inputSchema;
+    return d;
+  });
+  const contents = history.map(m => ({role:m.role === "assistant" ? "model" : "user", parts:[{text:m.content}]}));
   for (let step = 0; step < 6; step++) {
-    const res = await callMessages({max_tokens:900, system, tools, messages:msgs});
-    msgs.push({role:"assistant", content:res.content});
-    const text = res.content.filter(x => x.type === "text").map(x => x.text).join("\n").trim();
-    if (res.stop_reason !== "tool_use") return text || "(no answer)";
-    const results = [];
-    for (const blk of res.content.filter(x => x.type === "tool_use")) {
-      onStep(blk.name);
-      const tool = TOOLS.find(t => t.name === blk.name);
-      try { results.push({type:"tool_result", tool_use_id:blk.id, content:JSON.stringify(tool ? tool.execute(blk.input || {}) : {error:"unknown tool"}).slice(0, 24000)}); }
-      catch (err) { results.push({type:"tool_result", tool_use_id:blk.id, content:"Error: " + err.message, is_error:true}); }
+    const res = await callGemini({systemInstruction:{parts:[{text:system}]}, contents, tools:[{functionDeclarations:decl}], generationConfig:{maxOutputTokens:2048}});
+    const cand = res.candidates && res.candidates[0];
+    if (!cand || !cand.content) throw new Error(res.promptFeedback?.blockReason ? "blocked: " + res.promptFeedback.blockReason : "empty answer");
+    const parts = cand.content.parts || [];
+    contents.push({role:"model", parts});                 // keep parts as-is (they may carry thought signatures)
+    const calls = parts.filter(p => p.functionCall);
+    const text = parts.filter(p => p.text && !p.thought).map(p => p.text).join("\n").trim();
+    if (!calls.length) return text || "(no answer)";
+    const out = [];
+    for (const p of calls) {
+      const fc = p.functionCall; onStep(fc.name);
+      const tool = TOOLS.find(t => t.name === fc.name);
+      let result;
+      try { result = tool ? tool.execute(fc.args || {}) : {error:"unknown tool"}; } catch (err) { result = {error:err.message}; }
+      let json = JSON.stringify(result); if (json.length > 24000) json = json.slice(0, 24000) + "…(truncated)";
+      out.push({functionResponse:{name:fc.name, ...(fc.id ? {id:fc.id} : {}), response:{result:json}}});
     }
-    msgs.push({role:"user", content:results});
+    contents.push({role:"user", parts:out});
   }
   return "I needed too many lookups for this question. Try asking something narrower.";
 }
@@ -704,7 +715,7 @@ const TOOL_LABEL = {list_investigations:"listing investigations", get_investigat
 $("#askform").addEventListener("submit", async e => {
   e.preventDefault(); const q = $("#askq").value.trim(); if (!q) return;
   const route = aiRoute();
-  if (!route) { addMsg("assistant", "No AI service is connected. Open 'Use my own Anthropic API key' to add one, or ask the site owner to set up the FireSight AI service."); return; }
+  if (!route) { addMsg("assistant", "No AI service is connected. Open 'Use my own Gemini API key' to add one, or ask the site owner to set up the FireSight AI service."); return; }
   addMsg("user", q); $("#askq").value = ""; $("#askbtn").disabled = true;
   const out = addMsg("assistant", "Thinking…");
   const sys = SYS.replace("${O2}", S.o2).replace("${PSI}", S.psi).replace("${FLOW}", S.flow).replace("${G}", S.g);
@@ -723,8 +734,8 @@ $("#askform").addEventListener("submit", async e => {
   } catch (err) {
     HIST.pop();
     out.textContent = err.code === "not_granted" ? "Asking Claude was not allowed for this page."
-      : (err.code === "rate_limited" || err.status === 429) ? "Too many questions in a short time. Wait a minute and try again."
-      : err.status === 401 ? "The API key was rejected. Check it and try again."
+      : (err.code === "rate_limited" || err.status === 429) ? "The AI service is busy or its free daily quota is used up. Wait a minute and try again."
+      : (err.status === 401 || err.status === 400 && /key/i.test(err.message)) ? "The API key was rejected. Check it and try again."
       : err.status === 403 ? "The AI service refused this site. Its owner needs to add this address to ALLOWED_ORIGINS."
       : "Could not get an answer (" + (err.message || err.code || "network error") + ").";
   } finally { $("#askbtn").disabled = false; }

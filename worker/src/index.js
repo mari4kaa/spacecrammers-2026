@@ -1,9 +1,9 @@
-// FireSight AI proxy (Cloudflare Worker).
-// Keeps the Anthropic API key secret, so the public GitHub Pages site can use Claude.
+// FireSight AI proxy (Cloudflare Worker) for the Gemini API.
+// Keeps the Gemini API key secret, so the public GitHub Pages site can use the model.
 // The browser runs the tool loop on its own embedded data; this worker only forwards
-// Messages API calls with server-side limits (model, tokens, size, origin, rate).
+// generateContent calls with server-side limits (model, output size, request size, origin, rate).
 
-const UPSTREAM = "https://api.anthropic.com/v1/messages";
+const API = "https://generativelanguage.googleapis.com/v1beta/models/";
 const SYSTEM_PREFIX =
   "You are the assistant inside FireSight, a dashboard of NASA PSI microgravity combustion data for spacecraft and habitat fire safety. " +
   "Only answer questions about that data and fire safety in crewed spacecraft, habitats and related Earth analogs, using the provided tools. " +
@@ -41,46 +41,41 @@ export default {
     const allowed = (env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
     const h = cors(origin, allowed);
     const url = new URL(request.url);
+    const model = env.MODEL || "gemini-3.5-flash-lite";
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
-    if (url.pathname === "/health") return json(200, { ok: true, model: env.MODEL || "claude-haiku-5-5" }, h);
-    if (request.method !== "POST" || url.pathname !== "/v1/messages") return json(404, { error: "not found" }, h);
+    if (url.pathname === "/health") return json(200, { ok: true, provider: "gemini", model, fallback: env.FALLBACK_MODEL || null, keySet: Boolean(env.GEMINI_API_KEY) }, h);
+    if (request.method !== "POST" || url.pathname !== "/v1/generate") return json(404, { error: "not found" }, h);
     if (allowed.length && !allowed.includes(origin)) return json(403, { error: "origin not allowed" }, h);
-    if (!env.ANTHROPIC_API_KEY) return json(500, { error: "server is missing ANTHROPIC_API_KEY" }, h);
+    if (!env.GEMINI_API_KEY) return json(500, { error: "server is missing GEMINI_API_KEY" }, h);
 
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-    const perMinute = Number(env.RATE_PER_MINUTE || 12);
-    if (env.RATE_LIMITER) {
-      try {
-        const { success } = await env.RATE_LIMITER.limit({ key: ip });
-        if (!success) return json(429, { error: "rate limited" }, h);
-      } catch (e) { /* binding not available: fall back below */ }
-    }
-    if (limited(ip, perMinute)) return json(429, { error: "rate limited" }, h);
+    if (limited(ip, Number(env.RATE_PER_MINUTE || 12))) return json(429, { error: "rate limited" }, h);
 
     const raw = await request.text();
     if (raw.length > 300_000) return json(413, { error: "request too large" }, h);
     let body;
     try { body = JSON.parse(raw); } catch { return json(400, { error: "invalid JSON" }, h); }
-    if (!Array.isArray(body.messages) || body.messages.length === 0) return json(400, { error: "messages required" }, h);
+    if (!Array.isArray(body.contents) || body.contents.length === 0) return json(400, { error: "contents required" }, h);
 
+    const clientSystem = (body.systemInstruction?.parts || []).map((p) => p.text || "").join("\n").slice(0, 6000);
     const upstreamBody = {
-      model: env.MODEL || "claude-haiku-5-5",
-      max_tokens: Math.min(Number(body.max_tokens) || 900, Number(env.MAX_TOKENS || 1200)),
-      system: SYSTEM_PREFIX + "\n\n" + String(body.system || "").slice(0, 6000),
-      messages: body.messages.slice(-24),
-      ...(Array.isArray(body.tools) ? { tools: body.tools.slice(0, 8) } : {}),
+      systemInstruction: { parts: [{ text: SYSTEM_PREFIX + "\n\n" + clientSystem }] },
+      contents: body.contents.slice(-30),
+      ...(Array.isArray(body.tools) ? { tools: body.tools.slice(0, 2) } : {}),
+      generationConfig: {
+        maxOutputTokens: Math.min(Number(body.generationConfig?.maxOutputTokens) || 2048, Number(env.MAX_OUTPUT_TOKENS || 2048)),
+      },
     };
 
-    const r = await fetch(UPSTREAM, {
+    const call = (m) => fetch(API + encodeURIComponent(m) + ":generateContent", {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
+      headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
       body: JSON.stringify(upstreamBody),
     });
+    let r = await call(model);
+    // free-tier quota for the main model used up -> try the fallback model once (separate quota)
+    if (r.status === 429 && env.FALLBACK_MODEL && env.FALLBACK_MODEL !== model) r = await call(env.FALLBACK_MODEL);
     const text = await r.text();
     return new Response(text, { status: r.status, headers: { "content-type": "application/json", ...h } });
   },
