@@ -119,6 +119,21 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
 .msg{padding:10px 12px;border-radius:9px;max-width:80ch;white-space:pre-wrap}
 .msg.u{background:var(--o2-soft);justify-self:end}
 .msg.a{background:var(--chip)}
+.msg .lvl{display:block;margin-top:6px;font-size:11.5px;color:var(--muted);white-space:normal}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);color:var(--ink);padding:5px 12px;font-size:13px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.exgroups{display:grid;gap:8px}
+.exgroups h3{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 4px}
+.exgroups .chipbtn{text-align:left}
+.fab{position:fixed;right:22px;bottom:22px;z-index:50;display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 20px 0 16px;border-radius:999px;border:0;background:var(--accent);color:#fff;font:600 15px/1 "IBM Plex Sans",system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;transition:transform .15s}
+.fab .fabicon{font-size:19px;line-height:1}
+.fab:hover{transform:translateY(-2px)}
+.fab:focus-visible{outline:3px solid var(--o2);outline-offset:3px}
+.fab[hidden]{display:none}
+body{padding-bottom:90px}
+@media print{.fab{display:none}}
 .gapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .gap{border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:grid;gap:4px}
 .gap .st{font-family:var(--mono);font-size:22px}
@@ -307,7 +322,15 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
       <h2>Ask the data</h2>
       <p class="small" style="margin:0;max-width:80ch">Answers come from an AI model (Gemini on the public site) that may only use this dashboard's PSI data through lookup tools, and cite investigation IDs and table rows.</p>
       <div class="small" id="aistatus" role="status"></div>
-      <div class="chips" id="askexamples"></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+        <span class="small" id="lvllabel">Explain like:</span>
+        <div class="seg" role="group" aria-labelledby="lvllabel" id="lvlseg">
+          <button type="button" data-lvl="undergrad" aria-pressed="false">An undergrad</button>
+          <button type="button" data-lvl="engineer" aria-pressed="false">An engineer</button>
+        </div>
+        <span class="small muted" id="lvlhint"></span>
+      </div>
+      <details id="exwrap" open><summary class="small">Example questions</summary><div class="exgroups" id="askexamples" style="margin-top:8px"></div></details>
       <div class="msgs" id="msgs" aria-live="polite"></div>
       <form id="askform" style="display:flex;gap:8px">
         <label for="askq" class="small muted" style="position:absolute;left:-9999px">Question</label>
@@ -336,6 +359,7 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
   </section>
 </div>
 
+<button class="fab" id="fab" type="button" aria-label="Ask the data: open the AI research assistant"><span aria-hidden="true" class="fabicon">✨</span><span>Ask the data</span></button>
 <script id="bundle" type="application/json">/*__DATA__*/</script>
 <script>
 "use strict";
@@ -733,7 +757,7 @@ function renderGravityBounds(){
   const el = $("#gbounds"); if (!FB) { el.innerHTML = ""; return; }
   const m = FB.pmma_rod, cons = interpLog(m.curve.U, m.curve.pred_lo, m.minimum.U_cm_s);
   el.innerHTML = `<div class="gap"><div class="small muted">Microgravity (BASS-II, PMMA rods)</div><div class="st num">${fmt(m.minimum.o2, 1)}% O₂</div><div class="small">Lowest O₂ that keeps a flame, at about ${fmt(m.minimum.U_cm_s, 1)} cm/s air speed. Conservative: ${fmt(cons, 1)}%. <a href="#boundary">Boundary model</a></div></div>
-    <div class="gap"><div class="small muted">Normal gravity (same rods, 1-g tests)</div><div class="st num">15.4% O₂</div><div class="small">So the 1-g screening limit is about ${fmt(15.4 - m.minimum.o2, 1)} points higher than in space.</div></div>
+    <div class="gap"><div class="small muted">Normal gravity (PMMA, upward spread)</div><div class="st num">15.4% O₂</div><div class="small">Earth upward flame-spread limit with a 4 cm/s forced flow (Hirsch et al., cited in the BASS-II report). The microgravity minimum is about ${fmt(15.4 - m.minimum.o2, 1)} points lower.</div></div>
     <div class="gap mid"><div class="small muted">Moon and Mars</div><div class="st">Between, or lower</div><div class="small">If flammability changes steadily with gravity, partial gravity sits between these two limits. LUCI results hint it may instead be the most flammable case, so use the microgravity limit, not the midpoint.</div></div>
     <div class="gap"><div class="small muted">Artificial buoyancy in PSI</div><div class="st">ACME E-FIELD</div><div class="small">An electric field pushes the ions in a flame, creating a buoyancy-like flow in microgravity: the only PSI handle on partial-gravity behaviour. <a href="#explore" data-sel="PSI-22" class="gsel">Open E-FIELD</a></div></div>`;
   el.querySelectorAll(".gsel").forEach(a => a.onclick = () => { S.sel = a.dataset.sel; });
@@ -790,7 +814,7 @@ function renderBoundary(){
     traces.push(ptsTrace(pts.filter(p => p.outcome === "quench"), "Quench (went out as flow was lowered)", "x-thin", o2c, true, 12));
     traces.push(ptsTrace(pts.filter(p => p.outcome === "blowoff"), "Blowoff (went out as flow was raised)", "triangle-up-open", gas, true, 10));
     shapes.push({type:"line", xref:"paper", x0:0, x1:1, y0:m.one_g_reference.o2, y1:m.one_g_reference.o2, line:{color:muted, width:1.5, dash:"dot"}});
-    ann.push({xref:"paper", x:0.01, xanchor:"left", y:m.one_g_reference.o2, yanchor:"bottom", text:"Normal-gravity limit 15.4% (same material)", showarrow:false, font:{color:muted, size:11}});
+    ann.push({xref:"paper", x:0.01, xanchor:"left", y:m.one_g_reference.o2, yanchor:"bottom", text:"1-g upward-spread limit 15.4% (PMMA, Hirsch et al.)", showarrow:false, font:{color:muted, size:11}});
     const p = fbPredict(U), v = fbVerdict(o2, p), mn = m.minimum;
     readout = `
       <div class="gap ${v ? v.cls : "mid"}"><div class="small muted">Your scenario: ${fmt(o2)}% O₂, ${U} cm/s</div><div class="st">${v ? v.t : "Outside tested air speeds"}</div>
@@ -800,7 +824,7 @@ function renderBoundary(){
       <div class="gap"><div class="small muted">Most flammable air speed</div><div class="st num">${fmt(mn.U_cm_s, 1)} cm/s</div>
         <div class="small">Boundary minimum <b class="num">${fmt(mn.o2, 1)}%</b> O₂ (90% CI ${fmt(mn.o2_ci90[0], 1)}–${fmt(mn.o2_ci90[1], 1)}) at ${fmt(mn.U_ci90[0], 1)}–${fmt(mn.U_ci90[1], 1)} cm/s, the gentle ventilation typical near spacecraft surfaces.</div></div>
       <div class="gap"><div class="small muted">Microgravity vs Earth</div><div class="st num">−${fmt(15.4 - interpLog(c.U, c.pred_lo, mn.U_cm_s), 1)} pts</div>
-        <div class="small">Conservative microgravity limit ${fmt(interpLog(c.U, c.pred_lo, mn.U_cm_s), 1)}% vs ${fmt(m.one_g_reference.o2)}% in normal gravity: Earth screening tests overstate the safety margin.</div></div>`;
+        <div class="small">Conservative microgravity limit ${fmt(interpLog(c.U, c.pred_lo, mn.U_cm_s), 1)}% vs ${fmt(m.one_g_reference.o2)}% for upward spread in normal gravity (Hirsch et al., cited in the report): Earth screening tests overstate the safety margin.</div></div>`;
     note = `${m.n_extinction} extinction points and ${m.n_stable} stable flames from Figure 6.10 of the BASS-II report. ${esc(m.x_note)}`;
     $("#fbmodel").innerHTML = `<p style="margin-top:0"><b>Form</b> (as in the report): <span class="mono">${esc(m.equation)}</span>. Fitted to the ${m.n_extinction} extinction points (${m.n_quench} quench, ${m.n_blowoff} blowoff) by least squares; uncertainty from ${m.n_bootstrap.toLocaleString()} bootstrap resamples.</p>
       <table><thead><tr><th>Parameter</th><th class="n">Fitted</th><th class="n">90% CI</th><th class="n">Report</th></tr></thead><tbody>
@@ -940,34 +964,81 @@ function renderAIStatus(){
     : r === "proxy" ? '<span class="tag s">live</span> Connected to the FireSight AI service.'
     : '<span class="tag p">offline</span> The live assistant is not connected in this copy of the page. The investigation cards were generated in advance and work without it.';
 }
-const EXAMPLES = ["Which tests come closest to 34% O2 at 8.2 psi?", "What did BASS-II find about minimum O2 for PMMA rods?", "How did FLEX compare CO2 and helium as suppressants?", "Which smoke materials are hardest for the ISS detector?"];
-$("#askexamples").innerHTML = EXAMPLES.map(e => `<button class="chipbtn">${esc(e)}</button>`).join("");
+const EXAMPLES = [
+  ["Habitat atmosphere", ["Which investigations matter most for a lunar base at 30% O2 and 10.2 psi?", "Which tests come closest to 34% O2 at 8.2 psi?", "Is there any PSI data for a spacesuit atmosphere of 100% O2 at 4.3 psi?", "What can PSI tell us about fire safety in lunar or Martian gravity?"]],
+  ["Materials and flames", ["What is the lowest oxygen at which PMMA keeps burning in space, and at what air speed?", "Is NASA's 1-g material screening test conservative for microgravity?", "What did the BRE gas burner show about solids burning in still air?", "What are cool flames and why are they a hidden hazard?"]],
+  ["Detection and suppression", ["Which smoke materials are hardest for the ISS detector?", "How can a smoke detector tell lunar dust from smoke?", "How did FLEX compare CO2 and helium as suppressants?", "Did a nitrogen jet put out flames in BASS?"]],
+  ["Hardware and data", ["What do FLEX, FLEX-2 and CFI have in common, and how do they differ?", "Which investigations used the SPICE flow duct, and with which fuels?", "Which instrument did DAFT share with SAME?", "What data-quality problems should I know about in BASS-II?"]]];
+$("#askexamples").innerHTML = EXAMPLES.map(([g, qs]) => `<div><h3>${esc(g)}</h3><div class="chips">${qs.map(q => `<button class="chipbtn" type="button">${esc(q)}</button>`).join("")}</div></div>`).join("");
 $("#askexamples").querySelectorAll("button").forEach(b => b.onclick = () => { $("#askq").value = b.textContent; $("#askform").requestSubmit(); });
+
+/* explanation level */
+const LEVELS = {
+  undergrad:{label:"undergrad", hint:"Plain words, terms explained, the why behind the numbers.",
+    prompt:"Audience: an undergraduate student. Start with a one-sentence plain answer. Then give only the 3-4 most important numbers, not full tables. Use plain words and short sentences. The first time you use a technical term, explain it in a few words (for example: limiting oxygen concentration, the lowest O2 that keeps a flame alive). Where it helps, add one intuitive reason, starting with 'In general,'. Keep the key numbers with units and keep every citation."},
+  engineer:{label:"engineer", hint:"Concise and quantitative: values, units, conditions, uncertainty.",
+    prompt:"Audience: an aerospace engineer or researcher. Be concise and quantitative: give values with units, test conditions (O2, pressure, flow, fuel geometry), sample counts, and any ranges or uncertainty exactly as the tools report them (do not derive your own), and name data-quality caveats or assumed values. Use standard terms (LOI, Zst, opposed/concurrent flow, quenching vs blowoff) without defining them. When it adds something, end with the design implication in one sentence."}};
+if (!LEVELS[S.level]) S.level = "undergrad";
+function renderLevel(){
+  document.querySelectorAll("#lvlseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lvl === S.level)));
+  $("#lvlhint").textContent = LEVELS[S.level].hint;
+}
+document.querySelectorAll("#lvlseg button").forEach(b => b.onclick = () => { S.level = b.dataset.lvl; save(); renderLevel(); });
+renderLevel();
+
+/* floating assistant button */
+$("#fab").onclick = () => { if (location.hash !== "#ask") location.hash = "ask"; setTimeout(() => { $("#askq").focus(); window.scrollTo({top:$("#v-ask").getBoundingClientRect().top + window.scrollY - 12, behavior:"smooth"}); }, 50); };
+function resolveId(x){ if (!x) return x; const t = String(x).trim(); if (BYID[t]) return t; const u = t.toUpperCase().replace(/\s+/g, "");
+  const hit = INV.find(i => i.acr.toUpperCase().replace(/\s+/g, "") === u) || INV.find(i => i.acr.toUpperCase().replace(/\s+/g, "").split(/[\/(]/)[0] === u.split(/[\/(]/)[0]); return hit ? hit.id : t; }
+const ID_LIST = INV.map(i => `${i.acr}=${i.id}`).join(", ");
+function filterTests(q){ q.psi_id = resolveId(q.psi_id); return ROWS.filter(r => (!q.diluent_contains || (r.diluent || "").toLowerCase().includes(String(q.diluent_contains).toLowerCase())) && (!q.psi_id || r.psi_id === q.psi_id) && (!q.fuel_phase || r.fuel_phase === q.fuel_phase) && (!q.fuel_contains || (r.fuel || "").toLowerCase().includes(q.fuel_contains.toLowerCase())) &&
+       (q.o2_min == null || (r.o2_pct_max ?? r.o2_pct) >= q.o2_min) && (q.o2_max == null || (r.o2_pct != null && r.o2_pct <= q.o2_max)) &&
+       (q.psi_min == null || (r.p_atm != null && (r.p_atm_max ?? r.p_atm) * PSI_PER_ATM >= q.psi_min)) && (q.psi_max == null || (r.p_atm != null && r.p_atm * PSI_PER_ATM <= q.psi_max)) &&
+       (q.flow_min == null || (r.flow_cm_s_max ?? r.flow_cm_s) >= q.flow_min) && (q.flow_max == null || (r.flow_cm_s != null && r.flow_cm_s <= q.flow_max)) && (!q.measured_o2_only || !/^assumed/.test(r.o2_source || ""))); }
+const median = a => { const b = [...a].sort((x, y) => x - y), n = b.length; return n ? (n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2) : null; };
+function summarizeTests(q){
+  const rs = filterTests(q), key = q.group_by || "psi_id", groups = {};
+  rs.forEach(r => { const k = r[key] ?? "(blank)"; (groups[k] = groups[k] || []).push(r); });
+  const rng = (g, lo, hi, m = 1) => { const a = g.map(r => r[lo]).filter(v => v != null), b = g.map(r => r[hi] ?? r[lo]).filter(v => v != null); return a.length ? [+(Math.min(...a) * m).toFixed(2), +(Math.max(...b) * m).toFixed(2)] : null; };
+  const stat = (g, nm, val, un) => { const out = {}; g.forEach(r => { if (r[nm] && r[val] != null && !/NEGATIVE_VALUE/.test(r.flags || "")) (out[r[nm] + (r[un] ? " (" + r[un] + ")" : "")] = out[r[nm] + (r[un] ? " (" + r[un] + ")" : "")] || []).push(r[val]); });
+    return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, {n:v.length, min:+Math.min(...v).toFixed(4), median:+median(v).toFixed(4), max:+Math.max(...v).toFixed(4)}])); };
+  const res = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).slice(0, 25).map(([k, g]) => {
+    const oc = {}; g.forEach(r => { if (r.outcome) oc[r.outcome] = (oc[r.outcome] || 0) + 1; });
+    return {[key]:k, n:g.length, investigations:[...new Set(g.map(r => r.psi_id))], o2_pct:rng(g, "o2_pct", "o2_pct_max"), pressure_psi:rng(g, "p_atm", "p_atm_max", PSI_PER_ATM), flow_cm_s:rng(g, "flow_cm_s", "flow_cm_s_max"),
+      outcomes:oc, metrics:{...stat(g, "metric_name", "metric_value", "metric_unit"), ...stat(g, "metric2_name", "metric2_value", "metric2_unit")}, assumed_o2_rows:g.filter(r => /^assumed/.test(r.o2_source || "")).length};
+  });
+  if (!rs.length) return {total_rows:0, hint:"No rows match. Check psi_id (valid: " + ID_LIST + ") and loosen filters."};
+  return {total_rows:rs.length, grouped_by:key, groups:res, note:"Counts are table rows. Groups differ in diluent amount, O2 and pressure, so these summaries do not by themselves show which group is more effective. Cite as [PSI-xx], not row numbers. Copy numbers exactly."};
+}
 const TOOLS = [
   {name:"list_investigations", description:"List all PSI combustion investigations with id, acronym, tier, safety focus, fuel phase, test count and current scenario score.",
    inputSchema:{type:"object", properties:{}}, execute:() => RANKED.map(({i, s}) => ({id:i.id, acr:i.acr, tier:i.tier, pds:i.pds, phase:i.phase, ntests:i.ntests, score:+s.total.toFixed(1)}))},
   {name:"get_investigation", description:"Full card for one investigation: objective, fuel and sample/burner shape and size, hardware family, summary, varied/fixed, sensors, findings with sources, habitat relevance, quality notes, PSI objective text.",
    inputSchema:{type:"object", properties:{id:{type:"string", description:"PSI id like PSI-25"}}, required:["id"]},
-   execute:({id}) => { const i = BYID[id]; if (!i) throw new Error("unknown id"); const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, family_note:(B.families || {})[i.family] || "", shared_with:(B.shared_links || []).filter(L => L.ids.includes(id)).map(L => ({what:L.what, ids:L.ids, note:L.note})), pubs:pubs.slice(0, 8).map(p => p.t)}; }},
+   execute:({id}) => { id = resolveId(id); const i = BYID[id]; if (!i) return {error:"unknown id", valid_ids:ID_LIST}; const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, family_note:(B.families || {})[i.family] || "", shared_with:(B.shared_links || []).filter(L => L.ids.includes(id)).map(L => ({what:L.what, ids:L.ids, note:L.note})), pubs:pubs.slice(0, 8).map(p => p.t)}; }},
   {name:"query_tests", description:"Search the unified test matrix. Filters are optional. Returns up to 40 rows plus a count. o2 in %, pressure in psi, flow in cm/s.",
-   inputSchema:{type:"object", properties:{psi_id:{type:"string"}, fuel_phase:{type:"string"}, fuel_contains:{type:"string"}, o2_min:{type:"number"}, o2_max:{type:"number"}, psi_min:{type:"number"}, psi_max:{type:"number"}, flow_min:{type:"number"}, flow_max:{type:"number"}, measured_o2_only:{type:"boolean"}}},
-   execute:(q) => { const rs = ROWS.filter(r => (!q.psi_id || r.psi_id === q.psi_id) && (!q.fuel_phase || r.fuel_phase === q.fuel_phase) && (!q.fuel_contains || (r.fuel || "").toLowerCase().includes(q.fuel_contains.toLowerCase())) &&
-       (q.o2_min == null || (r.o2_pct_max ?? r.o2_pct) >= q.o2_min) && (q.o2_max == null || (r.o2_pct != null && r.o2_pct <= q.o2_max)) &&
-       (q.psi_min == null || (r.p_atm != null && (r.p_atm_max ?? r.p_atm) * PSI_PER_ATM >= q.psi_min)) && (q.psi_max == null || (r.p_atm != null && r.p_atm * PSI_PER_ATM <= q.psi_max)) &&
-       (q.flow_min == null || (r.flow_cm_s_max ?? r.flow_cm_s) >= q.flow_min) && (q.flow_max == null || (r.flow_cm_s != null && r.flow_cm_s <= q.flow_max)) && (!q.measured_o2_only || !/^assumed/.test(r.o2_source || "")));
+   inputSchema:{type:"object", properties:{psi_id:{type:"string", description:"PSI id like PSI-69, or the acronym like FLEX"}, fuel_phase:{type:"string"}, fuel_contains:{type:"string"}, diluent_contains:{type:"string", description:"e.g. CO2, He, N2"}, o2_min:{type:"number"}, o2_max:{type:"number"}, psi_min:{type:"number"}, psi_max:{type:"number"}, flow_min:{type:"number"}, flow_max:{type:"number"}, measured_o2_only:{type:"boolean"}}},
+   execute:(q) => { const rs = filterTests(q);
      return {count:rs.length, rows:rs.slice(0, 40).map(r => ({psi_id:r.psi_id, row:r.src_row, file:r.src_file, test:r.test_id, fuel:r.fuel, o2:r.o2_pct, o2_max:r.o2_pct_max, o2_src:r.o2_source, psi:r.p_atm != null ? +(r.p_atm * PSI_PER_ATM).toFixed(2) : null, flow:r.flow_cm_s, dil:r.diluent, outcome:r.outcome, metric:r.metric_name ? `${r.metric_name}=${r.metric_value} ${r.metric_unit}` : "", metric2:r.metric2_name ? `${r.metric2_name}=${r.metric2_value} ${r.metric2_unit}` : "", flags:r.flags}))}; }},
+  {name:"summarize_tests", description:"Summarize many test rows at once, grouped by a field (e.g. diluent, fuel, outcome, psi_id). Use it to compare groups (e.g. CO2 vs helium in FLEX) instead of query_tests, which returns only 40 rows. Same filters as query_tests. Per group: row count, O2/pressure/flow ranges, outcome counts, and min/median/max of each measured metric.",
+   inputSchema:{type:"object", properties:{group_by:{type:"string", enum:["diluent", "fuel", "fuel_phase", "fuel_class", "outcome", "psi_id", "flow_dir", "sample"]}, psi_id:{type:"string", description:"PSI id like PSI-69, or the acronym like FLEX"}, fuel_phase:{type:"string"}, fuel_contains:{type:"string"}, diluent_contains:{type:"string", description:"e.g. CO2, He, N2"}, o2_min:{type:"number"}, o2_max:{type:"number"}, psi_min:{type:"number"}, psi_max:{type:"number"}, flow_min:{type:"number"}, flow_max:{type:"number"}, measured_o2_only:{type:"boolean"}}, required:["group_by"]},
+   execute:(q) => summarizeTests(q)},
   {name:"flammability_boundary", description:"Microgravity flammability boundary from BASS-II (PSI-25) at about 1 atm. For PMMA rods returns the fitted limiting O2 (and 90% single-test range) at a given air speed, the most flammable air speed, model validation and caveats; also returns SIBAL fabric and thin-PMMA quench data.",
    inputSchema:{type:"object", properties:{flow_cm_s:{type:"number", description:"air speed past the material, cm/s"}, o2_pct:{type:"number", description:"oxygen % to judge"}}},
    execute:({flow_cm_s, o2_pct}) => { if (!FB) return {error:"not available"}; const m = FB.pmma_rod, U = flow_cm_s ?? S.flow, O = o2_pct ?? S.o2, p = fbPredict(U), v = fbVerdict(O, p);
-     return {source:"PSI-25 BASS-II Summary Report (NASA/TM-20210011385): PMMA rods Fig. 6.10 (digitized), SIBAL Table 7.1, thin PMMA Table 2.1",
+     const mn = m.minimum, cons = interpLog(m.curve.U, m.curve.pred_lo, mn.U_cm_s), f2 = x => (+x).toFixed(2);
+     const summary = (p ? `PMMA rods at ${U} cm/s: fitted limiting O2 ${f2(p.mid)}%; single tests went out anywhere between ${f2(p.lo)}% and ${f2(p.hi)}% O2 (90% prediction range). ` : `PMMA rods: ${U} cm/s is outside the tested air speeds (${m.valid_U.join("-")} cm/s). `) +
+       `Lowest limit at any air speed: ${f2(mn.o2)}% O2 at ${f2(mn.U_cm_s)} cm/s (90% confidence interval of that minimum ${f2(mn.o2_ci90[0])}-${f2(mn.o2_ci90[1])}%); conservative limit (lower prediction bound) ${f2(cons)}% O2. Normal-gravity upward flame-spread limit for PMMA with a 4 cm/s forced flow (Hirsch et al., cited in the BASS-II report, not a BASS-II test): 15.4% O2. ` +
+       (v ? `Verdict at ${O}% O2: ${v.t}. ` : "") + (O > 22.5 ? `The rod tests went up to about 21% O2, so at ${O}% this says only that the material burns, not how fast. ` : "") + "All tests near 14.7 psi, microgravity only.";
+     return {summary_use_these_numbers:summary, source:"PSI-25 BASS-II Summary Report (NASA/TM-20210011385): PMMA rods Fig. 6.10 (digitized), SIBAL Table 7.1, thin PMMA Table 2.1",
        pmma_rod:{at_requested_flow:{flow_cm_s:U, limiting_o2_pct:p ? +p.mid.toFixed(2) : null, single_test_range_90:p ? [+p.lo.toFixed(2), +p.hi.toFixed(2)] : null, judged_o2_pct:O, verdict:v ? v.t : "outside tested air speeds " + m.valid_U.join("-") + " cm/s"},
          lowest_limit_at_any_flow:{note:"minimum of the boundary = most flammable air speed", flow_cm_s:+m.minimum.U_cm_s.toFixed(2), o2_pct:+m.minimum.o2.toFixed(2), o2_ci90:m.minimum.o2_ci90.map(x => +x.toFixed(2)), conservative_o2_pct:+interpLog(m.curve.U, m.curve.pred_lo, m.minimum.U_cm_s).toFixed(2)},
-         one_g_limit_pct:15.4, fit:{params:m.params, report_equation:m.published, loo_rmse:+m.loo_rmse.toFixed(2)}},
+         one_g_limit_pct:15.4, one_g_limit_source:"Hirsch et al. (ASTM STP1454), cited in the BASS-II report: upward flame spread on PMMA in normal gravity with an extra 4 cm/s forced flow; not a BASS-II test", fit:{params:m.params, report_equation:m.published, loo_rmse:+m.loo_rmse.toFixed(2)}},
        sibal_fabric_2_2cm:{quench_speeds_cm_s:"2.2-2.8 at 16.9-18.7% O2 (higher at lower O2)", lowest_o2_with_spread:FB.sibal_22.lowest_spread_o2, no_ignition_at:FB.sibal_22.no_ignition_o2},
        thin_pmma_opposed:{extinction_speed_cm_s:{"21%":1.0, "16%":3.0}}, caveats:FB.caveats}; }},
   {name:"quality_issues", description:"Data-quality log entries, optionally for one investigation.", inputSchema:{type:"object", properties:{psi_id:{type:"string"}}},
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
-const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
+const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Investigation IDs: ${"${IDS}"}. To compare groups of tests (diluents, fuels, materials, outcomes), call summarize_tests with group_by and the right psi_id. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. Copy numbers exactly as the tools return them; never compute, round into new ranges, or invent uncertainty values. If a tool result has a summary field, take its numbers from there. Mention at most the two caveats that matter most for the question. Never state a result or ranking (which is better, more effective, more flammable) unless a tool returned it; you may add general physics to explain why, but start that sentence with "In general,". Use row numbers only for rows returned by query_tests; cite grouped summaries as [PSI-xx]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
 function addMsg(role, text){ const d = document.createElement("div"); d.className = "msg " + (role === "user" ? "u" : "a"); d.textContent = text; $("#msgs").appendChild(d); $("#msgs").scrollTop = 1e9; return d; }
 // Gemini generateContent call through the FireSight proxy (it holds the API key).
 async function callGemini(body){
@@ -1008,14 +1079,15 @@ async function runAgent(system, history, onStep){
   }
   return "I needed too many lookups for this question. Try asking something narrower.";
 }
-const TOOL_LABEL = {list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
+const TOOL_LABEL = {summarize_tests:"summarizing test groups", flammability_boundary:"reading the flammability boundary", list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
 $("#askform").addEventListener("submit", async e => {
   e.preventDefault(); const q = $("#askq").value.trim(); if (!q) return;
   const route = aiRoute();
   if (!route) { addMsg("assistant", "The live assistant is not connected in this copy of the page. The investigation cards on the Explore tab still work."); return; }
-  addMsg("user", q); $("#askq").value = ""; $("#askbtn").disabled = true;
+  addMsg("user", q); $("#askq").value = ""; $("#askbtn").disabled = true; $("#exwrap").open = false;
   const out = addMsg("assistant", "Thinking…");
-  const sys = SYS.replace("${O2}", S.o2).replace("${PSI}", S.psi).replace("${FLOW}", S.flow).replace("${G}", S.g);
+  const lvl = LEVELS[S.level] ? S.level : "undergrad";
+  const sys = SYS.replace("${O2}", S.o2).replace("${PSI}", S.psi).replace("${FLOW}", S.flow).replace("${G}", S.g).replace("${IDS}", ID_LIST) + " " + LEVELS[lvl].prompt;
   HIST.push({role:"user", content:q});
   const recent = HIST.slice(-8);
   try {
@@ -1027,7 +1099,8 @@ $("#askform").addEventListener("submit", async e => {
     } else {
       text = await runAgent(sys, recent, name => { out.textContent = "Looking up data: " + (TOOL_LABEL[name] || name) + "…"; });
     }
-    out.textContent = text; HIST.push({role:"assistant", content:text});
+    out.textContent = text; const tag = document.createElement("span"); tag.className = "lvl"; tag.textContent = "Explained for an " + LEVELS[lvl].label; out.appendChild(tag);
+    HIST.push({role:"assistant", content:text});
   } catch (err) {
     HIST.pop();
     out.textContent = err.code === "not_granted" ? "Asking Claude was not allowed for this page."
@@ -1073,6 +1146,7 @@ const VIEWS = ["explore", "compare", "gaps", "boundary", "data", "quality", "inc
 function route(){
   const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "explore";
   VIEWS.forEach(x => $("#v-" + x).classList.toggle("on", x === v));
+  $("#fab").hidden = v === "ask";
   document.querySelectorAll("#tabs a").forEach(a => { if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   if (v === "explore") { renderMap(); renderDetail(); }
   if (v === "compare") renderCompare();
