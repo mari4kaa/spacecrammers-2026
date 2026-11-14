@@ -203,12 +203,15 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
       <h2>Side-by-side comparison</h2>
       <div class="small muted">Pick up to 4 investigations. The top 3 for your scenario are preselected.</div>
       <div class="chips" id="cmppick"></div>
+      <div id="cmpsame"></div>
       <div class="tablewrap"><table id="cmptable"></table></div>
     </div>
     <div class="panel" style="display:grid;gap:8px">
       <h2>Hardware families</h2>
-      <div class="small muted">Investigations that shared flight hardware, so their data are directly comparable.</div>
+      <div class="small muted">Investigations that shared flight hardware, so their data are directly comparable. Click one to open it.</div>
       <div id="families" class="cols2"></div>
+      <h3 style="margin-top:6px">Shared hardware and instruments</h3>
+      <ul class="small" id="sharedlinks" style="margin:0;padding-left:18px;display:grid;gap:4px"></ul>
     </div>
   </section>
 
@@ -216,12 +219,22 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
   <section class="view" id="v-gaps">
     <div class="panel" style="display:grid;gap:12px">
       <h2>What PSI covers for your scenario</h2>
+      <p class="small muted" style="margin:0;max-width:90ch">Every PSI flight test ran in microgravity: aboard the ISS (in the Microgravity Science Glovebox, the Combustion Integrated Rack, or hand-held in the cabin) or, for Saffire, inside an uncrewed Cygnus after it left the ISS. Counts are table rows; one test can have several rows (SAME-R logs each smoke sample at several aging times).</p>
       <div class="gapgrid" id="gapgrid"></div>
       <div class="callout" id="gaptext"></div>
     </div>
     <div class="panel" style="display:grid;gap:10px">
+      <h2>Atmospheres from Earth to spacesuit</h2>
+      <p class="small" style="margin:0;max-width:85ch">Spacesuits hold pure O₂ at only 4.3 psi so they stay flexible, and crews pre-breathe O₂ before a spacewalk to purge nitrogen and avoid the bends. A Moon base or pressurized rover at an in-between atmosphere (expected 30% O₂ or more at 10.2 psi or less) shortens that pre-breathe, but it has over 40% more O₂ by fraction than Earth air, which makes materials burn more easily. This chart shows where PSI tests sit on that path.</p>
+      <div id="ladder" style="height:400px"></div>
+      <div class="small muted" id="laddernote"></div>
+      <div class="tablewrap"><table id="laddertable"></table></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
       <h2>Partial gravity: bounds and what is coming</h2>
-      <p class="small" style="margin:0;max-width:80ch">PSI has no partial-gravity combustion data yet. Microgravity and normal-gravity results bound the Moon and Mars case. ACME E-FIELD imitates buoyancy with an electric field. Work outside PSI that will fill the gap:</p>
+      <p class="small" style="margin:0;max-width:80ch">PSI has no partial-gravity combustion data yet; NASA expects LUCI and FM2 results to be added. Until then, microgravity and normal-gravity results can bound the Moon and Mars case, and ACME E-FIELD imitates buoyancy with an electric field.</p>
+      <div class="gapgrid" id="gbounds"></div>
+      <p class="small" style="margin:0;max-width:80ch">Work outside PSI that will fill the gap:</p>
       <div class="gapgrid" id="external"></div>
     </div>
   </section>
@@ -345,7 +358,7 @@ const PRESETS = [
   {k:"explo", n:"Exploration atm. 34% / 8.2 psia", o2:34, psi:8.2, flow:10, g:"moon", note:"FM2 targets flammability limits at 8.2 psia."},
   {k:"iss", n:"ISS / Orion cabin", o2:21, psi:14.7, flow:10, g:"0", note:"Standard air at sea-level pressure."},
   {k:"mars", n:"Mars habitat", o2:30, psi:10.2, flow:10, g:"mars", note:"Assumed same atmosphere as the lunar base."},
-  {k:"suit", n:"Spacesuit", o2:100, psi:4.3, flow:5, g:"moon", note:"100% O₂ at 4.3 psi. Far outside PSI tests."},
+  {k:"suit", n:"Spacesuit", o2:100, psi:4.3, flow:5, g:"moon", note:"100% O₂ at 4.3 psi. No PSI test is near this: see Gaps → Atmospheres from Earth to spacesuit."},
   {k:"earth", n:"Earth O₂-enriched room", o2:30, psi:14.7, flow:5, g:"earth", note:"Hospital or hyperbaric analog."}
 ];
 const S = {o2:30, psi:10.2, flow:10, g:"moon", pds:new Set(["prevention","detection","suppression"]), preset:"lunar", sel:null};
@@ -512,6 +525,8 @@ function renderDetail(){
     <div class="callout"><b>In plain words:</b> ${esc(i.summary)}<br><b>For engineers:</b> ${esc(i.engineer)}</div>
     <div class="cols2">
       <dl class="kv">
+        <dt>Objective</dt><dd>${esc(i.objective_short || "")}</dd>
+        <dt>Fuel &amp; samples</dt><dd>${esc(i.fuel_geom || "")}</dd>
         <dt>Varied</dt><dd>${esc(i.varied)}</dd>
         <dt>Held fixed</dt><dd>${esc(i.fixed)}</dd>
         <dt>Sensors</dt><dd>${esc(i.sensors)}</dd>
@@ -536,6 +551,46 @@ function renderDetail(){
   $("#addcmp").onclick = () => { if (!CMP.includes(i.id)) { CMP.push(i.id); if (CMP.length > 4) CMP.shift(); } location.hash = "compare"; };
 }
 
+/* similarities and differences between the picked investigations */
+const SENSOR_KW = [["cameras / video", /camera|video|image|still|photo/i], ["radiometers", /radiometer/i], ["thermocouples", /thermocouple/i], ["O₂ sensor", /\bO2\b|O2 \/|O2\/CO2/i], ["CO₂ sensor", /CO2/i], ["CO sensor", /\bCO\b/i],
+  ["particle counter (P-Trak)", /P-Trak/i], ["DustTrak", /DustTrak/i], ["smoke detectors", /smoke detector|ionization|MPASS|STS|ISS and STS/i], ["TEM particle samplers", /TEM/i], ["photomultipliers", /PMT/i], ["pyrometry", /pyrometr/i],
+  ["heat-flux gauge", /heat-flux|heat flux/i], ["chemiluminescence (OH*, CH*)", /OH\*|CH\*|chemilumin/i], ["ion current", /ion current/i], ["anemometers / flow sensors", /anemometer|flow sensor|flow display|duct air/i], ["pressure sensor", /pressure/i], ["simulation", /simulation|CFD|OpenFOAM/i], ["laser extinction", /laser/i]];
+const VARIED_KW = [["O₂", /\bO2\b|oxygen/i], ["pressure", /pressure/i], ["air / flow speed", /air speed|flow|velocity|coflow/i], ["flow direction", /direction|concurrent|opposed/i], ["diluent (N₂, CO₂, He)", /diluent|dilution|helium|\bHe\b|N2|CO2/i], ["fuel or material", /fuel|material/i],
+  ["sample or burner size", /size|thickness|diameter|nozzle|burner \d|droplet/i], ["heater temperature", /temperature/i], ["electric field", /field/i], ["gravity", /gravity/i], ["smoke aging time", /aging/i]];
+const kwSet = (txt, KW) => new Set(KW.filter(([, re]) => re.test(txt || "")).map(([n]) => n));
+function invRange(i, lo, hi, filter){ const rs = i.rows.filter(r => r[lo] != null && !/NEGATIVE_VALUE/.test(r.flags || "") && (!filter || filter(r))); return rs.length ? [Math.min(...rs.map(r => r[lo])), Math.max(...rs.map(r => r[hi] ?? r[lo]))] : null; }
+function cmpSameDiff(cols){
+  if (cols.length < 2) return "<p class='small muted' style='margin:0'>Pick at least two investigations.</p>";
+  const same = [], diff = [], names = cols.map(i => i.acr);
+  const fam = new Set(cols.map(i => i.family));
+  if (fam.size === 1) same.push(`Same hardware: ${esc(cols[0].family)}. ${esc((B.families || {})[cols[0].family] || "")}`);
+  else { const g = {}; cols.forEach(i => (g[i.family] = g[i.family] || []).push(i.acr)); diff.push(`Different hardware: ${Object.entries(g).map(([f, a]) => `${a.map(esc).join(", ")} → ${esc(f)}`).join("; ")}.`); }
+  for (const L of (B.shared_links || [])) { const hit = cols.filter(i => L.ids.includes(i.id)); if (hit.length >= 2 && fam.size > 1) same.push(`Shared ${esc(L.what)}: ${hit.map(i => esc(i.acr)).join(", ")}. ${esc(L.note)}`); else if (hit.length >= 2 && /P-Trak/.test(L.what)) same.push(`Shared ${esc(L.what)}: ${esc(L.note)}`); }
+  const ph = new Set(cols.map(i => i.phase));
+  if (ph.size === 1) same.push(`Same fuel phase: ${esc(cols[0].phase)}.`); else diff.push(`Fuel phase: ${cols.map(i => `${esc(i.acr)} ${esc(i.phase)}`).join(", ")}.`);
+  const rangeLine = (label, lo, hi, unit, m, filter) => {
+    const rs = cols.map(i => ({i, r:invRange(i, lo, hi, filter)})), have = rs.filter(x => x.r);
+    if (have.length < 2) return;
+    const a = Math.max(...have.map(x => x.r[0])), b = Math.min(...have.map(x => x.r[1]));
+    const each = have.map(x => `${esc(x.i.acr)} ${fmt(x.r[0] * m)}${x.r[1] !== x.r[0] ? "–" + fmt(x.r[1] * m) : ""}`).join(", ");
+    if (a <= b) same.push(`${label} overlap at ${fmt(a * m)}${b !== a ? "–" + fmt(b * m) : ""} ${unit} (${each}).`);
+    else diff.push(`${label} do not overlap: ${each} ${unit}.`);
+  };
+  rangeLine("Room O₂ levels", "o2_pct", "o2_pct_max", "%", 1, ambient);
+  rangeLine("Pressures", "p_atm", "p_atm_max", "psi", PSI_PER_ATM);
+  rangeLine("Air speeds", "flow_cm_s", "flow_cm_s_max", "cm/s", 1);
+  const setLine = (label, KW, field) => {
+    const sets = cols.map(i => kwSet(i[field], KW)); const common = [...sets[0]].filter(k => sets.every(s => s.has(k)));
+    if (common.length) same.push(`${label} in common: ${common.join(", ")}.`);
+    const uniq = cols.map((i, n) => [i, [...sets[n]].filter(k => !common.includes(k))]).filter(([, u]) => u.length);
+    if (uniq.length) diff.push(`${label}, not shared by all: ${uniq.map(([i, u]) => `${esc(i.acr)} (${u.join(", ")})`).join("; ")}.`);
+  };
+  setLine("Variables changed", VARIED_KW, "varied");
+  setLine("Measurements", SENSOR_KW, "sensors");
+  return `<div class="cols2"><div><h3>What they share</h3><ul class="small" style="margin:4px 0 0;padding-left:18px;display:grid;gap:4px">${same.map(t => `<li>${t}</li>`).join("") || "<li>Little in common.</li>"}</ul></div>
+    <div><h3>How they differ</h3><ul class="small" style="margin:4px 0 0;padding-left:18px;display:grid;gap:4px">${diff.map(t => `<li>${t}</li>`).join("") || "<li>No major differences found.</li>"}</ul></div></div>`;
+}
+
 /* ---------------- compare ---------------- */
 let CMP = [];
 function renderCompare(){
@@ -544,48 +599,144 @@ function renderCompare(){
   $("#cmppick").querySelectorAll("button").forEach(b => b.onclick = () => { const id = b.dataset.id; CMP = CMP.includes(id) ? CMP.filter(x => x !== id) : [...CMP, id].slice(-4); renderCompare(); });
   const cols = CMP.map(id => BYID[id]);
   const sc = id => RANKED.find(x => x.i.id === id)?.s;
-  const rng = (i, f, g, m = 1) => { const a = i.rows.map(f).filter(v => v != null), b = i.rows.map(g).filter(v => v != null); return a.length ? `${fmt(Math.min(...a) * m)}–${fmt(Math.max(...b) * m)}` : "–"; };
+  const rng = (i, f, g, m = 1) => { const ok = i.rows.filter(r => !/NEGATIVE_VALUE/.test(r.flags || "")), a = ok.map(f).filter(v => v != null), b = ok.map(g).filter(v => v != null); if (!a.length) return "–"; const x = fmt(Math.min(...a) * m), y = fmt(Math.max(...b) * m); return x === y ? x : `${x}–${y}`; };
   const R = [
     ["Score for your scenario", i => `<span class="num">${fmt(sc(i.id)?.total, 0)}</span>`],
     ["Tier", i => tierLabel(i.tier)], ["Safety focus", i => i.pds.join(", ")], ["Hardware family", i => esc(i.family)],
-    ["Fuel phase", i => esc(i.phase)], ["Fuels in table", i => esc([...new Set(i.rows.map(r => r.fuel_class))].join("; ") || "–")],
+    ["Objective", i => esc(i.objective_short || "")], ["Fuel phase", i => esc(i.phase)], ["Fuel, sample shape &amp; size", i => esc(i.fuel_geom || "")], ["Fuels in table", i => esc([...new Set(i.rows.map(r => r.fuel_class))].join("; ") || "–")],
     ["O₂ (%)", i => `<span class="num">${rng(i, r => r.o2_pct, r => r.o2_pct_max ?? r.o2_pct)}</span>`],
     ["Pressure (psi)", i => `<span class="num">${rng(i, r => r.p_atm, r => r.p_atm_max ?? r.p_atm, PSI_PER_ATM)}</span>`],
     ["Air speed (cm/s)", i => `<span class="num">${rng(i, r => r.flow_cm_s, r => r.flow_cm_s_max ?? r.flow_cm_s)}</span>`],
     ["Varied", i => esc(i.varied)], ["Held fixed", i => esc(i.fixed)], ["Sensors", i => esc(i.sensors)],
     ["Test rows", i => `<span class="num">${i.ntests}</span>`], ["Publications", i => `<span class="num">${i.pubs.length}</span>`],
     ["Headline finding", i => esc(i.findings[0]?.t || "")]];
+  $("#cmpsame").innerHTML = cmpSameDiff(cols);
   $("#cmptable").innerHTML = `<thead><tr><th></th>${cols.map(i => `<th>${esc(i.acr)}<div class="small muted">${i.id}</div></th>`).join("")}</tr></thead><tbody>` +
     R.map(([n, f]) => `<tr><th scope="row" style="position:static">${n}</th>${cols.map(i => `<td>${f(i)}</td>`).join("")}</tr>`).join("") + "</tbody>";
   const fam = {}; INV.forEach(i => (fam[i.family] = fam[i.family] || []).push(i));
-  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div><h3>${esc(f)}</h3><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
+  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div><h3>${esc(f)}</h3><div class="small" style="margin-top:2px">${esc((B.families || {})[f] || "")}</div><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
+  $("#sharedlinks").innerHTML = (B.shared_links || []).map(L => `<li><b>${esc(L.what)}:</b> ${L.ids.map(id => esc(BYID[id]?.acr || id)).join(", ")}. ${esc(L.note)}</li>`).join("");
   $("#families").querySelectorAll("button").forEach(b => b.onclick = () => { S.sel = b.dataset.id; location.hash = "explore"; });
 }
 
 /* ---------------- gaps ---------------- */
+// How a row's O2 value was obtained: measured/set per test, documented cabin air, uncertain, or a burner stream (not the room)
+const o2Kind = r => { const s = r.o2_source || ""; if (r.o2_pct == null) return "none"; if (/oxidizer stream/.test(s)) return "stream"; if (/N2-diluted/.test(s)) return "unsure"; if (/^assumed/.test(s)) return "air"; return "meas"; };
+const ambient = r => { const k = o2Kind(r); return k === "meas" || k === "air"; };
+function atmDist(r, o2, psi){            // distance in "window units": 3 O2 points or a factor 1.3 in pressure = 1
+  const ps = psi / PSI_PER_ATM, lo = r.o2_pct, hi = r.o2_pct_max ?? r.o2_pct;
+  const dO = o2 < lo ? lo - o2 : o2 > hi ? o2 - hi : 0;
+  let dP = .5;
+  if (r.p_atm != null) { const plo = r.p_atm, phi = r.p_atm_max ?? r.p_atm; const p = Math.min(Math.max(ps, plo), phi); dP = Math.abs(Math.log(p / ps)) / Math.log(1.3); }
+  return {d:Math.hypot(dO / 3, dP), dO, pRatio:r.p_atm != null ? Math.min(Math.max(ps, r.p_atm), r.p_atm_max ?? r.p_atm) / ps : null};
+}
+const inWindow = (r, o2, psi) => { const a = atmDist(r, o2, psi); return a.dO <= 3 && (a.pRatio == null || (a.pRatio <= 1.3 && a.pRatio >= 1 / 1.3)); };
+function nearest(rows, o2, psi){ let b = null; for (const r of rows) { const a = atmDist(r, o2, psi); if (!b || a.d < b.a.d) b = {r, a}; } return b; }
+const rowPsi = r => r.p_atm != null ? fmt(r.p_atm * PSI_PER_ATM) + (r.p_atm_max != null && r.p_atm_max !== r.p_atm ? "–" + fmt(r.p_atm_max * PSI_PER_ATM) : "") + " psi" : "pressure not tabulated";
+const rowO2 = r => fmt(r.o2_pct) + (r.o2_pct_max != null && r.o2_pct_max !== r.o2_pct ? "–" + fmt(r.o2_pct_max) : "") + "% O₂";
+function nearestText(b){
+  if (!b) return "";
+  const r = b.r, acr = BYID[r.psi_id].acr;
+  return `${esc(acr)}${r.test_id ? " " + esc(r.test_id) : ""}: ${rowO2(r)}${o2Kind(r) === "air" ? " (cabin air)" : ""}, ${rowPsi(r)}, ${esc(r.fuel || "")}`;
+}
+const GAPCATS = [["Solid fuels", r => r.fuel_phase === "solid" && !/smoke/.test(r.outcome || "") && !["PSI-101", "PSI-102"].includes(r.psi_id)],
+  ["Solid emulator (BRE)", r => r.fuel_phase === "gas (solid emulator)"], ["Liquid droplets", r => r.fuel_phase === "liquid" && !["PSI-101", "PSI-102"].includes(r.psi_id)],
+  ["Gaseous flames", r => r.fuel_phase === "gas"], ["Smoke / dust detection", r => ["PSI-101", "PSI-102", "PSI-47"].includes(r.psi_id)]];
 function renderGaps(){
-  const ps = S.psi / PSI_PER_ATM;
-  const near = (r, tolO2, tolP) => r.o2_pct != null && S.o2 >= r.o2_pct - tolO2 && S.o2 <= (r.o2_pct_max ?? r.o2_pct) + tolO2 && (r.p_atm == null || (ps >= r.p_atm / tolP && ps <= (r.p_atm_max ?? r.p_atm) * tolP));
-  const meas = r => !/^assumed/.test(r.o2_source || "");
-  const cats = [["Solid fuels", r => r.fuel_phase === "solid"], ["Solid emulator (BRE)", r => r.fuel_phase === "gas (solid emulator)"], ["Liquid droplets", r => r.fuel_phase === "liquid"], ["Gaseous flames", r => r.fuel_phase === "gas"], ["Smoke / detection", r => r.fuel_phase === "smoke" || r.fuel_phase === "dust" || /smoke/.test(r.outcome || "")]];
-  $("#gapgrid").innerHTML = cats.map(([n, f]) => {
-    const all = ROWS.filter(f);
-    const o2only = all.filter(r => meas(r) && r.o2_pct != null && S.o2 >= r.o2_pct - 3 && S.o2 <= (r.o2_pct_max ?? r.o2_pct) + 3).length;
-    const both = all.filter(r => meas(r) && near(r, 3, 1.3)).length;
-    const cls = both > 10 ? "ok" : both > 0 ? "mid" : "bad";
-    return `<div class="gap ${cls}"><div class="small muted">${n}</div><div class="st">${both}</div><div class="small">tests within ±3 O₂ points and ±30% pressure of your scenario (measured O₂ only). ${o2only} match O₂ alone, out of ${all.length}.</div></div>`;
+  $("#gapgrid").innerHTML = GAPCATS.map(([n, f]) => {
+    const all = ROWS.filter(f), amb = all.filter(ambient);
+    const hit = amb.filter(r => inWindow(r, S.o2, S.psi)), meas = hit.filter(r => o2Kind(r) === "meas").length, air = hit.length - meas;
+    const o2only = amb.filter(r => atmDist(r, S.o2, S.psi).dO <= 3).length;
+    const stream = all.filter(r => o2Kind(r) === "stream" && inWindow(r, S.o2, S.psi)).length;
+    const unsure = all.filter(r => o2Kind(r) === "unsure").length;
+    const cls = hit.length > 10 ? "ok" : hit.length > 0 ? "mid" : "bad";
+    const parts = [];
+    const where = r => /Cygnus/.test(r.o2_source) ? "Cygnus cabin air" : /ISS cabin/.test(r.o2_source) ? "ISS cabin air" : "air in the test chamber";
+    const airBy = {}; hit.filter(r => o2Kind(r) === "air").forEach(r => airBy[where(r)] = (airBy[where(r)] || 0) + 1);
+    if (hit.length) parts.push(`${meas} with O₂ measured or set per test${air ? `, ${Object.entries(airBy).map(([w, n]) => `${n} in ${w}`).join(", ")} (about 21% O₂, 14.7 psi; O₂ not logged per test)` : ""}.`);
+    else { const nb = nearest(amb, S.o2, S.psi); if (nb) parts.push(`Nearest test: ${nearestText(nb)}.`); }
+    parts.push(`${o2only} match O₂ alone, out of ${all.length}.`);
+    if (stream) parts.push(`Plus ${stream} inverse-flame tests where only the burner stream had this much O₂ (the room held fuel).`);
+    if (unsure) parts.push(`${unsure} BASS rows left out: O₂ not logged and some tests were N₂-diluted.`);
+    return `<div class="gap ${cls}"><div class="small muted">${n}</div><div class="st">${hit.length}</div><div class="small">table rows within ±3 O₂ points and ±30% pressure of your scenario. ${parts.join(" ")}</div></div>`;
   }).join("");
-  const solids = ROWS.filter(r => r.fuel_phase === "solid" && r.o2_pct != null && meas(r) && !/NEEDS_VERIFICATION/.test(r.flags || ""));
+  const solids = ROWS.filter(r => r.fuel_phase === "solid" && o2Kind(r) === "meas" && !/NEEDS_VERIFICATION/.test(r.flags || ""));
   const smax = Math.max(...solids.map(r => r.o2_pct_max ?? r.o2_pct));
+  const ambRows = ROWS.filter(ambient), amax = Math.max(...ambRows.map(r => r.o2_pct_max ?? r.o2_pct));
+  const smaxStream = Math.max(...ROWS.filter(r => o2Kind(r) === "stream").map(r => r.o2_pct_max ?? r.o2_pct));
   const pmin = Math.min(...ROWS.filter(r => r.p_atm != null && !/^assumed/.test(r.p_source || "")).map(r => r.p_atm)) * PSI_PER_ATM;
   const msgs = [];
+  if (S.o2 > amax) msgs.push(`No PSI test had a room atmosphere above ${fmt(amax)}% O₂. The ${fmt(smaxStream)}% O₂ in ACME CFI-G and Flame Design was the gas flowing out of an inverse-flame burner into a fuel-filled chamber, so it does not show how materials burn in an ${fmt(S.o2)}% O₂ room.`);
   if (S.o2 > smax) msgs.push(`No solid-fuel flight test in PSI goes above ${fmt(smax)}% O₂, so solid flammability at ${fmt(S.o2)}% must be extrapolated, or taken from the ACME BRE gas emulator (up to 40% O₂).`);
-  if (S.psi < 14) msgs.push(`All solid-fuel tests ran near 1 atm (14.7 psi). Reduced-pressure data at ${fmt(S.psi)} psi exist only for droplets and gas flames (lowest measured pressure in PSI: ${fmt(pmin)} psi).`);
+  if (S.psi < pmin) msgs.push(`${fmt(S.psi)} psi is below every pressure tested in PSI (lowest: ${fmt(pmin)} psi, droplets and gas flames).`);
+  else if (S.psi < 14) msgs.push(`All solid-fuel tests ran near 1 atm (14.7 psi). Reduced-pressure data at ${fmt(S.psi)} psi exist only for droplets and gas flames (lowest measured pressure in PSI: ${fmt(pmin)} psi).`);
   if (S.g === "moon" || S.g === "mars") msgs.push(`No partial-gravity data in PSI. Bound the ${S.g === "moon" ? "lunar" : "Martian"} case with microgravity (PSI) and 1-g tests; LUCI reports suggest lunar gravity may be close to the most flammable condition.`);
   if (S.flow < 5) msgs.push(`At ${S.flow} cm/s you are in the low-flow range where BASS-II found quenching (1-5 cm/s) and the lowest O₂ limits.`);
   if (!msgs.length) msgs.push("Your scenario sits inside well-covered PSI conditions.");
   $("#gaptext").innerHTML = msgs.map(esc).join("<br>");
+  renderLadder();
+  renderGravityBounds();
   $("#external").innerHTML = B.gaps_external.map(g => `<div class="gap"><h3>${esc(g.name)}</h3><div class="small">${esc(g.what)}</div><a class="small" href="${g.src}">Source</a></div>`).join("");
+}
+
+/* atmosphere ladder: Earth -> Moon base -> spacesuit */
+const LADDER = [
+  {n:"Earth sea level / ISS", o2:20.95, psi:14.7, why:"Normal air. The ISS keeps about the same atmosphere."},
+  {n:"Moon base / pressurized rover", o2:30, psi:10.2, why:"Expected: 30% O₂ or more at 10.2 psi or less, to shorten pre-breathing before moonwalks."},
+  {n:"Exploration atmosphere", o2:34, psi:8.2, why:"34% O₂ at 8.2 psi, the condition FM2 plans to test on the Moon."},
+  {n:"Spacesuit", o2:100, psi:4.3, why:"Pure O₂ at low pressure keeps the suit flexible. Crews pre-breathe O₂ to purge nitrogen and avoid the bends."}];
+const PP_SEA = .2095 * 14.696;
+function renderLadder(){
+  const amb = ROWS.filter(ambient), sol = amb.filter(r => r.fuel_phase === "solid");
+  const rowsFor = L => { const any = amb.filter(r => inWindow(r, L.o2, L.psi)).length, s = sol.filter(r => inWindow(r, L.o2, L.psi)).length, nb = nearest(amb, L.o2, L.psi), ns = nearest(sol, L.o2, L.psi); return {any, s, nb, ns}; };
+  const list = [...LADDER, {n:"Your scenario", o2:S.o2, psi:S.psi, why:"From the sliders above.", you:true}];
+  $("#laddertable").innerHTML = `<thead><tr><th>Atmosphere</th><th>O₂</th><th>Pressure</th><th>O₂ partial pressure</th><th>O₂ fraction vs Earth air</th><th>PSI tests in window (all / solids)</th><th>Nearest PSI test</th></tr></thead><tbody>` +
+    list.map(L => { const c = rowsFor(L), pp = L.o2 / 100 * L.psi, inc = (L.o2 / 20.95 - 1) * 100;
+      return `<tr${L.you ? ' style="background:var(--accent-soft)"' : ""}><th scope="row" style="position:static">${esc(L.n)}<div class="small muted" style="font-weight:400;max-width:34ch;white-space:normal">${esc(L.why)}</div></th>
+        <td class="num">${fmt(L.o2)}%</td><td class="num">${fmt(L.psi)} psi</td><td class="num">${fmt(pp, 2)} psi <span class="small muted">(${fmt(pp / PP_SEA * 100, 0)}% of sea level)</span></td>
+        <td class="num">${Math.abs(inc) < 1 ? "same" : (inc > 0 ? "+" : "") + fmt(inc, 0) + "%"}</td>
+        <td class="num">${c.any} / ${c.s}</td><td class="small">${c.any ? "Inside covered conditions" : nearestText(c.nb)}${!c.s && c.ns ? `<br><span class="muted">Nearest solid: ${nearestText(c.ns)}</span>` : ""}</td></tr>`; }).join("") + "</tbody>";
+  // chart
+  const traces = [];
+  for (const [ph, col, label] of [...PHASES].reverse()) {
+    const pts = amb.filter(r => phaseKey(r.fuel_phase) === ph && r.p_atm != null);
+    if (!pts.length) continue;
+    traces.push({type:"scattergl", mode:"markers", name:label, x:pts.map(r => r.p_atm * PSI_PER_ATM), y:pts.map(r => r.o2_pct),
+      text:pts.map(r => `<b>${BYID[r.psi_id].acr}</b> ${r.test_id || ""}<br>${esc(r.fuel || "")}<br>${rowO2(r)}, ${rowPsi(r)}<br><i>${esc(r.o2_source)}</i>`), hovertemplate:"%{text}<extra></extra>",
+      marker:{size:6, color:pts.map(r => o2Kind(r) === "air" ? "rgba(0,0,0,0)" : css(col)), line:{width:1.2, color:css(col)}, opacity:.8}});
+  }
+  const st = ROWS.filter(r => o2Kind(r) === "stream" && r.p_atm != null);
+  traces.push({type:"scattergl", mode:"markers", name:"Inverse flame: O₂ in burner stream, not the room", x:st.map(r => r.p_atm * PSI_PER_ATM), y:st.map(r => r.o2_pct),
+    text:st.map(r => `<b>${BYID[r.psi_id].acr}</b> ${r.test_id || ""}<br>${esc(r.fuel || "")} in the chamber<br>burner stream ${rowO2(r)}, ${rowPsi(r)}`), hovertemplate:"%{text}<extra></extra>",
+    marker:{symbol:"diamond-open", size:7, color:css("--muted")}});
+  const pg = []; for (let p = 3; p <= 46; p *= 1.05) pg.push(p);
+  traces.push({type:"scatter", mode:"lines", name:"Same O₂ partial pressure as sea level", x:pg, y:pg.map(p => Math.min(100, PP_SEA / p * 100)), hoverinfo:"skip", line:{color:css("--muted"), dash:"dash", width:1.2}});
+  traces.push({type:"scatter", mode:"markers", name:"Atmospheres", x:list.map(L => L.psi), y:list.map(L => L.o2), text:list.map(L => L.you ? "Your scenario" : L.n), hovertemplate:"%{text}: %{y}% O₂ at %{x} psi<extra></extra>",
+    marker:{symbol:list.map(L => L.you ? "star" : "square"), size:list.map(L => L.you ? 18 : 12), color:list.map(L => L.you ? css("--accent") : css("--ink")), line:{color:css("--surface"), width:1.5}}});
+  const OFF = {"Earth sea level / ISS":[45, 32], "Moon base / pressurized rover":[60, -48], "Exploration atmosphere":[-30, -58], "Spacesuit":[60, 28]};
+  const atmAnn = list.map(L => ({x:Math.log10(L.psi), y:L.o2, text:L.you ? "your scenario" : L.n.split(" /")[0], ax:L.you ? 0 : OFF[L.n][0], ay:L.you ? 0 : OFF[L.n][1], yshift:L.you ? 18 : 0, showarrow:!L.you, arrowhead:0, arrowwidth:1, arrowcolor:css("--muted"),
+    font:{family:"IBM Plex Sans Condensed", size:12, color:L.you ? css("--accent") : css("--ink")}, bgcolor:L.you ? "rgba(0,0,0,0)" : css("--surface")}));
+  const ink = css("--ink"), muted = css("--muted"), line = css("--line");
+  Plotly.react("ladder", traces, {margin:{l:56, r:16, t:10, b:46}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)", font:{family:"IBM Plex Sans", color:ink, size:12}, hovermode:"closest",
+    legend:{orientation:"h", y:-0.2, font:{size:11}},
+    xaxis:{title:{text:"Pressure (psi, log scale)", font:{color:muted}}, type:"log", range:[Math.log10(3), Math.log10(50)], tickvals:[3, 4.3, 5, 7, 10.2, 14.7, 20, 30, 45], ticktext:["3", "4.3", "5", "7", "10.2", "14.7", "20", "30", "45"], gridcolor:line, color:muted},
+    yaxis:{title:{text:"Oxygen in the room (%)", font:{color:muted}}, range:[0, 112], tickvals:[0, 20, 40, 60, 80, 100], gridcolor:line, color:muted},
+    shapes:[{type:"rect", x0:4.3, x1:10.2, y0:30, y1:100, line:{width:0}, fillcolor:css("--accent-soft"), opacity:.5, layer:"below"}],
+    annotations:[{x:Math.log10(6.6), y:92, text:"Moon base range:<br>≥30% O₂, ≤10.2 psi", showarrow:false, font:{size:11, color:muted}}, ...atmAnn]}, {displayModeBar:false, responsive:true});
+  const amaxRow = amb.reduce((a, r) => (r.o2_pct_max ?? r.o2_pct) > (a.o2_pct_max ?? a.o2_pct) ? r : a);
+  const pminRow = ROWS.filter(r => r.p_atm != null && !/^assumed/.test(r.p_source || "")).reduce((a, r) => r.p_atm < a.p_atm ? r : a);
+  $("#laddernote").innerHTML = `The dashed line keeps the O₂ partial pressure crews breathe at sea level. Moon-base and exploration atmospheres sit close to it, so they feel normal to breathe, but their O₂ <i>fraction</i> is 43-62% higher than Earth air, and the O₂ fraction is what makes materials more flammable. Highest room O₂ in PSI: <b class="num">${fmt(amaxRow.o2_pct_max ?? amaxRow.o2_pct)}%</b> (${esc(BYID[amaxRow.psi_id].acr)}). Lowest pressure: <b class="num">${fmt(pminRow.p_atm * PSI_PER_ATM)} psi</b> (${esc(BYID[pminRow.psi_id].acr)}). The spacesuit point is far from every test: no PSI material or fuel was burned in pure O₂ or below ${fmt(pminRow.p_atm * PSI_PER_ATM)} psi. Hollow circles: cabin air, not logged per test.`;
+}
+
+/* microgravity vs 1 g for PMMA rods (BASS-II) */
+function renderGravityBounds(){
+  const el = $("#gbounds"); if (!FB) { el.innerHTML = ""; return; }
+  const m = FB.pmma_rod, cons = interpLog(m.curve.U, m.curve.pred_lo, m.minimum.U_cm_s);
+  el.innerHTML = `<div class="gap"><div class="small muted">Microgravity (BASS-II, PMMA rods)</div><div class="st num">${fmt(m.minimum.o2, 1)}% O₂</div><div class="small">Lowest O₂ that keeps a flame, at about ${fmt(m.minimum.U_cm_s, 1)} cm/s air speed. Conservative: ${fmt(cons, 1)}%. <a href="#boundary">Boundary model</a></div></div>
+    <div class="gap"><div class="small muted">Normal gravity (same rods, 1-g tests)</div><div class="st num">15.4% O₂</div><div class="small">So the 1-g screening limit is about ${fmt(15.4 - m.minimum.o2, 1)} points higher than in space.</div></div>
+    <div class="gap mid"><div class="small muted">Moon and Mars</div><div class="st">Between, or lower</div><div class="small">If flammability changes steadily with gravity, partial gravity sits between these two limits. LUCI results hint it may instead be the most flammable case, so use the microgravity limit, not the midpoint.</div></div>
+    <div class="gap"><div class="small muted">Artificial buoyancy in PSI</div><div class="st">ACME E-FIELD</div><div class="small">An electric field pushes the ions in a flame, creating a buoyancy-like flow in microgravity: the only PSI handle on partial-gravity behaviour. <a href="#explore" data-sel="PSI-22" class="gsel">Open E-FIELD</a></div></div>`;
+  el.querySelectorAll(".gsel").forEach(a => a.onclick = () => { S.sel = a.dataset.sel; });
 }
 
 /* ---------------- flammability boundary ---------------- */
@@ -795,9 +946,9 @@ $("#askexamples").querySelectorAll("button").forEach(b => b.onclick = () => { $(
 const TOOLS = [
   {name:"list_investigations", description:"List all PSI combustion investigations with id, acronym, tier, safety focus, fuel phase, test count and current scenario score.",
    inputSchema:{type:"object", properties:{}}, execute:() => RANKED.map(({i, s}) => ({id:i.id, acr:i.acr, tier:i.tier, pds:i.pds, phase:i.phase, ntests:i.ntests, score:+s.total.toFixed(1)}))},
-  {name:"get_investigation", description:"Full card for one investigation: summary, varied/fixed, sensors, findings with sources, habitat relevance, quality notes, PSI objective.",
+  {name:"get_investigation", description:"Full card for one investigation: objective, fuel and sample/burner shape and size, hardware family, summary, varied/fixed, sensors, findings with sources, habitat relevance, quality notes, PSI objective text.",
    inputSchema:{type:"object", properties:{id:{type:"string", description:"PSI id like PSI-25"}}, required:["id"]},
-   execute:({id}) => { const i = BYID[id]; if (!i) throw new Error("unknown id"); const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, pubs:pubs.slice(0, 8).map(p => p.t)}; }},
+   execute:({id}) => { const i = BYID[id]; if (!i) throw new Error("unknown id"); const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, family_note:(B.families || {})[i.family] || "", shared_with:(B.shared_links || []).filter(L => L.ids.includes(id)).map(L => ({what:L.what, ids:L.ids, note:L.note})), pubs:pubs.slice(0, 8).map(p => p.t)}; }},
   {name:"query_tests", description:"Search the unified test matrix. Filters are optional. Returns up to 40 rows plus a count. o2 in %, pressure in psi, flow in cm/s.",
    inputSchema:{type:"object", properties:{psi_id:{type:"string"}, fuel_phase:{type:"string"}, fuel_contains:{type:"string"}, o2_min:{type:"number"}, o2_max:{type:"number"}, psi_min:{type:"number"}, psi_max:{type:"number"}, flow_min:{type:"number"}, flow_max:{type:"number"}, measured_o2_only:{type:"boolean"}}},
    execute:(q) => { const rs = ROWS.filter(r => (!q.psi_id || r.psi_id === q.psi_id) && (!q.fuel_phase || r.fuel_phase === q.fuel_phase) && (!q.fuel_contains || (r.fuel || "").toLowerCase().includes(q.fuel_contains.toLowerCase())) &&
@@ -816,7 +967,7 @@ const TOOLS = [
        thin_pmma_opposed:{extinction_speed_cm_s:{"21%":1.0, "16%":3.0}}, caveats:FB.caveats}; }},
   {name:"quality_issues", description:"Data-quality log entries, optionally for one investigation.", inputSchema:{type:"object", properties:{psi_id:{type:"string"}}},
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
-const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
+const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
 function addMsg(role, text){ const d = document.createElement("div"); d.className = "msg " + (role === "user" ? "u" : "a"); d.textContent = text; $("#msgs").appendChild(d); $("#msgs").scrollTop = 1e9; return d; }
 // Gemini generateContent call through the FireSight proxy (it holds the API key).
 async function callGemini(body){

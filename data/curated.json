@@ -51,7 +51,9 @@
      "src": "guide"
     }
    ],
-   "habitat": "Directly about cabin materials and local suppression. Its tests sit at 21% or lower O2, so habitat atmospheres at 30-34% O2 are outside its envelope."
+   "habitat": "Directly about cabin materials and local suppression. Its tests sit at 21% or lower O2, so habitat atmospheres at 30-34% O2 are outside its envelope.",
+   "objective_short": "Find out whether practical spacecraft solids burn in slow forced flow without buoyancy, how flames spread and go out, and whether a nitrogen jet can put them out.",
+   "fuel_geom": "PMMA spheres 1 and 2 cm; PMMA flat samples and slabs 1-2 cm wide; cotton-fiberglass (SIBAL), Nomex and Ultem fabric strips 1-2 cm wide; candles (also lit in the wake). Mounted in the 76 x 76 mm MSG flow duct."
   },
   "PSI-25": {
    "tier": 1,
@@ -84,7 +86,9 @@
      "src": "rpt-bass2"
     }
    ],
-   "habitat": "Core evidence that 1-g screening under-predicts flammability. Its boundaries are at 21% O2 or below, so extrapolating to 30-34% O2 lunar atmospheres needs modeling."
+   "habitat": "Core evidence that 1-g screening under-predicts flammability. Its boundaries are at 21% O2 or below, so extrapolating to 30-34% O2 lunar atmospheres needs modeling.",
+   "objective_short": "Map where solids stop burning in space (limiting O2 vs air speed) and compare that boundary with NASA's 1-g screening test.",
+   "fuel_geom": "Clear and black PMMA rods 6.3, 9.5 and 12.7 mm (1/4, 3/8, 1/2 in); PMMA films 0.1-0.4 mm thick, 1-2 cm wide; SIBAL fabric strips 1 and 2 cm wide; PMMA slabs. Same MSG flow duct."
   },
   "PSI-98": {
    "tier": 1,
@@ -110,7 +114,9 @@
      "src": "rpt-saffire-readme"
     }
    ],
-   "habitat": "Only full-scale data in PSI. Its sensor suite (O2, CO2, temperatures) also gives a basis for cabin-level smoke and heat-release estimates."
+   "habitat": "Only full-scale data in PSI. Its sensor suite (O2, CO2, temperatures) also gives a basis for cabin-level smoke and heat-release estimates.",
+   "objective_short": "See how fast a large fire grows in a spacecraft-sized volume and whether it reaches a steady spread rate.",
+   "fuel_geom": "One SIBAL cotton-fiberglass sheet, 94 x 40.6 cm, 0.37 mm thick, in a flow duct inside an uncrewed Cygnus."
   },
   "PSI-99": {
    "tier": 1,
@@ -139,7 +145,9 @@
      "src": "table"
     }
    ],
-   "habitat": "Material-by-material evidence for selection. Silicone and Nomex behavior matters for cabin seals and fabrics."
+   "habitat": "Material-by-material evidence for selection. Silicone and Nomex behavior matters for cabin seals and fabrics.",
+   "objective_short": "Compare microgravity ignition and flame spread of nine materials with NASA's 1-g screening test.",
+   "fuel_geom": "Nine sheets, mostly 29 x 5 cm (one 5 x 5 cm), 0.27-10 mm thick: SIBAL fabric, silicone, PMMA, PMMA with Nomex."
   },
   "PSI-100": {
    "tier": 1,
@@ -161,14 +169,16 @@
      "src": "rpt-saffire-readme"
     }
    ],
-   "habitat": "Ventilation speed is a design variable for habitats, and this pair (20 vs 30 cm/s) brackets typical cabin flows."
+   "habitat": "Ventilation speed is a design variable for habitats, and this pair (20 vs 30 cm/s) brackets typical cabin flows.",
+   "objective_short": "Repeat Saffire-I at a faster air speed to show how ventilation changes large-scale fire growth.",
+   "fuel_geom": "SIBAL sheet 94 x 40.6 cm, 0.33 mm thick, same Cygnus flow duct."
   },
   "PSI-102": {
    "tier": 1,
    "pds": [
     "detection"
    ],
-   "family": "SAME hardware (MSG)",
+   "family": "SAME smoke hardware (MSG)",
    "phase": "solid",
    "scale": 0.5,
    "summary": "Heated five common spacecraft materials (Teflon, Kapton, silicone rubber, cotton lampwick, dibutyl phthalate) to make smoke, then measured smoke particle sizes and how the ISS and Shuttle smoke detectors responded.",
@@ -190,14 +200,16 @@
      "src": "rpt-same"
     }
    ],
-   "habitat": "Direct input to detector requirements for Orion, Gateway and surface habitats."
+   "habitat": "Direct input to detector requirements for Orion, Gateway and surface habitats.",
+   "objective_short": "Measure the particle size of smoke from overheated (not burning) spacecraft materials in microgravity and how ISS and Shuttle smoke detectors respond to it.",
+   "fuel_geom": "Teflon, Kapton, silicone rubber, cotton lampwick and dibutyl phthalate samples on a carousel, heated by a wire to below their ignition point. No flame."
   },
   "PSI-101": {
    "tier": 1,
    "pds": [
     "detection"
    ],
-   "family": "SAME hardware (MSG)",
+   "family": "SAME smoke hardware (MSG)",
    "phase": "solid",
    "scale": 0.5,
    "summary": "Reflight of SAME with broader conditions (no-flow heating, higher temperatures), a new fire-retardant foam (Pyrell) and a prototype two-moment smoke detector (MPASS).",
@@ -219,14 +231,16 @@
      "src": "rpt-samer"
     }
    ],
-   "habitat": "Lunar dust makes nuisance-alarm rejection critical, and this is the PSI dataset that addresses it."
+   "habitat": "Lunar dust makes nuisance-alarm rejection critical, and this is the PSI dataset that addresses it.",
+   "objective_short": "Reflight of SAME over a wider range of heating and flow, with a new foam and a prototype two-moment smoke detector.",
+   "fuel_geom": "Kapton, silicone, lampwick, Teflon and Pyrell foam heated on a carousel to three temperature levels, with inlet flow 0-8.1 cm/s and smoke aging. No flame."
   },
   "PSI-47": {
    "tier": 1,
    "pds": [
     "detection"
    ],
-   "family": "SAME hardware (MSG)",
+   "family": "Hand-held aerosol counters (ISS cabin)",
    "phase": "dust",
    "scale": 0.3,
    "summary": "Checked that a commercial particle counter (P-Trak), modified to recycle its alcohol by capillary action, works in microgravity, using test dust instead of smoke.",
@@ -240,7 +254,9 @@
      "src": "rpt-daft"
     }
    ],
-   "habitat": "Baseline for dust-vs-smoke discrimination, highly relevant for lunar regolith dust."
+   "habitat": "Baseline for dust-vs-smoke discrimination, highly relevant for lunar regolith dust.",
+   "objective_short": "Prove that the P-Trak particle counter, a key SAME instrument, works in long-duration microgravity; measure background particles in the ISS cabin.",
+   "fuel_geom": "No fuel. Arizona Road Dust test aerosol in 15 L Mylar bags, plus ISS cabin air sampled at several modules. Hand-held P-Trak (with capillary alcohol wick) and DustTrak run by the crew."
   },
   "PSI-69": {
    "tier": 1,
@@ -274,7 +290,9 @@
      "src": "table"
     }
    ],
-   "habitat": "Supports choosing CO2 vs N2 vs He suppressants for pressure-reduced habitats, and it is the only PSI flight dataset with tests run at the planned lunar-habitat atmosphere (30-34% O2 near 10.3 psi), although with liquid droplets, not solids."
+   "habitat": "Supports choosing CO2 vs N2 vs He suppressants for pressure-reduced habitats, and it is the only PSI flight dataset with tests run at the planned lunar-habitat atmosphere (30-34% O2 near 10.3 psi), although with liquid droplets, not solids.",
+   "objective_short": "Measure how pressure and inert diluents (N2, CO2, He) change droplet burning and the oxygen limit, to rank suppressants for spacecraft.",
+   "fuel_geom": "Free-floating methanol and heptane droplets, 1.1-4.7 mm initial diameter, deployed and ignited in the MDCA inside the CIR."
   },
   "PSI-68": {
    "tier": 2,
@@ -296,7 +314,9 @@
      "src": "table"
     }
    ],
-   "habitat": "Its high-O2, low-pressure corner overlaps the planned lunar habitat atmosphere."
+   "habitat": "Its high-O2, low-pressure corner overlaps the planned lunar habitat atmosphere.",
+   "objective_short": "Extend FLEX to practical and multicomponent liquid fuels, fiber-supported droplets and slow forced flows.",
+   "fuel_geom": "Droplets 1.5-5 mm, free or on a fiber: heptane, n-octane, iso-octane, decane, ethanol, propanol-glycerol and heptane/iso-octane blends."
   },
   "PSI-39": {
    "tier": 2,
@@ -321,7 +341,9 @@
      "src": "rpt-cfi"
     }
    ],
-   "habitat": "Flags a detection gap: cool flames emit little light or heat."
+   "habitat": "Flags a detection gap: cool flames emit little light or heat.",
+   "objective_short": "Study 'cool flames' (low-temperature burning) of large-alkane droplets and when they start and go out, across pressure.",
+   "fuel_geom": "n-dodecane and dodecane/iso-dodecane droplets, free-floating or fiber-supported, in the MDCA."
   },
   "PSI-20": {
    "tier": 1,
@@ -346,7 +368,9 @@
      "src": "table"
     }
    ],
-   "habitat": "The strongest PSI match for 30-40% O2 habitats and for zero-ventilation scenarios."
+   "habitat": "The strongest PSI match for 30-40% O2 habitats and for zero-ventilation scenarios.",
+   "objective_short": "Emulate how solid materials burn in still air, and where they stop burning, as a function of material properties, using a controllable gas burner.",
+   "fuel_geom": "Flat porous burners 25 or 50 mm diameter fed ethylene, 50% ethylene or methane; fuel flow set to mimic the heat of gasification of a chosen solid."
   },
   "PSI-159": {
    "tier": 2,
@@ -371,7 +395,9 @@
      "src": "rpt-cfig"
     }
    ],
-   "habitat": "Data at oxygen-rich conditions comparable to suit and O2-line leak scenarios."
+   "habitat": "Data at oxygen-rich conditions comparable to suit and O2-line leak scenarios.",
+   "objective_short": "Create and study cool diffusion flames of gaseous fuels, including inverse flames, and measure their ignition and extinction.",
+   "fuel_geom": "6.35 mm porous spherical burner. Normal flames: ethane, propane or butane (pure or N2-diluted) flow out into O2/N2. Inverse flames: O2/N2 with up to 85% O2 flows out into a fuel-filled chamber."
   },
   "PSI-10": {
    "tier": 2,
@@ -392,7 +418,9 @@
      "src": "rpt-fd"
     }
    ],
-   "habitat": "Shows how O2 enrichment changes soot and extinction, which matter for smoke detection at 30-34% O2."
+   "habitat": "Shows how O2 enrichment changes soot and extinction, which matter for smoke detection at 30-34% O2.",
+   "objective_short": "Learn which flame structure (stoichiometric mixture fraction, O2) gives robust, soot-free flames; measure extinction and soot limits.",
+   "fuel_geom": "6.35 mm porous spherical burner, normal and inverse; ethylene and propane diluted with N2."
   },
   "PSI-23": {
    "tier": 2,
@@ -413,7 +441,9 @@
      "src": "rpt-sflame"
     }
    ],
-   "habitat": "Model-validation data for fire simulation codes at 21-30% O2."
+   "habitat": "Model-validation data for fire simulation codes at 21-30% O2.",
+   "objective_short": "Measure radiative extinction of spherical diffusion flames to test chemistry and radiation models.",
+   "fuel_geom": "6.35 mm porous spherical burner; hydrogen, methane, ethylene and blends, diluted with N2 or He."
   },
   "PSI-21": {
    "tier": 3,
@@ -434,7 +464,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "Indirect: soot models feed smoke-detection and radiation predictions."
+   "habitat": "Indirect: soot models feed smoke-detection and radiation predictions.",
+   "objective_short": "Measure coflow laminar flames from near-extinction to heavily sooting to improve soot models.",
+   "fuel_geom": "Coflow burner (fuel tube inside a concentric air tube); methane and ethylene, N2-diluted."
   },
   "PSI-22": {
    "tier": 3,
@@ -455,7 +487,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "A proxy for lunar and Martian gravity until LUCI and FM2 data enter PSI."
+   "habitat": "A proxy for lunar and Martian gravity until LUCI and FM2 data enter PSI.",
+   "objective_short": "Use an electric field acting on flame ions to steer flames, as a stand-in for buoyancy.",
+   "fuel_geom": "Coflow and gas-jet burners facing a high-voltage mesh (up to 10 kV); methane and ethylene, N2-diluted."
   },
   "PSI-107": {
    "tier": 2,
@@ -485,7 +519,9 @@
      "src": "rpt-spice"
     }
    ],
-   "habitat": "Smoke yield of fires depends on ventilation, which matters for detection timing."
+   "habitat": "Smoke yield of fires depends on ventilation, which matters for detection timing.",
+   "objective_short": "Measure smoke points of gas-jet flames in coflowing air to rank how readily fuels soot in microgravity.",
+   "fuel_geom": "Round nozzles 0.41, 0.76 and 1.60 mm inner diameter in the SPICE coflow duct; ethylene, propane, propylene, methane and N2-diluted propylene."
   },
   "PSI-106": {
    "tier": 3,
@@ -506,7 +542,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "Indirect: stability of leak-fed (gas-jet) fires."
+   "habitat": "Indirect: stability of leak-fed (gas-jet) fires.",
+   "objective_short": "Measure when jet flames lift off the nozzle and blow out in coflowing air.",
+   "fuel_geom": "Coflow jet burner in the SPICE duct; methane, ethane and ethylene, pure or N2-diluted."
   },
   "PSI-62": {
    "tier": "G",
@@ -527,7 +565,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "Modeling bridge for solid-fuel fires."
+   "habitat": "Modeling bridge for solid-fuel fires.",
+   "objective_short": "Model concurrent flame spread over solids with flamelet chemistry and check it against BASS and BASS-II images.",
+   "fuel_geom": "No new samples: BASS and BASS-II sample geometries, simulated."
   },
   "PSI-115": {
    "tier": "G",
@@ -548,7 +588,9 @@
      "src": "rpt-115"
     }
    ],
-   "habitat": "Supports larger-particle detection channels for space detectors."
+   "habitat": "Supports larger-particle detection channels for space detectors.",
+   "objective_short": "Simulate how smoke particles form and grow in microgravity compared with Earth.",
+   "fuel_geom": "Simulated dibutyl phthalate smoke in a SAME-like heater geometry."
   },
   "PSI-60": {
    "tier": "G",
@@ -569,7 +611,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "Indirect: soot and radiation modeling."
+   "habitat": "Indirect: soot and radiation modeling.",
+   "objective_short": "Extract soot temperature and soot volume fraction from SPICE flight images and compare with soot models.",
+   "fuel_geom": "SPICE gas-jet flames (images only)."
   },
   "PSI-142": {
    "tier": "G",
@@ -590,7 +634,9 @@
      "src": "table"
     }
    ],
-   "habitat": "Cool-flame hazard mapping."
+   "habitat": "Cool-flame hazard mapping.",
+   "objective_short": "Map cool-flame flammability limits at FLEX-like conditions with ground experiments and models.",
+   "fuel_geom": "Ozone-assisted counterflow flames in a ground laboratory."
   },
   "PSI-117": {
    "tier": "G",
@@ -611,7 +657,9 @@
      "src": "meta"
     }
    ],
-   "habitat": "Cool-flame hazard mapping."
+   "habitat": "Cool-flame hazard mapping.",
+   "objective_short": "Simulate droplet cool flames in 3-D and check against FLEX.",
+   "fuel_geom": "Simulated FLEX-size droplets."
   }
  },
  "inv_quality": {
@@ -732,6 +780,57 @@
    "name": "SoFIE (GEL, MIST)",
    "what": "CIR insert for solid fuels at 10-40% O2, 0.2-1.5 atm, 0-30 cm/s. Results not yet in PSI.",
    "src": "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20200000361.pdf"
+  }
+ ],
+ "families": {
+  "CIR + ACME": "The six ACME experiments (BRE, CFI-G, Flame Design, s-Flame, CLD Flame, E-FIELD Flames). All burned gaseous fuels with the same modular ACME hardware in the Combustion Integrated Rack (CIR), so burners, cameras and chamber are shared.",
+  "CIR + MDCA (droplets)": "FLEX, FLEX-2 and CFI burned droplets of liquid fuel in the Multi-user Droplet Combustion Apparatus (MDCA) inside the CIR: same chamber, droplet deployment and cameras.",
+  "MSG flow duct (SPICE hardware)": "BASS, BASS-II, SPICE and SLICE used the modular fan-driven flow duct built for SPICE, inside the Microgravity Science Glovebox (MSG). Together they cover solid and gaseous fuels in the same flow channel.",
+  "Saffire (Cygnus)": "Large samples burned in a flow duct inside uncrewed Cygnus cargo ships after they left the ISS.",
+  "SAME smoke hardware (MSG)": "SAME and SAME-R heated materials in the MSG to make smoke, then measured particle size and detector response.",
+  "Hand-held aerosol counters (ISS cabin)": "DAFT and DAFT-2 were crew-run checks of hand-held particle counters in the ISS cabin, using dust instead of smoke.",
+  "Ground analysis": "Ground studies that model or re-analyse the flight data."
+ },
+ "shared_links": [
+  {
+   "what": "P-Trak particle counter",
+   "ids": [
+    "PSI-47",
+    "PSI-102",
+    "PSI-101"
+   ],
+   "note": "The same type of instrument detected dust in DAFT/DAFT-2 and smoke in SAME and SAME-R. DAFT was flown first to show it works in microgravity."
+  },
+  {
+   "what": "SPICE flow duct in the MSG",
+   "ids": [
+    "PSI-26",
+    "PSI-25",
+    "PSI-107",
+    "PSI-106"
+   ],
+   "note": "Same fan-driven duct for solid fuels (BASS, BASS-II) and gas-jet flames (SPICE, SLICE)."
+  },
+  {
+   "what": "ACME modular hardware in the CIR",
+   "ids": [
+    "PSI-20",
+    "PSI-159",
+    "PSI-10",
+    "PSI-23",
+    "PSI-21",
+    "PSI-22"
+   ],
+   "note": "Six gaseous-flame experiments, one set of hardware. BRE used it to emulate solids."
+  },
+  {
+   "what": "MDCA droplet apparatus in the CIR",
+   "ids": [
+    "PSI-69",
+    "PSI-68",
+    "PSI-39"
+   ],
+   "note": "Three droplet investigations with the same apparatus; CFI followed up the cool flames FLEX discovered."
   }
  ]
 }
