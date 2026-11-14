@@ -142,6 +142,7 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
     <a href="#explore">Explore &amp; rank</a>
     <a href="#compare">Compare</a>
     <a href="#gaps">Gaps &amp; partial gravity</a>
+    <a href="#boundary">Flammability boundary</a>
     <a href="#data">Data &amp; export</a>
     <a href="#quality">Data quality</a>
     <a href="#incidents">Incidents &amp; Earth benefits</a>
@@ -222,6 +223,31 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
       <h2>Partial gravity: bounds and what is coming</h2>
       <p class="small" style="margin:0;max-width:80ch">PSI has no partial-gravity combustion data yet. Microgravity and normal-gravity results bound the Moon and Mars case. ACME E-FIELD imitates buoyancy with an electric field. Work outside PSI that will fill the gap:</p>
       <div class="gapgrid" id="external"></div>
+    </div>
+  </section>
+
+  <!-- FLAMMABILITY BOUNDARY -->
+  <section class="view" id="v-boundary">
+    <div class="panel" style="display:grid;gap:10px">
+      <div class="rhead" style="flex-wrap:wrap"><h2>Flammability boundary in microgravity</h2>
+        <label class="small muted">Material <select id="fbmat">
+          <option value="pmma_rod">PMMA rods, stagnation flow (Olson): fitted model</option>
+          <option value="sibal_22">Cotton-fiberglass fabric (SIBAL), concurrent flow (T'ien)</option>
+          <option value="pmma_thin">Thin PMMA sheet, opposed flow (Bhattacharjee)</option></select></label></div>
+      <p class="small" style="margin:0;max-width:95ch">Below the boundary a flame cannot survive; above it the material keeps burning. The curve is the lowest oxygen level at which a burning sample stays lit, as a function of how fast air moves past it. Data: BASS-II on the ISS (PSI-25), about 1 atm. Air speed sets the scenario value; change it in the bar above.</p>
+      <div class="gapgrid" id="fbreadout"></div>
+      <div class="maptools" id="fbtoggles"><label><input type="checkbox" id="fbpub" checked> Show the report's own equation</label><label><input type="checkbox" id="fbpred" checked> Show 90% prediction band</label></div>
+      <div id="fbchart" style="width:100%;height:500px" role="img" aria-label="Flammability boundary: oxygen percentage versus air speed, with test outcomes"></div>
+      <div class="small muted" id="fbnote"></div>
+    </div>
+    <div class="cols2">
+      <div class="panel" style="display:grid;gap:8px;align-content:start"><h2>Model and validation</h2><div class="small" id="fbmodel"></div></div>
+      <div class="panel" style="display:grid;gap:8px;align-content:start"><h2>Limits of this model</h2><ul class="small" id="fbcaveats" style="margin:0;padding-left:18px;display:grid;gap:4px"></ul></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2>Boundary data points</h2>
+      <div class="chips" id="fbexport"></div>
+      <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="fbtable"></table></div>
     </div>
   </section>
 
@@ -482,7 +508,7 @@ function renderDetail(){
   const flagged = i.rows.filter(r => r.flags).length;
   $("#detail").innerHTML = `
     <div class="dhead"><div><h2>${esc(i.acr)} <span class="muted" style="font-weight:500">· ${i.id}</span></h2><div class="small muted">${esc(i.title)}</div></div>
-      <div class="chips"><a class="chipbtn" href="${i.url}">Open in PSI</a>${i.doi ? `<a class="chipbtn" href="https://doi.org/${esc(i.doi)}">DOI ${esc(i.doi)}</a>` : ""}<button class="chipbtn" id="addcmp">Add to compare</button></div></div>
+      <div class="chips"><a class="chipbtn" href="${i.url}">Open in PSI</a>${i.doi ? `<a class="chipbtn" href="https://doi.org/${esc(i.doi)}">DOI ${esc(i.doi)}</a>` : ""}${(i.id === "PSI-25" || i.id === "PSI-26") ? `<a class="chipbtn" href="#boundary">Flammability boundary</a>` : ""}<button class="chipbtn" id="addcmp">Add to compare</button></div></div>
     <div class="callout"><b>In plain words:</b> ${esc(i.summary)}<br><b>For engineers:</b> ${esc(i.engineer)}</div>
     <div class="cols2">
       <dl class="kv">
@@ -561,6 +587,136 @@ function renderGaps(){
   $("#gaptext").innerHTML = msgs.map(esc).join("<br>");
   $("#external").innerHTML = B.gaps_external.map(g => `<div class="gap"><h3>${esc(g.name)}</h3><div class="small">${esc(g.what)}</div><a class="small" href="${g.src}">Source</a></div>`).join("");
 }
+
+/* ---------------- flammability boundary ---------------- */
+const FB = B.boundary || null;
+const FBO = {stable:"stable flame", spread:"spread", quench:"quench", blowoff:"blowoff", noign:"no ignition"};
+function interpLog(xs, ys, x){            // interpolate y at x on a log-x grid
+  if (x <= xs[0]) return ys[0]; if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
+  let i = 1; while (xs[i] < x) i++;
+  const t = (Math.log(x) - Math.log(xs[i - 1])) / (Math.log(xs[i]) - Math.log(xs[i - 1]));
+  return ys[i - 1] + t * (ys[i] - ys[i - 1]);
+}
+function fbPredict(U){
+  const m = FB.pmma_rod, c = m.curve;
+  if (!(U > 0) || U < m.valid_U[0] || U > m.valid_U[1]) return null;
+  return {mid:interpLog(c.U, c.mid, U), lo:interpLog(c.U, c.pred_lo, U), hi:interpLog(c.U, c.pred_hi, U), clo:interpLog(c.U, c.conf_lo, U), chi:interpLog(c.U, c.conf_hi, U)};
+}
+function fbVerdict(o2, p){
+  if (!p) return null;
+  if (o2 > p.hi) return {cls:"bad", t:"Burns", d:`Your ${fmt(o2)}% O₂ is ${fmt(o2 - p.lo, 1)} points above the conservative limit. A PMMA flame would keep burning at this air speed.`};
+  if (o2 >= p.lo) return {cls:"mid", t:"Near the limit", d:`Your ${fmt(o2)}% O₂ is inside the 90% range where single tests went either way.`};
+  return {cls:"ok", t:"No sustained flame expected", d:`Your ${fmt(o2)}% O₂ is below the lowest level any stable flame needed in these tests.`};
+}
+function fbCaveatsForScenario(){
+  const c = [];
+  if (S.psi < 13.5) c.push(`Your cabin is at ${fmt(S.psi)} psi; these tests ran near 14.7 psi, so pressure effects are not included.`);
+  if (S.g === "moon" || S.g === "mars") c.push(`${S.g === "moon" ? "Lunar" : "Martian"} gravity adds buoyant flow that microgravity tests lack; partial gravity may be more flammable.`);
+  if (S.o2 > 21.5) c.push(`The tests went up to about 21% O₂. Above that the boundary still says whether the material burns, not how fast.`);
+  return c;
+}
+function fbPoints(mat){ return FB.points.filter(p => p.material === mat || (mat === "sibal_22" && p.material === "sibal_12")); }
+function renderBoundary(){
+  if (!FB) { $("#fbreadout").innerHTML = '<div class="gap">Boundary data not included in this build.</div>'; return; }
+  const mat = $("#fbmat").value, U = S.flow, o2 = S.o2;
+  $("#fbtoggles").style.display = mat === "pmma_rod" ? "" : "none";
+  const ink = css("--ink"), muted = css("--muted"), line = css("--line"), acc = css("--accent"), o2c = css("--o2"), gas = css("--ph-gas"), smoke = css("--ph-smoke");
+  const traces = [], shapes = [], ann = [];
+  const scen = fbCaveatsForScenario();
+  let readout = "", note = "";
+  const ptsTrace = (pts, name, sym, color, open, size = 10, ex = null) => ({type:"scatter", mode:"markers", name, x:pts.map(p => p.flow_cm_s), y:pts.map(p => p.o2_pct),
+    error_x:ex, text:pts.map(p => `${esc(p.material_label)}<br>${esc(p.outcome_detail)}${p.test_id ? "<br>" + esc(p.test_id) : ""}<br>${fmt(p.flow_cm_s, 2)} cm/s · ${fmt(p.o2_pct, 2)}% O₂`),
+    hovertemplate:"%{text}<extra></extra>", marker:{symbol:sym, size, color:(open && !/-open$/.test(sym) && !/^x/.test(sym)) ? "rgba(0,0,0,0)" : color, line:{color, width:open || /^x/.test(sym) ? 2 : 1}}});
+  let ymax = 19.5, ymin = 12;
+  if (mat === "pmma_rod") {
+    const m = FB.pmma_rod, c = m.curve;
+    if ($("#fbpred").checked) traces.push({type:"scatter", x:[...c.U, ...c.U.slice().reverse()], y:[...c.pred_hi, ...c.pred_lo.slice().reverse()], fill:"toself", fillcolor:css("--accent-soft"), line:{width:0}, opacity:.65, name:"90% prediction band (single test)", hoverinfo:"skip"});
+    traces.push({type:"scatter", x:[...c.U, ...c.U.slice().reverse()], y:[...c.conf_hi, ...c.conf_lo.slice().reverse()], fill:"toself", fillcolor:acc, opacity:.22, line:{width:0}, name:"90% confidence band (boundary)", hoverinfo:"skip"});
+    traces.push({type:"scatter", mode:"lines", x:c.U, y:c.mid, line:{color:ink, width:3}, name:"Fitted boundary (FireSight)", hovertemplate:"%{x:.2f} cm/s → %{y:.2f}% O₂<extra>fitted</extra>"});
+    if ($("#fbpub").checked) traces.push({type:"scatter", mode:"lines", x:c.U, y:c.published, line:{color:muted, width:2, dash:"dash"}, name:"Report's equation (Olson, Eq. 6.1)", hovertemplate:"%{x:.2f} cm/s → %{y:.2f}% O₂<extra>report</extra>"});
+    const pts = fbPoints(mat);
+    traces.push(ptsTrace(pts.filter(p => p.outcome === "stable flame"), "Stable flame (kept burning)", "circle", acc, false, 8));
+    traces.push(ptsTrace(pts.filter(p => p.outcome === "quench"), "Quench (went out as flow was lowered)", "x-thin", o2c, true, 12));
+    traces.push(ptsTrace(pts.filter(p => p.outcome === "blowoff"), "Blowoff (went out as flow was raised)", "triangle-up-open", gas, true, 10));
+    shapes.push({type:"line", xref:"paper", x0:0, x1:1, y0:m.one_g_reference.o2, y1:m.one_g_reference.o2, line:{color:muted, width:1.5, dash:"dot"}});
+    ann.push({xref:"paper", x:0.01, xanchor:"left", y:m.one_g_reference.o2, yanchor:"bottom", text:"Normal-gravity limit 15.4% (same material)", showarrow:false, font:{color:muted, size:11}});
+    const p = fbPredict(U), v = fbVerdict(o2, p), mn = m.minimum;
+    readout = `
+      <div class="gap ${v ? v.cls : "mid"}"><div class="small muted">Your scenario: ${fmt(o2)}% O₂, ${U} cm/s</div><div class="st">${v ? v.t : "Outside tested air speeds"}</div>
+        <div class="small">${v ? v.d : `The tests covered ${fmt(m.valid_U[0], 2)}–${fmt(m.valid_U[1], 0)} cm/s. ${U === 0 ? "At zero air speed there is no data; the slowest test (0.23 cm/s) still burned at 15.6% O₂." : "No prediction outside that range."}`}</div></div>
+      <div class="gap"><div class="small muted">Limiting O₂ at ${U} cm/s</div><div class="st num">${p ? fmt(p.mid, 1) + "%" : "–"}</div>
+        <div class="small">${p ? `Single tests went out between <b class="num">${fmt(p.lo, 1)}%</b> and <b class="num">${fmt(p.hi, 1)}%</b> (90%). Use the lower number as the safe limit.` : "Outside the fitted range."}</div></div>
+      <div class="gap"><div class="small muted">Most flammable air speed</div><div class="st num">${fmt(mn.U_cm_s, 1)} cm/s</div>
+        <div class="small">Boundary minimum <b class="num">${fmt(mn.o2, 1)}%</b> O₂ (90% CI ${fmt(mn.o2_ci90[0], 1)}–${fmt(mn.o2_ci90[1], 1)}) at ${fmt(mn.U_ci90[0], 1)}–${fmt(mn.U_ci90[1], 1)} cm/s, the gentle ventilation typical near spacecraft surfaces.</div></div>
+      <div class="gap"><div class="small muted">Microgravity vs Earth</div><div class="st num">−${fmt(15.4 - interpLog(c.U, c.pred_lo, mn.U_cm_s), 1)} pts</div>
+        <div class="small">Conservative microgravity limit ${fmt(interpLog(c.U, c.pred_lo, mn.U_cm_s), 1)}% vs ${fmt(m.one_g_reference.o2)}% in normal gravity: Earth screening tests overstate the safety margin.</div></div>`;
+    note = `${m.n_extinction} extinction points and ${m.n_stable} stable flames from Figure 6.10 of the BASS-II report. ${esc(m.x_note)}`;
+    $("#fbmodel").innerHTML = `<p style="margin-top:0"><b>Form</b> (as in the report): <span class="mono">${esc(m.equation)}</span>. Fitted to the ${m.n_extinction} extinction points (${m.n_quench} quench, ${m.n_blowoff} blowoff) by least squares; uncertainty from ${m.n_bootstrap.toLocaleString()} bootstrap resamples.</p>
+      <table><thead><tr><th>Parameter</th><th class="n">Fitted</th><th class="n">90% CI</th><th class="n">Report</th></tr></thead><tbody>
+      ${"ABCD".split("").map(k => `<tr><td>${k}</td><td class="n">${fmt(m.params[k], k === "C" ? 4 : 2)}</td><td class="n">${fmt(m.params_ci90[k][0], k === "C" ? 4 : 2)}–${fmt(m.params_ci90[k][1], k === "C" ? 4 : 2)}</td><td class="n">${m.published[k]}</td></tr>`).join("")}</tbody></table>
+      <ul style="padding-left:18px;margin:8px 0 0;display:grid;gap:4px">
+        <li>Matches the report's own equation within <b class="num">${fmt(m.max_diff_vs_published, 2)}</b> O₂ points everywhere in the tested range.</li>
+        <li>Residual scatter <b class="num">${fmt(m.rms_residual, 2)}</b> points; leave-one-out prediction error <b class="num">${fmt(m.loo_rmse, 2)}</b> points.</li>
+        <li>The 90% prediction band contains <b class="num">${Math.round(m.pred_band_coverage * 100)}%</b> of extinction points, and <b class="num">${Math.round(m.stable_above_lower_bound * 100)}%</b> of stable flames sit above its lower edge, so the lower edge works as a "no flame below" line in this data.</li>
+        <li>The central curve is an average: ${Math.round((1 - m.stable_on_flammable_side) * 100)}% of stable flames burned below it. For safety decisions use the lower edge.</li></ul>`;
+  } else if (mat === "sibal_22") {
+    const m = FB.sibal_22, c = m.curve; ymin = 16; ymax = 21.5;
+    traces.push({type:"scatter", x:[...c.U_lo, ...c.U_hi.slice().reverse()], y:[...c.o2, ...c.o2.slice().reverse()], fill:"toself", fillcolor:acc, opacity:.18, line:{width:0}, name:"90% band of the quench line", hoverinfo:"skip"});
+    traces.push({type:"scatter", mode:"lines", x:c.U_mid, y:c.o2, line:{color:ink, width:3}, name:"Fitted quench line, 2.2 cm (FireSight)", hovertemplate:"%{y:.1f}% O₂ → quench at %{x:.2f} cm/s<extra></extra>"});
+    const pts = fbPoints(mat), w22 = pts.filter(p => p.material === "sibal_22"), w12 = pts.filter(p => p.material === "sibal_12");
+    traces.push(ptsTrace(w22.filter(p => p.outcome === "spread"), "2.2 cm: kept spreading", "circle", acc, false, 9));
+    traces.push(ptsTrace(w22.filter(p => p.outcome === "quench"), "2.2 cm: quench", "x-thin", o2c, true, 13));
+    traces.push(ptsTrace(w22.filter(p => p.outcome === "no ignition"), "2.2 cm: did not ignite", "x", smoke, false, 9));
+    traces.push(ptsTrace(w12.filter(p => p.outcome === "spread"), "1.2 cm: kept spreading", "diamond", acc, true, 9));
+    traces.push(ptsTrace(w12.filter(p => p.outcome === "quench"), "1.2 cm: quench", "diamond-x-open", o2c, true, 11));
+    traces.push(ptsTrace(w12.filter(p => p.outcome === "blowoff"), "1.2 cm: blowoff", "triangle-up-open", gas, true, 10));
+    const inR = o2 >= c.o2[0] && o2 <= c.o2[c.o2.length - 1];
+    const uq = m.params.alpha + m.params.beta * o2;
+    readout = `
+      <div class="gap ${o2 < m.lowest_spread_o2 ? "ok" : U > (inR ? uq : 3) ? "bad" : "mid"}"><div class="small muted">Your scenario: ${fmt(o2)}% O₂, ${U} cm/s</div>
+        <div class="st">${o2 < m.lowest_spread_o2 ? "Below tested burning O₂" : inR ? (U > uq ? "Burns" : "Near or below quench speed") : (U > 3 ? "Burns" : "Very low air speed")}</div>
+        <div class="small">${inR ? `At ${fmt(o2)}% O₂ the 2.2-cm fabric quenched below about <b class="num">${fmt(uq, 1)} cm/s</b>.` : o2 > c.o2[c.o2.length - 1] ? `Above the tested 16.9–18.7% O₂. Quench speeds there were 2.2–2.8 cm/s and fall as O₂ rises, so at ${fmt(o2)}% O₂ the fabric burns at any air speed above about 2 cm/s (extrapolated).` : "Below the lowest O₂ that sustained spread."}</div></div>
+      <div class="gap"><div class="small muted">Quench speed range</div><div class="st num">2.2–2.8 cm/s</div><div class="small">Four quench tests, 16.9–18.7% O₂. Higher speed needed at lower O₂: about <b class="num">${fmt(-m.params.beta, 2)}</b> cm/s more per point less O₂ (r² ${fmt(m.r2, 2)}, only 4 points).</div></div>
+      <div class="gap"><div class="small muted">Lowest O₂ with spread</div><div class="st num">${fmt(m.lowest_spread_o2)}%</div><div class="small">At 4 cm/s. Samples did not ignite at ${m.no_ignition_o2.join("% and ")}%, so the floor is near 16.8–16.9% O₂ at ~1 atm.</div></div>`;
+    note = "Values from Table 7.1 of the BASS-II report (exact). For quench and blowoff the final air speed is plotted; for spreading flames the lowest air speed they survived. Reused samples are excluded, as in the report.";
+    $("#fbmodel").innerHTML = `<p style="margin-top:0">Quench branch only: <span class="mono">${esc(m.equation)}</span>, ordinary least squares on ${m.n_quench} quench tests with a t-based 90% band. Fitted α = ${fmt(m.params.alpha, 2)} cm/s, β = ${fmt(m.params.beta, 3)} cm/s per % O₂, residual ${fmt(m.rms_residual, 2)} cm/s.</p>
+      <p>With four points this line shows the trend the report describes (quench speeds of 1–5 cm/s, higher at lower O₂); it is not precise enough for design numbers. The 1.2-cm samples have a smaller flammable range; the report could not resolve their quench limit.</p>`;
+  } else {
+    ymin = 14; ymax = 23;
+    const pts = fbPoints(mat);
+    traces.push(ptsTrace(pts, "Extinction speed (experiment, ±0.5 cm/s)", "x-thin", o2c, true, 14, {type:"constant", value:0.5, color:o2c}));
+    traces.push({type:"scatter", mode:"lines", x:pts.map(p => p.flow_cm_s), y:pts.map(p => p.o2_pct), line:{color:o2c, width:1, dash:"dot"}, showlegend:false, hoverinfo:"skip"});
+    readout = `<div class="gap"><div class="small muted">Thin PMMA, opposed flow</div><div class="st num">1.0 → 3.0 cm/s</div>
+      <div class="small">Below these air speeds a flame spreading against the flow goes out: 1.0 cm/s at 21% O₂, 3.0 cm/s at 16% O₂. Fuel thickness did not change it.</div></div>
+      <div class="gap ${U > 3 ? "bad" : "mid"}"><div class="small muted">Your air speed ${U} cm/s</div><div class="st">${U > 3 ? "Above both limits" : U >= 1 ? "Between the limits" : "Below both limits"}</div><div class="small">Only two measured points; no fitted curve.</div></div>`;
+    note = "Values from Table 2.1 of the BASS-II report (experiment column). The report's computation gives 1.5 and 3.5 cm/s; its closed-form theory gives 0.75 and 1.0 cm/s.";
+    $("#fbmodel").innerHTML = "<p style=\"margin-top:0\">Two measured points, so no curve is fitted. The report derives a closed-form critical speed from a radiative-loss scale analysis (its Eq. 2.5) and finds it independent of fuel thickness.</p>";
+  }
+  // scenario marker
+  if (U > 0) shapes.push({type:"line", x0:U, x1:U, yref:"paper", y0:0, y1:1, line:{color:acc, width:1.5, dash:"dot"}});
+  if (U > 0 && o2 >= ymin && o2 <= ymax) traces.push({type:"scatter", mode:"markers", x:[U], y:[o2], name:"Your scenario", marker:{symbol:"star", size:18, color:acc, line:{color:css("--surface"), width:1.5}}, hovertemplate:`Your scenario: ${U} cm/s, ${fmt(o2)}% O₂<extra></extra>`});
+  else if (U > 0 && o2 > ymax) ann.push({x:Math.log10(U), y:ymax, yanchor:"top", text:`Your scenario: ${fmt(o2)}% O₂ ↑ (above chart)`, showarrow:true, ax:0, ay:28, arrowcolor:acc, font:{color:acc, size:12}, bgcolor:css("--surface")});
+  const layout = {margin:{l:56, r:16, t:10, b:46}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)", font:{family:"IBM Plex Sans", color:ink, size:12}, hovermode:"closest",
+    xaxis:{type:"log", range:[Math.log10(0.15), Math.log10(80)], tickvals:[0.2, 0.5, 1, 2, 5, 10, 20, 50], ticktext:["0.2", "0.5", "1", "2", "5", "10", "20", "50"], title:{text:"Air speed past the sample (cm/s, log scale)", font:{color:muted}}, gridcolor:line, color:muted},
+    yaxis:{range:[ymin, ymax], title:{text:"Oxygen (% by volume)", font:{color:muted}}, gridcolor:line, color:muted},
+    legend:{orientation:"h", y:-0.2, font:{size:11}, entrywidth:0.33, entrywidthmode:"fraction"}, shapes, annotations:ann};
+  Plotly.react("fbchart", traces, layout, {displayModeBar:false, responsive:true});
+  $("#fbreadout").innerHTML = readout;
+  $("#fbnote").innerHTML = note + (scen.length ? `<div class="qnote" style="margin-top:6px">${scen.map(esc).join("<br>")}</div>` : "");
+  $("#fbcaveats").innerHTML = FB.caveats.map(x => `<li>${esc(x)}</li>`).join("");
+  const cols = ["material_label", "configuration", "test_id", "flow_cm_s", "a_per_s", "o2_pct", "outcome", "outcome_detail", "method", "notes"];
+  const rows = fbPoints(mat);
+  $("#fbtable").innerHTML = `<thead><tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>` + rows.map(r => `<tr>${cols.map(c => typeof r[c] === "number" ? `<td class="n">${fmt(r[c], 3)}</td>` : `<td>${esc(r[c] ?? "")}</td>`).join("")}</tr>`).join("") + "</tbody>";
+}
+function renderFbExport(){
+  if (!FB) return;
+  const cols = ["material", "material_label", "configuration", "test_id", "flow_cm_s", "a_per_s", "o2_pct", "outcome", "outcome_detail", "method", "notes"];
+  const items = [["boundary points (all materials)", "firesight_flammability_boundary_points.csv", () => toCSV(cols, FB.points)],
+    ["fitted curves + bands", "firesight_flammability_boundary_model.json", () => JSON.stringify({about:FB.about, source:FB.source_doc, pmma_rod:FB.pmma_rod, sibal_22:FB.sibal_22, caveats:FB.caveats}, null, 1)]];
+  $("#fbexport").innerHTML = items.map(([n], k) => `<button class="btn" data-k="${k}" data-a="dl">Download ${n}</button><button class="btn" data-k="${k}" data-a="cp">Copy ${n}</button>`).join("");
+  $("#fbexport").querySelectorAll("button").forEach(b => b.onclick = () => { const it = items[+b.dataset.k]; const t = it[2](); b.dataset.a === "dl" ? saveFile(it[1], t, b) : copy(t, b); });
+}
+["fbmat", "fbpub", "fbpred"].forEach(id => $("#" + id).addEventListener("change", renderBoundary));
 
 /* ---------------- data table + export ---------------- */
 function fillSelect(sel, vals){ sel.insertAdjacentHTML("beforeend", vals.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join("")); }
@@ -649,6 +805,15 @@ const TOOLS = [
        (q.psi_min == null || (r.p_atm != null && (r.p_atm_max ?? r.p_atm) * PSI_PER_ATM >= q.psi_min)) && (q.psi_max == null || (r.p_atm != null && r.p_atm * PSI_PER_ATM <= q.psi_max)) &&
        (q.flow_min == null || (r.flow_cm_s_max ?? r.flow_cm_s) >= q.flow_min) && (q.flow_max == null || (r.flow_cm_s != null && r.flow_cm_s <= q.flow_max)) && (!q.measured_o2_only || !/^assumed/.test(r.o2_source || "")));
      return {count:rs.length, rows:rs.slice(0, 40).map(r => ({psi_id:r.psi_id, row:r.src_row, file:r.src_file, test:r.test_id, fuel:r.fuel, o2:r.o2_pct, o2_max:r.o2_pct_max, o2_src:r.o2_source, psi:r.p_atm != null ? +(r.p_atm * PSI_PER_ATM).toFixed(2) : null, flow:r.flow_cm_s, dil:r.diluent, outcome:r.outcome, metric:r.metric_name ? `${r.metric_name}=${r.metric_value} ${r.metric_unit}` : "", metric2:r.metric2_name ? `${r.metric2_name}=${r.metric2_value} ${r.metric2_unit}` : "", flags:r.flags}))}; }},
+  {name:"flammability_boundary", description:"Microgravity flammability boundary from BASS-II (PSI-25) at about 1 atm. For PMMA rods returns the fitted limiting O2 (and 90% single-test range) at a given air speed, the most flammable air speed, model validation and caveats; also returns SIBAL fabric and thin-PMMA quench data.",
+   inputSchema:{type:"object", properties:{flow_cm_s:{type:"number", description:"air speed past the material, cm/s"}, o2_pct:{type:"number", description:"oxygen % to judge"}}},
+   execute:({flow_cm_s, o2_pct}) => { if (!FB) return {error:"not available"}; const m = FB.pmma_rod, U = flow_cm_s ?? S.flow, O = o2_pct ?? S.o2, p = fbPredict(U), v = fbVerdict(O, p);
+     return {source:"PSI-25 BASS-II Summary Report (NASA/TM-20210011385): PMMA rods Fig. 6.10 (digitized), SIBAL Table 7.1, thin PMMA Table 2.1",
+       pmma_rod:{at_requested_flow:{flow_cm_s:U, limiting_o2_pct:p ? +p.mid.toFixed(2) : null, single_test_range_90:p ? [+p.lo.toFixed(2), +p.hi.toFixed(2)] : null, judged_o2_pct:O, verdict:v ? v.t : "outside tested air speeds " + m.valid_U.join("-") + " cm/s"},
+         lowest_limit_at_any_flow:{note:"minimum of the boundary = most flammable air speed", flow_cm_s:+m.minimum.U_cm_s.toFixed(2), o2_pct:+m.minimum.o2.toFixed(2), o2_ci90:m.minimum.o2_ci90.map(x => +x.toFixed(2)), conservative_o2_pct:+interpLog(m.curve.U, m.curve.pred_lo, m.minimum.U_cm_s).toFixed(2)},
+         one_g_limit_pct:15.4, fit:{params:m.params, report_equation:m.published, loo_rmse:+m.loo_rmse.toFixed(2)}},
+       sibal_fabric_2_2cm:{quench_speeds_cm_s:"2.2-2.8 at 16.9-18.7% O2 (higher at lower O2)", lowest_o2_with_spread:FB.sibal_22.lowest_spread_o2, no_ignition_at:FB.sibal_22.no_ignition_o2},
+       thin_pmma_opposed:{extinction_speed_cm_s:{"21%":1.0, "16%":3.0}}, caveats:FB.caveats}; }},
   {name:"quality_issues", description:"Data-quality log entries, optionally for one investigation.", inputSchema:{type:"object", properties:{psi_id:{type:"string"}}},
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
 const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
@@ -739,12 +904,12 @@ function renderMethod(){
   <li>${nq} row-level issues were found and logged (see Data quality).</li>
   <li>Findings come from 13 PSI report files read for this build, plus NASA's 2015 Researcher's Guide. Every finding was fact-checked against its cited passage or recomputed from the PSI table on 2026-11-14. Some PSI document links are broken and are listed as quality issues.</li>
   <li>${esc(B.about)}</li>
+  <li>Flammability boundary: 74 points from the BASS-II report (Figure 6.10 digitized at 400 dpi and checked marker by marker; Tables 7.1 and 2.1 copied). PMMA-rod boundary refitted with 3,000 bootstrap resamples and checked against the report's own equation.</li>
   <li>Cite PSI datasets by DOI, as PSI requires. Each investigation card links its DOI.</li></ul>`;
   $("#roadmap").innerHTML = [
-    "Flammability-boundary view: BASS-II minimum O₂ vs air speed with a fitted curve and uncertainty band, as a first predictive model.",
     "Add findings from NASA NTRS papers for FLEX, FLEX-2, E-FIELD and BRE, which have no reports in PSI.",
     "Pull per-test results that sit only in analyzed-data spreadsheets (SAME-R particle sizes, Saffire sensor files).",
-    "Add LUCI, FM2 and SoFIE data when they appear in PSI, to replace partial-gravity bounds with measurements.",
+    "Add LUCI, FM2 and SoFIE data when they appear in PSI, to replace partial-gravity bounds with measurements and extend the flammability boundary to Moon and Mars gravity and to lower cabin pressures.",
     "Live refresh from PSI instead of a snapshot; 3-D O₂ × pressure × air-speed view."].map(x => `<li>${esc(x)}</li>`).join("");
 }
 
@@ -753,7 +918,7 @@ function renderStamp(){
   const nq = B.quality.reduce((a, q) => a + +q.count, 0);
   $("#stamp").innerHTML = `<span class="pill"><b>${INV.length}</b> investigations</span><span class="pill"><b>${ROWS.length.toLocaleString()}</b> test rows</span><span class="pill"><b>${nq}</b> data fixes &amp; flags</span><span class="pill">PSI snapshot <b>${B.built}</b></span>`;
 }
-const VIEWS = ["explore", "compare", "gaps", "data", "quality", "incidents", "ask", "method"];
+const VIEWS = ["explore", "compare", "gaps", "boundary", "data", "quality", "incidents", "ask", "method"];
 function route(){
   const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "explore";
   VIEWS.forEach(x => $("#v-" + x).classList.toggle("on", x === v));
@@ -761,15 +926,16 @@ function route(){
   if (v === "explore") { renderMap(); renderDetail(); }
   if (v === "compare") renderCompare();
   if (v === "gaps") renderGaps();
+  if (v === "boundary") renderBoundary();
   if (v === "data") renderData();
   if (v === "quality") renderQuality();
 }
 window.addEventListener("hashchange", route);
 function update(){ save(); renderPresets(); renderReadout(); renderRank(); route(); }
 
-syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderMethod(); update();
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => renderMap());
-new MutationObserver(() => renderMap()).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderFbExport(); renderMethod(); update();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { renderMap(); if (location.hash === "#boundary") renderBoundary(); });
+new MutationObserver(() => { renderMap(); if (location.hash === "#boundary") renderBoundary(); }).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
 
 // optional page capabilities (only inside claude.ai)
 renderAIStatus();

@@ -57,8 +57,11 @@ for t in tests:
         r.append(v)
     rows.append(r)
 
+fbp = D / "boundary" / "flammability_boundary.json"
+boundary = json.load(open(fbp)) if fbp.exists() else None
+
 bundle = {"built": "2026-11-14", "about": cur["_about"], "sources": cur["sources"], "inv": inv, "cols": cols, "rows": rows,
-          "quality": qlog, "incidents": cur["incidents"], "spinoffs": cur["spinoffs"], "gaps_external": cur["gaps_external"]}
+          "quality": qlog, "incidents": cur["incidents"], "spinoffs": cur["spinoffs"], "gaps_external": cur["gaps_external"], "boundary": boundary}
 s = json.dumps(bundle, separators=(",", ":"), ensure_ascii=False)
 OUT.write_text(s)
 print("bundle KB", len(s) // 1024, "inv", len(inv), "rows", len(rows), "quality", len(qlog))
