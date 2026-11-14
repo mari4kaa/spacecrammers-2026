@@ -13,4 +13,4 @@ Data behind the FireSight dashboard. Machine-readable description: `datapackage.
 | `boundary/` | Flammability-boundary points and fitted model from BASS-II | See `boundary/README.md` |
 | `evidence/` | BRE, FLEX and SAME fire-safety tables | See `evidence/README.md` |
 
-Data: NASA Physical Sciences Informatics, https://psi.nasa.gov (CC0). Cite each investigation by its DOI.
+Data: NASA Physical Sciences Informatics, https://psi.nasa.gov (CC0). Cite each investigation by its DOI. Exception: the tables in `evidence/` come from published papers and a PSI report; they are not all CC0, so see `evidence/README.md` for each source, its terms and how to cite it.

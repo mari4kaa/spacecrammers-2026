@@ -30,7 +30,7 @@
   "liu2016": "Liu, Xu, Hicks, Avedisian, Comprehensive study of initial diameter effects ... n-heptane, n-octane, and n-decane, Combust. Flame 171 (2016) 27-41",
   "xu2017": "Xu, Hicks, Avedisian, The combustion of iso-octane droplets with initial diameters from 0.5 to 5 mm, Proc. Combust. Inst. 36 (2017) 2541-2548",
   "xu2020": "Xu, Farouk, Hicks, Avedisian, Initial diameter effects on combustion of unsupported equi-volume n-heptane/iso-octane mixture droplets, Combust. Flame 220 (2020) 82-91",
-  "dehghani2023": "Dehghani, Quintiere, Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient, Combust. Flame (2023), accepted manuscript",
+  "dehghani2023": "Dehghani, Quintiere, Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient, Combust. Flame 253 (2023) 112809, doi:10.1016/j.combustflame.2023.112809",
   "rpt-bass-fabric": "PSI-26 file: Ferkul, Olson, Johnston, T'ien, Flammability Aspects of Fabric in Opposed and Concurrent Air Flow in Microgravity, 8th U.S. National Combustion Meeting (2013)",
   "ntrs-detector-2007": "Urban et al., Particle and Smoke Detection on ISS for Next Generation Smoke Detectors (2007), NTRS 20070031686"
  },
@@ -1195,9 +1195,13 @@
   },
   {
    "group": "Investigation cards (outside PSI)",
-   "cite": "Dehghani, P.; Quintiere, J.G.: Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient. Combustion and Flame (2023), article S0010218023001803. Accepted manuscript under the Elsevier user license.",
-   "used": "ACME BRE ISS results: O2 versus pressure effect, flammability window, critical flame temperature, external-radiation effect. Copy supplied by the project owner; not in the public report-search file. Its Table A.1 (83 ISS tests) is the BRE flammability map on the Safety evidence tab (data/evidence/bre_iss_tests.csv).",
+   "cite": "Dehghani, P.; Quintiere, J.G.: Flammability maps for microgravity burning of a small flat material in a quiescent ambient. Combustion and Flame 253 (2023) 112809. DOI 10.1016/j.combustflame.2023.112809. Accepted manuscript available under the Elsevier user license (non-commercial use).",
+   "used": "ACME BRE ISS results: O2 versus pressure effect, flammability window, critical flame temperature, external-radiation effect. Copy supplied by the project owner; not in the public report-search file. Its Table A.1 (83 ISS tests) is the BRE flammability map on the Safety evidence tab (data/evidence/bre_iss_tests.csv). Only the measured values were copied (facts, with this citation on every row); no text or figures from the article are included. The article is © 2023 Elsevier.",
    "links": [
+    [
+     "DOI 10.1016/j.combustflame.2023.112809",
+     "https://doi.org/10.1016/j.combustflame.2023.112809"
+    ],
     [
      "Version of record",
      "https://www.sciencedirect.com/science/article/pii/S0010218023001803"

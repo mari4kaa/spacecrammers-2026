@@ -13,7 +13,7 @@
  "licenses": [
   {
    "name": "CC0-1.0",
-   "title": "NASA PSI data (psi.nasa.gov) are CC0; cite each investigation by its DOI"
+   "title": "NASA PSI data (psi.nasa.gov) are CC0; cite each investigation by its DOI. Files in evidence/ name their own source and terms (see each resource)."
   }
  ],
  "sources": [
@@ -246,7 +246,7 @@
    "name": "bre_iss_tests",
    "path": "evidence/bre_iss_tests.csv",
    "format": "csv",
-   "description": "83 ACME BRE ISS tests from Dehghani & Quintiere (2023), Combustion and Flame, Table A.1. Extracted by Claude and compared with the page images. See evidence/README.md.",
+   "description": "83 ACME BRE ISS tests: measured values from Dehghani & Quintiere (2023), Combustion and Flame 253, 112809, Table A.1, doi:10.1016/j.combustflame.2023.112809. Extracted by Claude and compared with the page images. See evidence/README.md.",
    "x_ai_generated": "extracted by Claude",
    "schema": {
     "fields": [
@@ -305,7 +305,19 @@
       "name": "source"
      }
     ]
-   }
+   },
+   "sources": [
+    {
+     "title": "Dehghani & Quintiere (2023), Combustion and Flame 253, 112809, Table A.1",
+     "path": "https://doi.org/10.1016/j.combustflame.2023.112809"
+    }
+   ],
+   "licenses": [
+    {
+     "name": "other",
+     "title": "Not CC0. Measured values (facts) from an Elsevier article (© 2023 Elsevier; accepted manuscript under the Elsevier user license, non-commercial). Cite the article; see evidence/README.md."
+    }
+   ]
   },
   {
    "name": "flex_loi_by_diluent",
@@ -334,7 +346,20 @@
       "name": "source"
      }
     ]
-   }
+   },
+   "sources": [
+    {
+     "title": "Dietrich et al. (2014), Microgravity Sci. Technol. 26:65-76",
+     "path": "https://doi.org/10.1007/s12217-014-9372-2"
+    }
+   ],
+   "licenses": [
+    {
+     "name": "CC-BY-4.0",
+     "path": "https://creativecommons.org/licenses/by/4.0/",
+     "title": "Creative Commons Attribution 4.0 (from the source article); cite Dietrich et al. 2014"
+    }
+   ]
   },
   {
    "name": "same_smoke_particle_sizes",
@@ -366,7 +391,19 @@
       "name": "source"
      }
     ]
-   }
+   },
+   "sources": [
+    {
+     "title": "SAME Final Science Report, NASA PSI investigation PSI-102",
+     "path": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-102"
+    }
+   ],
+   "licenses": [
+    {
+     "name": "CC0-1.0",
+     "title": "NASA PSI data"
+    }
+   ]
   }
  ]
 }
