@@ -17,7 +17,20 @@
   "rpt-sflame": "PSI-23 file: s-Flame Final Report (2021)",
   "rpt-cfi": "PSI-39 file: CFI Science Final Report",
   "rpt-115": "PSI-115 file: Final Report NNX17AF08A (smoke simulation)",
-  "ext-hirsch": "Hirsch, D., et al. (2003), ASTM STP1454, pp. 21-26: 1-g upward flame-spread limit for PMMA, as cited in the BASS-II Summary Report (ref. 23, ch. 6)"
+  "ext-hirsch": "Hirsch, D., et al. (2003), ASTM STP1454, pp. 21-26: 1-g upward flame-spread limit for PMMA, as cited in the BASS-II Summary Report (ref. 23, ch. 6)",
+  "ntrs-flex-tp": "Dietrich et al., Detailed Results from the Flame Extinguishment Experiment (FLEX) March 2009 to December 2011, NASA/TP-2015-216046 (NTRS 20150023456)",
+  "dietrich2014": "Dietrich et al., Droplet Combustion Experiments Aboard the International Space Station, Microgravity Sci. Technol. 26 (2014) 65-76, open access",
+  "ntrs-flex-co2": "Nayagam et al., Methanol Droplet Extinction in Oxygen/Carbon-dioxide/Nitrogen Mixtures in Microgravity (2011), NTRS 20120016855",
+  "ntrs-coolflame": "Nayagam et al., Cool-flame Extinction During N-Alkane Droplet Combustion in Microgravity (2014), NTRS 20140006750",
+  "arxiv-flex2": "Xu et al., Digital measurement of droplet flame diameter in microgravity combustion images using Segment Anything Model 2 (2026), arXiv:2607.16587",
+  "ntrs-acme-2022": "Stocker, Laminar Non-Premixed Flames of Gaseous Fuel Aboard the International Space Station (2022), NTRS 20220005205",
+  "ntrs-bre-2017": "Markan et al., Emulation of Condensed Fuel Flames Using a Burning Rate Emulator (BRE) in Microgravity (2017), NTRS 20170009141",
+  "ntrs-slice-soot": "Ma et al., An Experimental and Computational Study on Soot Formation in a Coflow Jet Flame Under Microgravity and Normal Gravity (2014), NTRS 20140017780",
+  "ntrs-slice-dil": "Cao et al., A Computational and Experimental Study of Coflow Laminar Methane/Air Diffusion Flames: Effects of Fuel Dilution, Inlet Velocity, and Gravity (2014), NTRS 20150002322",
+  "liu2016": "Liu, Xu, Hicks, Avedisian, Comprehensive study of initial diameter effects ... n-heptane, n-octane, and n-decane, Combust. Flame 171 (2016) 27-41",
+  "xu2017": "Xu, Hicks, Avedisian, The combustion of iso-octane droplets with initial diameters from 0.5 to 5 mm, Proc. Combust. Inst. 36 (2017) 2541-2548",
+  "xu2020": "Xu, Farouk, Hicks, Avedisian, Initial diameter effects on combustion of unsupported equi-volume n-heptane/iso-octane mixture droplets, Combust. Flame 220 (2020) 82-91",
+  "dehghani2023": "Dehghani, Quintiere, Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient, Combust. Flame (2023), accepted manuscript"
  },
  "inv": {
   "PSI-26": {
@@ -275,6 +288,22 @@
    "sensors": "Backlit droplet camera, OH* UV camera, color video, radiometers",
    "findings": [
     {
+     "t": "Lowest oxygen that keeps a droplet burning (limiting oxygen index) at 1 atm: 12% for methanol and 15% for heptane in O2/N2. With CO2 added to air to simulate a suppressant it rose to about 14% and 17%; with helium added, about 14% and 15%.",
+     "src": "dietrich2014"
+    },
+    {
+     "t": "Methanol droplets still ignited and burned briefly at 13% O2 (rest N2) at 1 atm. At 18% O2 or more, flames went out by diffusive extinction at small droplet sizes; at 14% or less, by radiative extinction close to the starting size. More CO2 favoured radiative extinction, as expected from its strong infrared emission.",
+     "src": "ntrs-flex-co2"
+    },
+    {
+     "t": "n-heptane, n-octane and n-decane droplets (14-25% O2, 0.5-1 atm, CO2- or helium-diluted) all kept burning with an invisible 'cool flame' after the visible flame went out radiatively; cool-flame burning rates were slightly lower than hot-flame rates.",
+     "src": "ntrs-coolflame"
+    },
+    {
+     "t": "FLEX was the first experiment run in the Combustion Integrated Rack. NASA's 2009-2011 data report says the measured limiting oxygen values came out slightly lower than initially expected.",
+     "src": "ntrs-flex-tp"
+    },
+    {
      "t": "The flammability limit is lower in reduced gravity, so inert-suppressant standards set on Earth may not give the same safety margin in space.",
      "src": "guide"
     },
@@ -287,7 +316,7 @@
      "src": "table"
     },
     {
-     "t": "Table: 17 FLEX tests (heptane and methanol) ran at 30-34% O2 and 10.3-10.5 psi, close to the planned lunar-habitat atmosphere (30% O2, 10.2 psi); 15 ended in droplet disruption and 2 burned to completion.",
+     "t": "Table: 17 FLEX tests (heptane and methanol) ran at 30-34% O2 and 10.3-10.5 psi, close to the planned lunar-habitat atmosphere (30% O2, 10.2 psi); 15 ended in droplet disruption and 2 burned to completion. All 17 ran in 2009-2010 with coated fuel needles; NASA's data report says methanol disruptions in that period were probably caused by the needle coating.",
      "src": "table"
     }
    ],
@@ -310,6 +339,22 @@
    "fixed": "Droplet 1.5-5 mm, 25 °C ambient",
    "sensors": "MDCA cameras and radiometers",
    "findings": [
+    {
+     "t": "In 1 atm air on the ISS, n-heptane, n-octane and n-decane droplets larger than about 2 mm often lost their visible flame through radiative heat loss, and burning slowed toward plain evaporation. Estimated flame temperature fell from above 1200 K to under about 800 K and then held steady, which the authors linked to a low-temperature (cool-flame) burning regime.",
+     "src": "liu2016"
+    },
+    {
+     "t": "iso-Octane droplets smaller than 2.7 mm burned to completion; larger ones went out radiatively, with flame radiation dropping about a hundredfold and the flame flickering. Estimated flame temperature fell from about 1600 K to about 700 K after the flame went out. Unlike n-heptane, it is unclear whether iso-octane enters a cool-flame regime: its burning rate simply decayed toward evaporation.",
+     "src": "xu2017"
+    },
+    {
+     "t": "A 50/50 n-heptane/iso-octane mix (a gasoline reference fuel) kept a normal hot flame below 3 mm. Larger droplets went out radiatively and switched to cool-flame burning, with an abrupt drop in burning rate. Neither component evaporated preferentially, and a detailed model with low-temperature chemistry matched the ISS measurements.",
+     "src": "xu2020"
+    },
+    {
+     "t": "FLEX-2's 'surrogate fuel' tests burned free n-heptane, n-octane and n-decane droplets in 1 atm air. A 2026 study used 19,537 of these flame images to automate flame-diameter measurement with an AI segmentation model (3.1% mean error against manual measurement, about 229 times faster).",
+     "src": "arxiv-flex2"
+    },
     {
      "t": "Table: the PSI table lists the planned test matrix (17-30% O2, 0.5-3 atm, flow 0.1-5 cm/s), not per-test results; those are in the 48 listed publications.",
      "src": "table"
@@ -356,10 +401,34 @@
    "scale": 0.4,
    "summary": "A porous gas burner whose fuel flow is set to mimic how paper, plastic or alcohol would burn, tested in still air at O2 up to 40%.",
    "engineer": "Emulates solid-fuel flammability in quiescent environments as a function of material properties, the configuration most like a sealed habitat with fans off.",
-   "varied": "O2 21-40%, burner 25 or 50 mm, fuel (C2H4, 50% C2H4, CH4), pressure (not tabulated)",
+   "varied": "O2 21-40%, burner 25 or 50 mm, fuel (C2H4, 50% C2H4, CH4), pressure 0.56-1 bar (not tabulated in PSI; from Dehghani & Quintiere 2023)",
    "fixed": "Quiescent chamber, N2 diluent",
    "sensors": "Heat-flux gauge, surface thermocouples, cameras, radiometers",
    "findings": [
+    {
+     "t": "49 ethylene flames on the 25 mm burner burned steadily on the ISS at 26.5-40% O2 and 0.56-1 bar, the range considered for spacecraft atmospheres. Oxygen fraction dominated whether a flame kept burning; pressure over 0.56-1 atm had a relatively negligible effect.",
+     "src": "dehghani2023"
+    },
+    {
+     "t": "For each O2 level, steady burning sits inside a window of heat of combustion versus heat of gasification: above it flames go out by radiation loss (radiant fraction above about 0.65, large flames), below it by a 'small flame' limit like Earth's fire point (about 40 kW/m2 critical heat release). Steady flames needed about 1100-1200 K; real solid and liquid fuels fall inside these limits, so they could also burn steadily in microgravity.",
+     "src": "dehghani2023"
+    },
+    {
+     "t": "Theory for PMMA shows that external radiant heating (for example from a nearby fire or hot surface) can allow steady burning where it was otherwise impossible, including at 21% O2.",
+     "src": "dehghani2023"
+    },
+    {
+     "t": "On the ISS, low-momentum emulator flames burned for minutes with no air flow and no flame spread, but self-extinguished at O2 below about 25%. Larger flames generally went out within 1.5 minutes, and methane flames within a minute.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "The ISS tests mimicked plastics by matching heats of combustion and gasification, surface temperature and smoke point, and included the elevated-O2, reduced-pressure atmospheres considered for future crew vehicles.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "Before flight, 5-second drop-tower tests with 25 and 50 mm burners gave a roughly hemispherical flame with near-steady heat flux after about 5 s; the larger burner burned faster than pure-diffusion theory predicts, showing gas radiation matters.",
+     "src": "ntrs-bre-2017"
+    },
     {
      "t": "Designed to assess whether existing flammability tests apply in low- and partial-gravity environments.",
      "src": "guide"
@@ -461,8 +530,16 @@
    "sensors": "OH*/CH* chemiluminescence, soot luminosity, laser extinction, thin-filament pyrometry",
    "findings": [
     {
-     "t": "Per-test-day table only. See publications for results.",
-     "src": "meta"
+     "t": "Preliminary ISS results: soot volume fraction can be several times higher in microgravity than in comparable 1-g flames, and the flames are taller and wider.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "Dilution limits for methane and ethylene flames were extended in microgravity: flames were more stable, so lifted flames held at lower fuel concentrations.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "Table: per-test-day log only (no per-test results); results above come from the papers.",
+     "src": "table"
     }
    ],
    "habitat": "Indirect: soot models feed smoke-detection and radiation predictions.",
@@ -484,8 +561,16 @@
    "sensors": "Ion current, cameras, flame response time",
    "findings": [
     {
-     "t": "Per-test-day table only. See publications for results.",
-     "src": "meta"
+     "t": "Unlike in 1 g, microgravity flames showed a distinct peak in ion current matching the most compact flame. Soot generation could be suppressed, and flame luminosity, combustion intensity and ion current were clearly correlated.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "Highly diluted flames could be stabilized with very weak electric fields, but strong fields caused corona and arc discharges.",
+     "src": "ntrs-acme-2022"
+    },
+    {
+     "t": "Table: per-test-day log only (no per-test results); results above come from the papers.",
+     "src": "table"
     }
    ],
    "habitat": "A proxy for lunar and Martian gravity until LUCI and FM2 data enter PSI.",
@@ -539,8 +624,16 @@
    "sensors": "High-resolution stills with overlaid sensor data (4,000+ images)",
    "findings": [
     {
-     "t": "Per-test-day table only. See publications for results.",
-     "src": "meta"
+     "t": "Microgravity methane coflow flames were about 4 to 8 times sootier (peak soot volume fraction) than the same flames at 1 g. Peak soot moved from the centerline (1 g) to the flame wings (microgravity), and flame temperature was lower in microgravity because of soot radiation.",
+     "src": "ntrs-slice-soot"
+    },
+    {
+     "t": "Flame size is set mainly by the fuel mass flow rate; nonbuoyant flames are noticeably longer than at 1 g, while fuel dilution and inlet velocity matter less. Models still underestimate soot volume fraction, most of all in microgravity.",
+     "src": "ntrs-slice-dil"
+    },
+    {
+     "t": "Table: per-test-day log only (no per-test results); results above come from the papers.",
+     "src": "table"
     }
    ],
    "habitat": "Indirect: stability of leak-fed (gas-jet) fires.",
@@ -685,7 +778,8 @@
    "Per the BASS-II ReadMe, the video date display is one day later than the actual date (leap-year bug)."
   ],
   "PSI-69": [
-   "Burning-rate column header says 'mm', but values fit a burning-rate constant in mm²/s."
+   "Burning-rate column header says 'mm', but values fit a burning-rate constant in mm²/s.",
+   "NASA's FLEX data report (2009-2011, the period in this PSI table) says a conformal coating on the fuel needles contaminated some droplets: methanol 'disruption' outcomes were probably caused by it and heptane disruptions may have been; burning rates and radiative-extinction sizes were not affected. The UV flame camera window was also smudged early on, adding uncertainty to flame sizes."
   ]
  },
  "incidents": [
@@ -942,6 +1036,161 @@
     [
      "Article",
      "https://phys.org/news/2018-03-power-combustion-iss.amp"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Dietrich, D.L.; Nayagam, V.; Hicks, M.C.; Ferkul, P.V.; Dryer, F.L.; Farouk, T.; Shaw, B.D.; Suh, H.K.; Choi, M.Y.; Liu, Y.C.; Avedisian, C.T.; Williams, F.A.: Droplet Combustion Experiments Aboard the International Space Station. Microgravity Science and Technology 26 (2014) 65-76. Open access (CC BY 4.0).",
+   "used": "FLEX limiting oxygen index with nitrogen, CO2 and helium (FLEX card).",
+   "links": [
+    [
+     "Springer (open access)",
+     "https://link.springer.com/article/10.1007/s12217-014-9372-2"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Dietrich, D.L.; Ferkul, P.V.; Bryg, V.M.; Nayagam, M.V.; Hicks, M.C.; Williams, F.A.: Detailed Results from the Flame Extinguishment Experiment (FLEX) March 2009 to December 2011. NASA/TP-2015-216046.",
+   "used": "FLEX background and the needle-contamination data-quality note.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20150023456"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Nayagam, V.; Dietrich, D.; Ferkul, P.; Hicks, M.C.; Williams, F.A.: Methanol Droplet Extinction in Oxygen/Carbon-dioxide/Nitrogen Mixtures in Microgravity: Results from the International Space Station Experiments. Eastern States Section of the Combustion Institute, Fall Technical Meeting, 2011.",
+   "used": "FLEX methanol extinction modes and CO2 effect (scanned PDF, read with OCR).",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20120016855"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Nayagam, V.; Dietrich, D.L.; Hicks, M.C.; Williams, F.A.: Cool-flame Extinction During N-Alkane Droplet Combustion in Microgravity. 2014.",
+   "used": "FLEX cool-flame finding for n-heptane, n-octane and n-decane.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20140006750"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Xu, M.; Zhou, C.; Cecil, A.P.; Liu, X.; Huang, S.; Xu, Y.: Digital measurement of droplet flame diameter in microgravity combustion images using Segment Anything Model 2 with automatic prompt selection. arXiv:2607.16587, 2026.",
+   "used": "FLEX-2 surrogate-fuel test description and the AI image-measurement finding (FLEX-2 card).",
+   "links": [
+    [
+     "arXiv",
+     "https://arxiv.org/abs/2607.16587"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Stocker, D.P.: Laminar Non-Premixed Flames of Gaseous Fuel Aboard the International Space Station. Central States Section of the Combustion Institute, Spring Technical Meeting, 2022.",
+   "used": "ISS results for ACME BRE, CLD Flame and E-FIELD Flames.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20220005205"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Markan, A.; Quintiere, J.G.; Sunderland, P.B.; de Ris, J.L.; Stocker, D.P.: Emulation of Condensed Fuel Flames Using a Burning Rate Emulator (BRE) in Microgravity. 10th U.S. National Combustion Meeting, 2017.",
+   "used": "BRE drop-tower (pre-flight) finding.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20170009141"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Ma, B.; Cao, S.; Giassi, D.; Stocker, D.P.; Takahashi, F.; Bennett, B.A.V.; Smooke, M.D.; Long, M.B.: An Experimental and Computational Study on Soot Formation in a Coflow Jet Flame Under Microgravity and Normal Gravity. 2014.",
+   "used": "SLICE soot finding.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20140017780"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Cao, S.; Ma, B.; Bennett, B.A.V.; Giassi, D.; Stocker, D.P.; Takahashi, F.; Long, M.B.; Smooke, M.D.: A Computational and Experimental Study of Coflow Laminar Methane/Air Diffusion Flames: Effects of Fuel Dilution, Inlet Velocity, and Gravity. 2014.",
+   "used": "SLICE flame-size finding.",
+   "links": [
+    [
+     "NASA NTRS record",
+     "https://ntrs.nasa.gov/citations/20150002322"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Liu, Y.C.; Xu, Y.; Hicks, M.C.; Avedisian, C.T.: Comprehensive study of initial diameter effects and other observations on convection-free droplet combustion in the standard atmosphere for n-heptane, n-octane, and n-decane. Combustion and Flame 171 (2016) 27-41.",
+   "used": "FLEX-2 finding on radiative extinction and low-temperature burning of n-alkane droplets. Copy supplied by the project owner from the authors' Cornell lab site; not included in the public report-search file (journal copyright).",
+   "links": [
+    [
+     "DOI 10.1016/j.combustflame.2016.05.013",
+     "https://doi.org/10.1016/j.combustflame.2016.05.013"
+    ],
+    [
+     "Authors' copy",
+     "https://cpb-us-e1.wpmucdn.com/blogs.cornell.edu/dist/4/4135/files/2017/09/2-1pr19jc.pdf"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Xu, Y.; Hicks, M.C.; Avedisian, C.T.: The combustion of iso-octane droplets with initial diameters from 0.5 to 5 mm: Effects on burning rate and flame extinction. Proceedings of the Combustion Institute 36 (2017) 2541-2548.",
+   "used": "FLEX-2 iso-octane finding. Copy supplied by the project owner from the authors' Cornell lab site; not in the public report-search file.",
+   "links": [
+    [
+     "DOI 10.1016/j.proci.2016.07.096",
+     "https://doi.org/10.1016/j.proci.2016.07.096"
+    ],
+    [
+     "Authors' copy",
+     "https://cpb-us-e1.wpmucdn.com/blogs.cornell.edu/dist/4/4135/files/2017/11/2-iso-octane-1lqlve9.pdf"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Xu, Y.; Farouk, T.I.; Hicks, M.C.; Avedisian, C.T.: Initial diameter effects on combustion of unsupported equi-volume n-heptane/iso-octane mixture droplets and the transition to cool flame behavior: Experimental observations and detailed numerical modeling. Combustion and Flame 220 (2020) 82-91.",
+   "used": "FLEX-2 heptane/iso-octane mixture finding. Copy supplied by the project owner from the authors' Cornell lab site; not in the public report-search file.",
+   "links": [
+    [
+     "DOI 10.1016/j.combustflame.2020.06.012",
+     "https://doi.org/10.1016/j.combustflame.2020.06.012"
+    ],
+    [
+     "Authors' copy",
+     "https://cpb-us-w2.wpmucdn.com/sites.coecis.cornell.edu/dist/9/231/files/2020/08/2020-CF-Initial-diameter-effects-on-Combustion.pdf"
+    ]
+   ]
+  },
+  {
+   "group": "Investigation cards (outside PSI)",
+   "cite": "Dehghani, P.; Quintiere, J.G.: Flammability Maps for Microgravity Burning of a Small Flat Material in a Quiescent Ambient. Combustion and Flame (2023), article S0010218023001803. Accepted manuscript under the Elsevier user license.",
+   "used": "ACME BRE ISS results: O2 versus pressure effect, flammability window, critical flame temperature, external-radiation effect. Copy supplied by the project owner; not in the public report-search file.",
+   "links": [
+    [
+     "Version of record",
+     "https://www.sciencedirect.com/science/article/pii/S0010218023001803"
     ]
    ]
   }
