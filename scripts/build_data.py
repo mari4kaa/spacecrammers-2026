@@ -66,7 +66,10 @@ def _csv(n):
 evidence = {"bre": _csv("bre_iss_tests.csv"), "loi": _csv("flex_loi_by_diluent.csv"), "smoke": _csv("same_smoke_particle_sizes.csv"),
             "detector": {"min_um": 0.3, "best_above_um": 1.0, "src": "ntrs-detector-2007"}}
 
-bundle = {"built": "2026-11-14", "about": cur["_about"], "sources": cur["sources"], "inv": inv, "cols": cols, "rows": rows,
+import datetime as _dt
+_snap = max((f.stat().st_mtime for f in pathlib.Path(sys.argv[1]).glob("PSI-*.json")), default=None)
+PSI_SNAPSHOT = _dt.date.fromtimestamp(_snap).isoformat() if _snap else ""
+bundle = {"built": "2026-11-14", "psi_snapshot": PSI_SNAPSHOT, "about": cur["_about"], "sources": cur["sources"], "inv": inv, "cols": cols, "rows": rows,
           "quality": qlog, "incidents": cur["incidents"], "spinoffs": cur["spinoffs"], "gaps_external": cur["gaps_external"], "boundary": boundary,
           "families": cur.get("families", {}), "shared_links": cur.get("shared_links", []), "references": cur.get("references", []), "evidence": evidence}
 s = json.dumps(bundle, separators=(",", ":"), ensure_ascii=False)

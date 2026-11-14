@@ -120,6 +120,10 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;
 .msg.u{background:var(--o2-soft);justify-self:end}
 .msg.a{background:var(--chip)}
 .refs{margin:0;padding-left:20px;display:grid;gap:8px}.refs li .used{color:var(--muted)}
+.psiquote{margin:8px 0 0;padding:10px 14px;border-left:4px solid var(--accent);background:var(--chip);border-radius:0 8px 8px 0;max-width:90ch;display:grid;gap:8px}
+.psiquote p{margin:0}
+.psiquote footer{color:var(--muted);font-size:12px}
+.srctag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;vertical-align:1px}
 .msg .lvl{display:block;margin-top:6px;font-size:11.5px;color:var(--muted);white-space:normal}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:var(--surface);color:var(--ink);padding:5px 12px;font-size:13px}
@@ -486,6 +490,17 @@ function score(inv){
   for (const k in W) { seg[k] = 100 * W[k] * c[k] / tw; total += seg[k]; }
   return {total, c, seg, ct};
 }
+/* note when the closest test's O2 or pressure is not in the PSI table but assumed */
+function assumedNote(sc){
+  if (!sc || !sc.ct) return "";
+  const r = sc.ct.r, ao = /^assumed/.test(r.o2_source || ""), ap = /^assumed/.test(r.p_source || "");
+  if (!ao && !ap) return "";
+  const src = (r.o2_source || "") + " " + (r.p_source || "");
+  const where = /Cygnus/.test(src) ? "Cygnus cabin air" : /ISS cabin/.test(src) ? "ISS cabin air" : "air in the test chamber";
+  const what = ao && ap ? "O₂ and pressure" : ao ? "O₂" : "pressure";
+  const val = ao && ap ? `${where} (about 21% O₂, 14.7 psi)` : ao ? `${where} (about 21% O₂)` : `the ${where.replace(" air", "")} pressure (about 14.7 psi)`;
+  return `Its closest test's ${what} ${ao && ap ? "are" : "is"} not in the PSI table: FireSight assumes ${val}, so this closeness rests on an assumption.${/N2-diluted/.test(src) ? " Some of its tests were nitrogen-diluted, so the real O₂ may be lower." : ""}`;
+}
 function why(inv, sc){
   const ks = Object.keys(W).filter(k => W[k] > 0);
   const strong = ks.filter(k => sc.c[k] >= .7).sort((a, b) => sc.seg[b] - sc.seg[a]).slice(0, 2).map(k => WL[k].toLowerCase());
@@ -495,6 +510,43 @@ function why(inv, sc){
   if (sc.ct) { const r = sc.ct.r; t += ` Closest test: ${r.test_id || "row " + r.src_row} at ${fmt(r.o2_pct)}% O₂, ${r.p_atm != null ? fmt(r.p_atm * PSI_PER_ATM) + " psi" : "pressure n/a"}, ${r.flow_cm_s != null ? fmt(r.flow_cm_s) + " cm/s" : "flow n/a"}.`; }
   else t += " No numeric O₂ in its table.";
   return t.trim();
+}
+
+/* scenario-specific relevance lines for one investigation (recomputed for every scenario change) */
+function scenarioRelevance(i){
+  const L = [], amb = i.rows.filter(ambient), here = `${fmt(S.o2)}% O₂ / ${fmt(S.psi)} psi`;
+  const hit = amb.filter(r => inWindow(r, S.o2, S.psi)), stream = i.rows.filter(r => o2Kind(r) === "stream" && inWindow(r, S.o2, S.psi));
+  if (!i.rows.length) L.push(`No test table in PSI, so its coverage of ${here} can't be checked; see the findings above.`);
+  else if (!amb.length) L.push(`Its table gives no room oxygen per test, so coverage of ${here} can't be checked.`);
+  else if (hit.length) L.push(`${hit.length} of its ${i.rows.length} test rows ran within ±3 O₂ points and ±30% pressure of your ${here}: directly relevant data.`);
+  else { const nb = nearest(amb, S.o2, S.psi); L.push(`None of its tests ran near your ${here}. Closest: ${nearestText(nb)}.`); }
+  if (stream.length) L.push(`${stream.length} inverse-flame tests had about your O₂ only in the burner stream, not in the room.`);
+  if (amb.length) {
+    const o2max = Math.max(...amb.map(r => r.o2_pct_max ?? r.o2_pct)), o2min = Math.min(...amb.map(r => r.o2_pct));
+    if (S.o2 > o2max + 3) L.push(`Your O₂ is above everything it tested (highest ${fmt(o2max)}%), so its results must be extrapolated upward.`);
+    else if (S.o2 < o2min - 3) L.push(`Your O₂ is below everything it tested (lowest ${fmt(o2min)}%).`);
+    const ps = amb.filter(r => r.p_atm != null);
+    if (ps.length) { const pmin = Math.min(...ps.map(r => r.p_atm)) * PSI_PER_ATM, pmax = Math.max(...ps.map(r => r.p_atm_max ?? r.p_atm)) * PSI_PER_ATM;
+      if (S.psi < pmin / 1.1) L.push(`Your ${fmt(S.psi)} psi is below its lowest test pressure (${fmt(pmin)} psi).`);
+      else if (S.psi > pmax * 1.1) L.push(`Your ${fmt(S.psi)} psi is above its highest test pressure (${fmt(pmax)} psi).`); }
+  }
+  const fl = i.rows.filter(r => r.flow_cm_s != null && !/NEGATIVE_VALUE/.test(r.flags || ""));
+  if (fl.length) { const fmin = Math.min(...fl.map(r => r.flow_cm_s)), fmax = Math.max(...fl.map(r => r.flow_cm_s_max ?? r.flow_cm_s));
+    const span = fmin === fmax ? `${fmin === 0 ? "only still air (0 cm/s)" : "only " + fmt(fmin) + " cm/s"}` : `${fmt(fmin)}-${fmt(fmax)} cm/s`;
+    L.push(S.flow < fmin || S.flow > fmax ? `It tested ${span}; your air speed of ${fmt(S.flow)} cm/s was not tested.` : `Your air speed of ${fmt(S.flow)} cm/s is within its tested ${span}.`); }
+  if (S.g === "moon" || S.g === "mars") L.push(i.id === "PSI-22" ? "Its electric field imitates buoyancy: the closest PSI handle on Moon or Mars gravity." : `Microgravity data only: it bounds the ${S.g === "moon" ? "lunar" : "Martian"} case from one side; no partial-gravity data exist in PSI.`);
+  else if (S.g === "earth") L.push("These are microgravity results; on Earth, buoyancy changes flame shape, spread and soot.");
+  else L.push(i.tier === "G" ? "Ground study of microgravity flight data, matching your 0 g scenario." : "Tested in microgravity, matching your 0 g scenario.");
+  const foc = [...S.pds], match = foc.filter(x => i.pds.includes(x));
+  L.push(match.length ? `Covers your focus on ${match.join(" and ")}.` : `Outside your chosen focus (${foc.join(", ") || "none"}).`);
+  if (i.id === "PSI-25" && typeof FB !== "undefined" && FB) { const p = fbPredict(S.flow), v = p && fbVerdict(S.o2, p);
+    const ext = [S.o2 > 22.5 ? "the rod tests went up to about 21% O₂, so above that it can only say the material burns" : "", S.psi < 13.5 || S.psi > 16 ? `the tests ran near 14.7 psi, not ${fmt(S.psi)} psi` : ""].filter(Boolean);
+    L.push(v ? `Flammability boundary for PMMA rods at your ${fmt(S.flow)} cm/s: ${v.t}. ${v.d}${ext.length ? " Caution: " + ext.join("; ") + "." : ""}` : `Your ${fmt(S.flow)} cm/s is outside the boundary model's air-speed range, so it gives no verdict.`); }
+  if (i.id === "PSI-20" && EV.bre.length) { const n = breNear(S.o2, S.psi), k = n.filter(breKept).length;
+    L.push(n.length ? `ISS BRE tests near your atmosphere: ${k} of ${n.length} small flames kept burning with no air flow (Safety evidence tab).` : "No ISS BRE test ran near your atmosphere (Safety evidence tab)."); }
+  if ((i.id === "PSI-69" || i.id === "PSI-68") && EV.loi.length) L.push(S.o2 > 17 ? `Droplet flames of methanol and heptane need at least 12-17% O₂ depending on the diluent; your ${fmt(S.o2)}% is above all of these limits (Safety evidence tab).` : S.o2 > 12 ? `Your ${fmt(S.o2)}% O₂ is inside the 12-17% range where FLEX droplet flames can still burn, depending on the diluent.` : `Your ${fmt(S.o2)}% O₂ is below every FLEX droplet limit (lowest 12%).`);
+  if (["PSI-102", "PSI-101", "PSI-47"].includes(i.id)) L.push(Math.abs(S.o2 - 21) > 1.5 || Math.abs(S.psi - 14.7) > 1.5 ? `Its measurements were made only in ISS cabin air (about 21% O₂, 14.7 psi), not at your ${here}.` : "Measured in ISS cabin air, close to your scenario.");
+  return L;
 }
 
 /* ---------------- rendering: scenario ---------------- */
@@ -531,7 +583,7 @@ function renderRank(){
       <div class="rsub">${i.id} · ${tierLabel(i.tier)} · ${esc(i.phase)} · ${i.ntests} rows</div>
       <div class="bar">${Object.keys(W).map(k => `<span title="${WL[k]}: ${fmt(s.seg[k], 1)}" style="width:${s.seg[k]}%;background:var(${WC[k]})"></span>`).join("")}</div>
       <div>${i.pds.map(p => `<span class="tag ${p[0]}">${p}</span>`).join("")}</div>
-      <div class="why">${esc(why(i, s))}</div>
+      <div class="why">${esc(why(i, s))}</div>${assumedNote(s) ? `<div class="qnote" style="font-size:12.5px;margin-top:6px">${esc(assumedNote(s))}</div>` : ""}
     </button>`).join("");
   $("#rank").querySelectorAll(".rcard").forEach(b => b.onclick = () => { S.sel = b.dataset.id; save(); renderRank(); renderMap(); renderDetail(); });
 }
@@ -623,12 +675,20 @@ function renderDetail(){
       </dl>
     </div>
     <div><h3>Key findings</h3><ul class="findings">${i.findings.map(f => `<li>${esc(f.t)} <span class="src">[${esc(srcLabel(f.src))}]</span></li>`).join("")}</ul></div>
-    <div><h3>Relevance to your habitat</h3><p style="margin:4px 0 0">${esc(i.habitat)}</p>${sc ? `<p class="small muted" style="margin:4px 0 0">${esc(why(i, sc))}</p>` : ""}</div>
+    <div><h3>Relevance to your habitat</h3>
+      <div class="small muted" style="margin-top:4px">For your scenario: ${esc(S.preset ? (PRESETS.find(p => p.k === S.preset) || {}).n || "custom" : "custom")} · ${fmt(S.o2)}% O₂ · ${fmt(S.psi)} psi · ${fmt(S.flow)} cm/s · ${esc({"0":"0 g", moon:"Moon", mars:"Mars", earth:"Earth"}[S.g] || S.g)}</div>
+      <ul class="findings" style="margin-top:4px">${scenarioRelevance(i).map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+      ${sc ? `<p class="small muted" style="margin:4px 0 0">Ranking: ${esc(why(i, sc))}</p>${assumedNote(sc) ? `<div class="qnote" style="font-size:12.5px;margin-top:4px">${esc(assumedNote(sc))}</div>` : ""}` : ""}
+      <p style="margin:8px 0 0"><span class="small muted">In general (written in advance, same for every scenario):</span> ${esc(i.habitat)}</p></div>
     ${i.quality.length ? `<div style="display:grid;gap:6px"><h3>Data-quality notes</h3>${i.quality.map(q => `<div class="qnote">${esc(q)}</div>`).join("")}</div>` : ""}
-    <details><summary>Original PSI text: objective, hypothesis, impacts</summary><div class="small" style="display:grid;gap:8px;margin-top:8px;max-width:90ch">
-      <div><b>Objective.</b> ${esc(i.objective)}</div><div><b>Approach.</b> ${esc(i.approach)}</div><div><b>Hypothesis.</b> ${esc(i.hypothesis)}</div><div><b>Impacts.</b> ${esc(i.impacts)}</div></div></details>
+    <details><summary>Original PSI text: objective, approach, hypothesis, impacts <span class="srctag">Quoted from NASA PSI</span></summary>
+      <div class="small muted" style="margin-top:8px;max-width:90ch">Source: NASA Physical Sciences Informatics (PSI), investigation ${esc(i.id)}, “${esc(i.title)}”. FireSight fetched this text from the investigation's PSI record${B.psi_snapshot ? ` on ${esc(B.psi_snapshot)}` : ""} and shows it verbatim below; it was not written or edited by FireSight. The AI summary above was written from it and from the PSI files named in brackets.</div>
+      <blockquote class="psiquote small" cite="${esc(i.url)}">
+        <p><b>Objective.</b> ${esc(i.objective)}</p><p><b>Approach.</b> ${esc(i.approach)}</p><p><b>Hypothesis.</b> ${esc(i.hypothesis)}</p><p><b>Impacts.</b> ${esc(i.impacts)}</p>
+        <footer>— NASA PSI, ${esc(i.id)} ${esc(i.acr)} · <a href="${esc(i.url)}">psi.nasa.gov investigation page</a>${i.doi ? ` · <a href="https://doi.org/${esc(i.doi)}">DOI ${esc(i.doi)}</a>` : ""}</footer>
+      </blockquote></details>
     ${i.pubs.length ? `<details><summary>${i.pubs.length} publications listed in PSI</summary><ul class="small">${i.pubs.map(p => `<li>${esc(p.t)}${p.doi ? ` <a href="https://doi.org/${esc(p.doi)}">${esc(p.doi)}</a>` : ""} <span class="muted">${esc(p.a)}</span></li>`).join("")}</ul></details>` : ""}
-    <p class="small muted" style="margin:0">Summaries and findings were written by Claude from the PSI files named in brackets. Check them against the source before citing.</p>`;
+    <p class="small muted" style="margin:0">Summaries and findings were written by Claude from the PSI files named in brackets.</p>`;
   $("#addcmp").onclick = () => { if (!CMP.includes(i.id)) { CMP.push(i.id); if (CMP.length > 4) CMP.shift(); } location.hash = "compare"; };
 }
 
@@ -1217,7 +1277,7 @@ const TOOLS = [
    inputSchema:{type:"object", properties:{}}, execute:() => RANKED.map(({i, s}) => ({id:i.id, acr:i.acr, tier:i.tier, pds:i.pds, phase:i.phase, ntests:i.ntests, score:+s.total.toFixed(1)}))},
   {name:"get_investigation", description:"Full card for one investigation: objective, fuel and sample/burner shape and size, hardware family, summary, varied/fixed, sensors, findings with sources, habitat relevance, quality notes, PSI objective text.",
    inputSchema:{type:"object", properties:{id:{type:"string", description:"PSI id like PSI-25"}}, required:["id"]},
-   execute:({id}) => { id = resolveId(id); const i = BYID[id]; if (!i) return {error:"unknown id", valid_ids:ID_LIST}; const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, family_note:(B.families || {})[i.family] || "", shared_with:(B.shared_links || []).filter(L => L.ids.includes(id)).map(L => ({what:L.what, ids:L.ids, note:L.note})), pubs:pubs.slice(0, 8).map(p => p.t)}; }},
+   execute:({id}) => { id = resolveId(id); const i = BYID[id]; if (!i) return {error:"unknown id", valid_ids:ID_LIST}; const {rows, pubs, approach, impacts, ...rest} = i; return {...rest, habitat_general:rest.habitat, scenario_relevance:scenarioRelevance(i), family_note:(B.families || {})[i.family] || "", shared_with:(B.shared_links || []).filter(L => L.ids.includes(id)).map(L => ({what:L.what, ids:L.ids, note:L.note})), pubs:pubs.slice(0, 8).map(p => p.t)}; }},
   {name:"query_tests", description:"Search the unified test matrix. Filters are optional. Returns up to 40 rows plus a count. o2 in %, pressure in psi, flow in cm/s.",
    inputSchema:{type:"object", properties:{psi_id:{type:"string", description:"PSI id like PSI-69, or the acronym like FLEX"}, fuel_phase:{type:"string"}, fuel_contains:{type:"string"}, diluent_contains:{type:"string", description:"e.g. CO2, He, N2"}, o2_min:{type:"number"}, o2_max:{type:"number"}, psi_min:{type:"number"}, psi_max:{type:"number"}, flow_min:{type:"number"}, flow_max:{type:"number"}, measured_o2_only:{type:"boolean"}}},
    execute:(q) => { const rs = filterTests(q);
