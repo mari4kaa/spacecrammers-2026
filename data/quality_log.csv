@@ -1,0 +1,158 @@
+psi_id,acronym,field,raw_value,action,code,src_rows,count
+PSI-26,BASS,As Run Test #,24,also used on row 25; kept both,DUPLICATE_ID,26,1
+PSI-26,BASS,Date,6/29/`12,read as 2012,DATE_TYPO,44,1
+PSI-26,BASS,Fuel Sample Material,SOOT Cleaning,row dropped (not a burn),NON_TEST_ROW,67,1
+PSI-26,BASS,As Run Test #,85,also used on row 88; kept both,DUPLICATE_ID,89,1
+PSI-26,BASS,As Run Test #,89,also used on row 93; kept both,DUPLICATE_ID,96,1
+PSI-26,BASS,As Run Test #,90,also used on row 94; kept both,DUPLICATE_ID,97,1
+PSI-26,BASS,As Run Test #,91,also used on row 95; kept both,DUPLICATE_ID,98,1
+PSI-26,BASS,GMT,4/26/2013 vs GMT 113,day-of-year should be 116; kept date,DATE_GMT_MISMATCH,100,1
+PSI-26,BASS,Fuel Sample Material,pmma slab oppsed,read as 'opposed',TYPO,104,1
+PSI-26,BASS,Date,5/15/2103,read as 2013,DATE_TYPO,111,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 137,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,118,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 150,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,119,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 150,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,120,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 150,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,121,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 150,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,122,1
+PSI-26,BASS,GMT,6/1/2013 vs GMT 150,day-of-year should be 152; kept date,DATE_GMT_MISMATCH,123,1
+PSI-25,BASS-II,Calibrated final O2,initial 22.2 -> final 1.6,kept; check BASS-II Summary Report before use,NEEDS_VERIFICATION,3,1
+PSI-25,BASS-II,Calibrated final O2,initial 20.8 -> final 0.6,kept; check BASS-II Summary Report before use,NEEDS_VERIFICATION,97,1
+PSI-25,BASS-II,Calibrated final O2,initial 20 -> final 39.1,kept; check BASS-II Summary Report before use,NEEDS_VERIFICATION,98,1
+PSI-25,BASS-II,Calibrated final O2,initial 20.7 -> final 0.9,kept; check BASS-II Summary Report before use,NEEDS_VERIFICATION,128,1
+PSI-25,BASS-II,Calibrated final O2,initial 20.7 -> final 40.4,kept; check BASS-II Summary Report before use,NEEDS_VERIFICATION,129,1
+PSI-98,SAFFIRE-I,Sample Thickness,0.37,SIBAL fabric is ~0.3-0.4 mm (SAFFIRE-II lists 0.37 mm); value kept as mm,UNIT_SUSPECT,2,1
+PSI-98,SAFFIRE-I,Sample Length/Width,40.6 / 94,SAFFIRE-III lists the same sample as 94 cm long x 40.6 cm wide; swapped,VALUES_SWAPPED,2,1
+PSI-98,SAFFIRE-I,Sample Thickness,0.37,SIBAL fabric is ~0.3-0.4 mm (SAFFIRE-II lists 0.37 mm); value kept as mm,UNIT_SUSPECT,3,1
+PSI-98,SAFFIRE-I,Sample Length/Width,40.6 / 94,SAFFIRE-III lists the same sample as 94 cm long x 40.6 cm wide; swapped,VALUES_SWAPPED,3,1
+PSI-98,SAFFIRE-I,Sample Number,F1C1/F1C2,row dropped (flow-visualization set or note),NON_TEST_ROW,4,1
+PSI-98,SAFFIRE-I,Sample Number,F2C1/F2C2,row dropped (flow-visualization set or note),NON_TEST_ROW,5,1
+PSI-99,SAFFIRE-II,header,Samle Thickness ,read as Sample Thickness,TYPO,1,1
+PSI-99,SAFFIRE-II,header,?-g Burn Length / ?-g Spread Length,'?' is a lost 'µ' (micro-g),ENCODING_LOSS,1,1
+PSI-99,SAFFIRE-II,Sample Thickness,037 mm,read as 0.37 mm (missing decimal point),TYPO,5,1
+PSI-99,SAFFIRE-II,Sample Thickness,037 mm,read as 0.37 mm (missing decimal point),TYPO,6,1
+PSI-99,SAFFIRE-II,Material,(blank),filled down as 'Cotton-Fiberglass (SIBAL)',MISSING_FILLED,7,1
+PSI-99,SAFFIRE-II,Sample Thickness,037 mm,read as 0.37 mm (missing decimal point),TYPO,7,1
+PSI-99,SAFFIRE-II,Material,(blank),filled down as 'PMMA',MISSING_FILLED,10,1
+PSI-99,SAFFIRE-II,Sample Number,F1C1/F1C2,row dropped (flow-visualization set or note),NON_TEST_ROW,11,1
+PSI-99,SAFFIRE-II,Sample Number,F2C1/F2C2,row dropped (flow-visualization set or note),NON_TEST_ROW,12,1
+PSI-99,SAFFIRE-II,Sample Number,Note 1 Derived from measured CO2 production and referenced t,row dropped (flow-visualization set or note),NON_TEST_ROW,13,1
+PSI-99,SAFFIRE-II,Sample Number,Note 2 The PMMA portion was completely consumed but the Nome,row dropped (flow-visualization set or note),NON_TEST_ROW,14,1
+PSI-99,SAFFIRE-II,Sample Number,Note 3 This is the length of fuel with significant visible d,row dropped (flow-visualization set or note),NON_TEST_ROW,15,1
+PSI-99,SAFFIRE-II,Sample Number,Note 4 The flames remain anchored at the base of the sample ,row dropped (flow-visualization set or note),NON_TEST_ROW,16,1
+PSI-100,SAFFIRE-III,Sample Thickness,.33 cm,SIBAL fabric is ~0.3-0.4 mm (SAFFIRE-II lists 0.37 mm); value kept as mm,UNIT_SUSPECT,2,1
+PSI-100,SAFFIRE-III,Sample Thickness,.33 cm,SIBAL fabric is ~0.3-0.4 mm (SAFFIRE-II lists 0.37 mm); value kept as mm,UNIT_SUSPECT,3,1
+PSI-102,SAME,Sample Material,Kapton: same conditions as 1-4,expanded into the 4 conditions of samples 1-4,EXPANDED_FROM_NOTE,6,1
+PSI-102,SAME,Sample Material,Silicone Rubber: same conditions as 1-4,expanded into the 4 conditions of samples 1-4,EXPANDED_FROM_NOTE,7,1
+PSI-102,SAME,Sample Material,Lampwick: same conditions as 1-4,expanded into the 4 conditions of samples 1-4,EXPANDED_FROM_NOTE,8,1
+PSI-102,SAME,Sample Material,Dibutyl Phthalate: same conditions as 1-4,expanded into the 4 conditions of samples 1-4,EXPANDED_FROM_NOTE,9,1
+PSI-69,FLEX,header,Burning rate; mm,values 0.3-0.8 match a droplet burning-rate constant in mm²/s; unit relabeled,UNIT_SUSPECT,1,1
+PSI-69,FLEX,Ambient pressure; mmHg,0,treated as missing,IMPOSSIBLE_VALUE,115,1
+PSI-20,ACME BRE,Oxygen Conc (percent),3400%,read as 34% (percent format applied twice),PERCENT_FORMAT_FIXED,6,1
+PSI-20,ACME BRE,Oxygen Conc (percent),2100%,read as 21% (percent format applied twice),PERCENT_FORMAT_FIXED,9,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH5,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,"3,33",2
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH6,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,4,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH7,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,5,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH8,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,6,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH9,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,7,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH10,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,8,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH11,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,9,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH12,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,10,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH13,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,11,1
+PSI-21,ACME CLD Flame,Fuel Bottle,40% CH14,read as '40% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,12,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% CH5,read as '100% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,14,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% CH6,read as '100% CH4' (spreadsheet auto-fill),AUTOFILL_FIXED,15,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H5,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,17,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H6,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,18,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H7,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,19,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H8,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,20,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H9,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,21,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H10,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,22,1
+PSI-21,ACME CLD Flame,Fuel Bottle,100% C2H11,read as '100% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,23,1
+PSI-21,ACME CLD Flame,Fuel Bottle,50% C2H5,read as '50% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,25,1
+PSI-21,ACME CLD Flame,Fuel Bottle,50% C2H6,read as '50% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,26,1
+PSI-21,ACME CLD Flame,Fuel Bottle,50% C2H7,read as '50% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,27,1
+PSI-21,ACME CLD Flame,Fuel Bottle,50% C2H8,read as '50% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,28,1
+PSI-21,ACME CLD Flame,Fuel Bottle,50% C2H9,read as '50% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,29,1
+PSI-21,ACME CLD Flame,Fuel Bottle,30% C2H5,read as '30% C2H4' (spreadsheet auto-fill),AUTOFILL_FIXED,31,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,4,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,7,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,15,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,19,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,25,1
+PSI-22,ACME E-FIELD,Fuel Conc,50%,continuation row merged into previous test day,CONTINUATION_MERGED,27,1
+PSI-22,ACME E-FIELD,Fuel Conc,80%,continuation row merged into previous test day,CONTINUATION_MERGED,28,1
+PSI-22,ACME E-FIELD,Fuel Conc,100%,continuation row merged into previous test day,CONTINUATION_MERGED,29,1
+PSI-22,ACME E-FIELD,(whole row),18319,exact repeat of an earlier block; dropped,DUPLICATE_ROW,30,1
+PSI-23,ACME s-Flame,Atmosphere,~21% O2 with N3,read as '~21% O2 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,"3,7",2
+PSI-23,ACME s-Flame,Fuel Bottle,50% C2H4 with N3,read as '50% C2H4 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,3,1
+PSI-23,ACME s-Flame,Atmosphere,~21% O2 with N4,read as '~21% O2 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,"4,8",2
+PSI-23,ACME s-Flame,Fuel Bottle,45% CH4 with N3,read as '45% CH4 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,5,1
+PSI-23,ACME s-Flame,Atmosphere,~21% O2 with N5,read as '~21% O2 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,9,1
+PSI-23,ACME s-Flame,Atmosphere,~21% O2 with N6,read as '~21% O2 with N2' (spreadsheet auto-fill),AUTOFILL_FIXED,10,1
+PSI-10,ACME Flame Design,numeric columns,RAMPED,text placeholder in numeric column; set to empty,PLACEHOLDER_TEXT,"3,5,7",3
+PSI-10,ACME Flame Design,numeric columns,RAMP,text placeholder in numeric column; set to empty,PLACEHOLDER_TEXT,"27,28,29,30,31,39,40,41,42,43,45,46,47,48,49,51,52,53,54,55,56,57,58,59,75,81,85,86,87,93,94,95,96,98,99,100,113,116,117,118,123,129,130,132,133,140,141,142,154,180,181,182,184,185,186,187,188,31,32,33,77,78,87,88,94,104",66
+PSI-10,ACME Flame Design,numeric columns,LOW O2,text placeholder in numeric column; set to empty,PLACEHOLDER_TEXT,"89,90",2
+PSI-107,SPICE,(whole row),14:37:08 Ethylene 103.8,exact duplicate of row 2; dropped,DUPLICATE_ROW,3,1
+PSI-107,SPICE,(whole row),15:35:44 Ethylene 138,exact duplicate of row 6; dropped,DUPLICATE_ROW,7,1
+PSI-107,SPICE,(whole row),15:42:22 Ethylene 69,exact duplicate of row 9; dropped,DUPLICATE_ROW,10,1
+PSI-107,SPICE,(whole row),15:48:39 Ethylene 63.6,exact duplicate of row 11; dropped,DUPLICATE_ROW,12,1
+PSI-107,SPICE,(whole row),15:50:59 Ethylene 34.8,exact duplicate of row 13; dropped,DUPLICATE_ROW,14,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,90,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,91,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,92,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,93,1
+PSI-107,SPICE,Fuel,75 % Propylene,normalized to '75% Propylene',LABEL_VARIANT,"95,96,97,98,99,100,101,102,104,107,108,112,113,114,118,119,120,123,124,128,129,130,136,137,138,139,140,141,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403",115
+PSI-107,SPICE,Air Rate (cm/s),65.54,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,98,1
+PSI-107,SPICE,(whole row),Ku              LOS 75 % Propylene ,exact duplicate of row 102; dropped,DUPLICATE_ROW,103,1
+PSI-107,SPICE,(whole row),17.47.12 75 % Propylene 44.24633431,exact duplicate of row 123; dropped,DUPLICATE_ROW,125,1
+PSI-107,SPICE,(whole row),17.50.49 75 % Propylene 27.41348974,exact duplicate of row 129; dropped,DUPLICATE_ROW,131,1
+PSI-107,SPICE,(whole row),17.50.49 75 % Propylene 27.41348974,exact duplicate of row 129; dropped,DUPLICATE_ROW,132,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,133,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,134,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,135,1
+PSI-107,SPICE,Air Rate (cm/s),67.42,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,136,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,137,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,138,1
+PSI-107,SPICE,Air Rate (cm/s),85.28,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,139,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,140,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,141,1
+PSI-107,SPICE,Fuel,50 % Propylene,normalized to '50% Propylene',LABEL_VARIANT,"142,143,144,145,147,149,150,151,152,154,156,157,158,161,162,163,164,166,168,169,170,171,175,176,177,178,179,180,181,182,183,186,187,188,189,190,191,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,337,338,339,340,341,342,343",96
+PSI-107,SPICE,(whole row),8:56:16 50 % Propylene 55.24822695,exact duplicate of row 142; dropped,DUPLICATE_ROW,146,1
+PSI-107,SPICE,(whole row),8:56:16 50 % Propylene 69.20567376,exact duplicate of row 144; dropped,DUPLICATE_ROW,148,1
+PSI-107,SPICE,(whole row),9:00:26 50 % Propylene 43.61702128,exact duplicate of row 150; dropped,DUPLICATE_ROW,153,1
+PSI-107,SPICE,(whole row),9:00:26 50 % Propylene 107.0070922,exact duplicate of row 151; dropped,DUPLICATE_ROW,155,1
+PSI-107,SPICE,(whole row),9:36:14 50 % Propylene 81.41843972,exact duplicate of row 156; dropped,DUPLICATE_ROW,159,1
+PSI-107,SPICE,(whole row),9:36:14 50 % Propylene 40.70921986,exact duplicate of row 157; dropped,DUPLICATE_ROW,160,1
+PSI-107,SPICE,(whole row),9:39:14 50 % Propylene 91.88652482,exact duplicate of row 162; dropped,DUPLICATE_ROW,165,1
+PSI-107,SPICE,(whole row),9:39:14 50 % Propylene 105.2624113,exact duplicate of row 164; dropped,DUPLICATE_ROW,167,1
+PSI-107,SPICE,(whole row),9:49:56 50 % Propylene 106.4255319,exact duplicate of row 169; dropped,DUPLICATE_ROW,172,1
+PSI-107,SPICE,(whole row),9:49:56 50 % Propylene 52.92198582,exact duplicate of row 170; dropped,DUPLICATE_ROW,173,1
+PSI-107,SPICE,(whole row),9:49:56 50 % Propylene 97.12056738,exact duplicate of row 171; dropped,DUPLICATE_ROW,174,1
+PSI-107,SPICE,(whole row),10:01:00 50 % Propylene 45.36170213,exact duplicate of row 182; dropped,DUPLICATE_ROW,184,1
+PSI-107,SPICE,(whole row),10:01:00 50 % Propylene 23.26241135,exact duplicate of row 183; dropped,DUPLICATE_ROW,185,1
+PSI-107,SPICE,(whole row),10:25:40 50 % Propylene 64.55319149,exact duplicate of row 191; dropped,DUPLICATE_ROW,192,1
+PSI-107,SPICE,(whole row),9:37:52 Propylene 14.35,exact duplicate of row 215; dropped,DUPLICATE_ROW,216,1
+PSI-107,SPICE,(whole row),9:44:17 Propylene 11.48,exact duplicate of row 220; dropped,DUPLICATE_ROW,222,1
+PSI-107,SPICE,(whole row),9:55:18 Propylene 33.21,exact duplicate of row 229; dropped,DUPLICATE_ROW,231,1
+PSI-107,SPICE,(whole row),9:55:18 Propylene 16.81,exact duplicate of row 230; dropped,DUPLICATE_ROW,232,1
+PSI-107,SPICE,(whole row),Ku LOS Propylene ,exact duplicate of row 234; dropped,DUPLICATE_ROW,235,1
+PSI-107,SPICE,(whole row),Ku LOS Propylene ,exact duplicate of row 234; dropped,DUPLICATE_ROW,236,1
+PSI-107,SPICE,(whole row),10:18:27 Propylene ,exact duplicate of row 240; dropped,DUPLICATE_ROW,241,1
+PSI-107,SPICE,(whole row),10:18:27 Propylene ,exact duplicate of row 240; dropped,DUPLICATE_ROW,242,1
+PSI-107,SPICE,Air Rate (cm/s),4.42,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,249,1
+PSI-107,SPICE,Air Rate (cm/s),4.42,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,250,1
+PSI-107,SPICE,(whole row),11:25:49 Propylene 46.33,exact duplicate of row 251; dropped,DUPLICATE_ROW,253,1
+PSI-107,SPICE,(whole row),12:42:59 Propylene 12.71,exact duplicate of row 266; dropped,DUPLICATE_ROW,267,1
+PSI-107,SPICE,Air Rate (cm/s),-0.28,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,296,1
+PSI-107,SPICE,Air Rate (cm/s),0.66,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,297,1
+PSI-107,SPICE,Air Rate (cm/s),-0.28,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,298,1
+PSI-107,SPICE,Air Rate (cm/s),-0.28,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,299,1
+PSI-107,SPICE,Air Rate (cm/s),-0.28,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,300,1
+PSI-107,SPICE,Air Rate (cm/s),-0.28,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,301,1
+PSI-107,SPICE,Air Rate (cm/s),66.48,outside the 5.4-65 cm/s range stated in the investigation description,OUT_OF_STATED_RANGE,327,1
+PSI-107,SPICE,(whole row),11:04:59 50 % Propylene 22.68085106,exact duplicate of row 330; dropped,DUPLICATE_ROW,336,1
+PSI-107,SPICE,Air Rate (cm/s),-5.92,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,337,1
+PSI-107,SPICE,Air Rate (cm/s),-5.92,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,338,1
+PSI-107,SPICE,Air Rate (cm/s),-5.92,"negative reading (sensor offset at ~zero coflow); kept, treat as ≈0",NEGATIVE_VALUE,339,1
+PSI-107,SPICE,Fuel Rate,0,zero fuel flow,IMPOSSIBLE_VALUE,403,1
+PSI-107,SPICE,GMT Flame Off,11 rows blank,kept,MISSING_VALUE,,1

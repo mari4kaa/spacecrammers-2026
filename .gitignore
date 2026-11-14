@@ -147,3 +147,11 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# FireSight
+raw/
+worker/node_modules/
+worker/.wrangler/
+worker/.dev.vars
+.DS_Store
+_to_delete/

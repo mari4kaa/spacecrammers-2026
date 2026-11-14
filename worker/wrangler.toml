@@ -1,0 +1,14 @@
+name = "firesight-ai"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+# Sites allowed to call this proxy (comma-separated, no trailing slash).
+ALLOWED_ORIGINS = "https://mari4kaa.github.io,http://localhost:8000"
+MODEL = "claude-haiku-5-5"
+MAX_TOKENS = "1200"
+RATE_PER_MINUTE = "12"
+
+# The API key is NOT stored here. Set it once with:
+#   npx wrangler secret put ANTHROPIC_API_KEY
+# For local testing put ANTHROPIC_API_KEY=... in worker/.dev.vars (git-ignored).
