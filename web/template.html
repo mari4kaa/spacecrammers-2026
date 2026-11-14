@@ -737,16 +737,15 @@ function renderMethod(){
   $("#methoddata").innerHTML = `<p style="margin-top:0">Built ${B.built} from the PSI repository (psi.nasa.gov). ${INV.length} investigations with combustion relevance, ${INV.filter(i => i.ntests).length} with experiment tables. Two non-combustion search hits were excluded (PSI-181 solders, PSI-108 STDCE).</p>
   <ul><li>Metadata and table CSVs were pulled from the PSI data service and normalized by a Python script that keeps the PSI file and row for every value.</li>
   <li>${nq} row-level issues were found and logged (see Data quality).</li>
-  <li>Findings come from 13 PSI report files read for this build, plus NASA's 2015 Researcher's Guide. Some PSI document links are broken and are listed as quality issues.</li>
+  <li>Findings come from 13 PSI report files read for this build, plus NASA's 2015 Researcher's Guide. Every finding was fact-checked against its cited passage or recomputed from the PSI table on 2026-11-14. Some PSI document links are broken and are listed as quality issues.</li>
   <li>${esc(B.about)}</li>
   <li>Cite PSI datasets by DOI, as PSI requires. Each investigation card links its DOI.</li></ul>`;
   $("#roadmap").innerHTML = [
-    "Parse more PDFs (all reports and theses) for findings, sensor lists and missing test matrices; FLEX, FLEX-2 and E-FIELD have no reports in PSI, so pull their papers from NASA NTRS.",
+    "Flammability-boundary view: BASS-II minimum O₂ vs air speed with a fitted curve and uncertainty band, as a first predictive model.",
+    "Add findings from NASA NTRS papers for FLEX, FLEX-2, E-FIELD and BRE, which have no reports in PSI.",
     "Pull per-test results that sit only in analyzed-data spreadsheets (SAME-R particle sizes, Saffire sensor files).",
-    "Replace the 2-D map with a 3-D O₂ × pressure × air-speed view.",
-    "Live refresh from PSI instead of a snapshot.",
-    "Add LUCI, FM2 and SoFIE data when they appear in PSI; fit simple flammability-boundary curves with uncertainty bands.",
-    "Run a separate reviewer over every AI-written finding against its source page."].map(x => `<li>${esc(x)}</li>`).join("");
+    "Add LUCI, FM2 and SoFIE data when they appear in PSI, to replace partial-gravity bounds with measurements.",
+    "Live refresh from PSI instead of a snapshot; 3-D O₂ × pressure × air-speed view."].map(x => `<li>${esc(x)}</li>`).join("");
 }
 
 /* ---------------- stamp, routing, init ---------------- */
