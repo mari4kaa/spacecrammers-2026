@@ -158,6 +158,15 @@ select{max-width:100%}
 .msg details.citefix{margin-top:4px;font-size:11.5px;color:var(--muted);white-space:normal}
 .msg details.citefix ul{margin:4px 0 0;padding-left:18px}
 .sitefoot{max-width:1440px;margin:0 auto;padding:0 clamp(16px,2.5vw,32px) 90px;color:var(--muted);font-size:12.5px;line-height:1.5}
+.tkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:10px}
+.tk{border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:9px;padding:10px 12px;display:grid;gap:6px;align-content:start}
+.tk.bad{border-left-color:var(--bad)} .tk.mid{border-left-color:var(--warn)} .tk.ok{border-left-color:var(--good)} .tk.na{border-left-color:var(--o2)}
+.tk h3{margin:0;font-size:15px} .tk p{margin:0;font-size:13.5px;line-height:1.45}
+.tkhead{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.tkst{font-size:11.5px;font-weight:600;color:var(--muted)} .tk.bad .tkst{color:var(--bad)} .tk.mid .tkst{color:var(--warn)} .tk.ok .tkst{color:var(--good)} .tk.na .tkst{color:var(--o2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tksum{margin:0;padding-left:0;list-style:none;display:grid;gap:6px} .tksum li{display:flex;gap:8px;align-items:baseline}
+.tkdot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--muted);transform:translateY(1px)} .tkdot.bad{background:var(--bad)} .tkdot.mid{background:var(--warn)} .tkdot.ok{background:var(--good)} .tkdot.na{background:var(--o2)}
 .aitable td:first-child{font-weight:600;white-space:nowrap}
 @media (max-width:600px){.aitable td:first-child{white-space:normal}}
 </style>
@@ -216,6 +225,7 @@ select{max-width:100%}
         <details><summary>Adjust ranking weights</summary><div class="weights" id="weights" style="margin-top:10px"></div></details>
       </div>
       <div class="right">
+        <div class="panel" style="display:grid;gap:8px" id="tksumpanel"></div>
         <div class="panel" style="display:grid;gap:8px">
           <div class="rhead"><h2>Mission map: where the tests are</h2></div>
           <div class="maptools">
@@ -306,6 +316,12 @@ select{max-width:100%}
 
   <!-- SAFETY EVIDENCE -->
   <section class="view" id="v-evidence">
+    <div class="panel" style="display:grid;gap:10px" id="tkpanel">
+      <div class="rhead" style="flex-wrap:wrap"><h2>Design takeaways for your scenario</h2><span class="small muted" id="tkscen"></span></div>
+      <p class="small" style="margin:0;max-width:95ch">What the flight data on this tab and the Flammability boundary tab suggest for fire-safety equipment and controls at the oxygen, pressure, air speed and gravity set in the bar above. Each card is recomputed from the data when you change the scenario and follows your Prevention / Detection / Suppression choice. The rules and wording were written with AI assistance (Claude); no AI model runs here. These are design inputs from small-scale tests, not a safety certification.</p>
+      <div class="tkgrid" id="tkgrid"></div>
+      <div class="chips" id="tkdl"></div>
+    </div>
     <div class="panel" style="display:grid;gap:8px">
       <h2>Fire-safety evidence from the experiments</h2>
       <p class="small" style="margin:0;max-width:90ch">Three questions a habitat designer asks, answered with measured flight data copied from the reports and papers behind the cards: will a small fire keep burning (prevention), how far must a suppressant cut the oxygen (suppression), and will the smoke be seen (detection). The data are fixed published measurements; your scenario from the bar above is compared against them (oxygen and pressure for prevention, oxygen for suppression), and each panel says when your conditions were never tested.</p>
@@ -434,6 +450,7 @@ select{max-width:100%}
         <tr><td>Flammability-boundary points</td><td>Digitized from BASS-II report Figure 6.10 with Claude-written code; Tables 7.1 and 2.1 copied by Claude.</td><td>Each point checked by Claude against the figure; the refit is compared with the report's own equation.</td></tr>
         <tr><td>Safety-evidence tables</td><td>Extracted by Claude from published papers and a PSI report table (BRE, FLEX, SAME).</td><td>Rows compared with the source pages; each file names its source.</td></tr>
         <tr><td>Summaries, findings, page text</td><td>Investigation summaries, findings, relevance notes and explanations were written by Claude from the cited sources.</td><td>Each finding names its source; all were checked by Claude against the source passages on 2026-11-14.</td></tr>
+        <tr><td>Design takeaways</td><td>Rules and wording of the Safety evidence takeaways were written with Claude.</td><td>Every number is computed from the data for your scenario when you change it; each card names its source and tested conditions.</td></tr>
         <tr><td>Scores, fits, counts</td><td>None at run time: computed by deterministic code from the data.</td><td>Formulas are shown above and in the code.</td></tr>
         <tr><td>Live answers (Ask the data)</td><td>Generated when you ask, by Google Gemini (gemini-3.5-flash-lite, fallback gemini-3.1-flash-lite), using only lookup tools over this data.</td><td>Every answer is labelled as AI-generated; the page checks its citations against the lookups and corrects or removes wrong ones.</td></tr>
       </tbody></table></div>
@@ -448,7 +465,7 @@ select{max-width:100%}
     </div>
   </section>
 </div>
-<footer class="sitefoot">FireSight is a NASA Space Apps Challenge 2026 project by team Spacecrammers, not an official NASA product. Data: NASA Physical Sciences Informatics (psi.nasa.gov, CC0); cite each investigation by its DOI. AI use: code, data extraction and summaries were produced with Claude (Anthropic); live answers come from Google Gemini. See <a href="#method">Method → How AI was used</a>.</footer>
+<footer class="sitefoot">FireSight is a NASA Space Apps Challenge 2026 project by team Spacecrammers, not an official NASA product. Data: NASA Physical Sciences Informatics (psi.nasa.gov, CC0); cite each investigation by its DOI. AI use: code, data extraction and summaries were produced with Claude (Anthropic) assistance; live answers come from Google Gemini. See <a href="#method">Method → How AI was used</a>.</footer>
 
 <button class="fab" id="fab" type="button" aria-label="Ask the data: open the AI research assistant"><span aria-hidden="true" class="fabicon">✨</span><span>Ask the data</span></button>
 <script id="bundle" type="application/json">/*__DATA__*/</script>
@@ -1056,7 +1073,127 @@ function evDownloads(el, items){
   el.innerHTML = items.map(([n], k) => `<button class="btn" data-k="${k}" data-a="dl">Download ${n}</button><button class="btn" data-k="${k}" data-a="cp">Copy ${n}</button>`).join("");
   el.querySelectorAll("button").forEach(b => b.onclick = () => { const it = items[+b.dataset.k]; const t = it[2](); b.dataset.a === "dl" ? saveFile(it[1], t, b) : copy(t, b); });
 }
+/* ---------------- design takeaways: fixed rules over the data above (no AI model at run time) ---------------- */
+const TK_ST = {bad:"Applies to your scenario", mid:"Near the limit", ok:"Below the limit", info:"For your scenario", na:"Not tested at your conditions"};
+const TK_AREA = {prevention:["p", "Prevention"], detection:["d", "Detection"], suppression:["s", "Suppression"], all:["", "All areas"]};
+const TK_ORDER = {bad:0, mid:1, na:2, info:3, ok:4};
+const AMB_MAX = Math.max(...ROWS.filter(r => r.o2_pct != null && /^measured ambient|^measured \(/.test(r.o2_source || "")).map(r => r.o2_pct_max ?? r.o2_pct));
+const P_MIN = Math.min(...ROWS.filter(r => r.p_atm != null).map(r => r.p_atm * PSI_PER_ATM));
+const SOLID_MAX = Math.max(...ROWS.filter(r => r.fuel_phase === "solid" && r.o2_pct != null && !/^assumed/.test(r.o2_source) && !/NEEDS_VERIFICATION/.test(r.flags || "")).map(r => r.o2_pct_max ?? r.o2_pct));
+function takeaways(sc = S){
+  const T = [], o2 = +sc.o2, psi = +sc.psi, U = +sc.flow, g = String(sc.g), bar = psi * BAR_PER_PSI;
+  const pNote = psi < 13.5 ? `Your ${fmt(psi)} psi was not tested (these ran near 14.7 psi).` : "";
+  const gNote = g === "moon" || g === "mars" ? `${g === "moon" ? "Lunar" : "Martian"} gravity adds buoyant flow that these microgravity tests lack.` : g === "earth" ? "These are microgravity results; on Earth buoyancy changes the flame." : "";
+  const cav = (...a) => a.filter(Boolean);
+  if (FB) {
+    const m = FB.pmma_rod, mn = m.minimum, p = fbPredict(U), cons = interpLog(m.curve.U, m.curve.pred_lo, mn.U_cm_s);
+    // 1. materials
+    let st, head;
+    if (p) { st = o2 > p.hi ? "bad" : o2 >= p.lo ? "mid" : "ok";
+      head = `At ${fmt(o2)}% O₂ and ${fmt(U)} cm/s, PMMA rods ${st === "bad" ? "keep burning" : st === "mid" ? "are at the edge of burning" : "would not keep burning"}: their fitted limit there is ${fmt(p.mid, 1)}% O₂ (90% prediction band ${fmt(p.lo, 1)}-${fmt(p.hi, 1)}%).`; }
+    else { st = o2 > mn.o2 ? "bad" : o2 > cons ? "mid" : "ok";
+      head = `Your air speed (${fmt(U)} cm/s) is outside the tested range (${fmt(m.valid_U[0], 1)}-${fmt(m.valid_U[1], 1)} cm/s). At the most flammable tested speed the PMMA-rod limit is ${fmt(mn.o2, 1)}% O₂ (conservative ${fmt(cons, 1)}%), so at ${fmt(o2)}% O₂ they ${o2 > mn.o2 ? "can keep burning" : "would not keep burning"}.`; }
+    T.push({id:"materials", area:"prevention", st, title:"Materials: screen at your oxygen level", head,
+      short:`Materials: PMMA ${st === "bad" ? "keeps burning" : st === "mid" ? "is at the edge" : "would not keep burning"} at ${fmt(o2)}% O₂; microgravity limit ${fmt(mn.o2, 1)}% vs 15.4% in 1 g.`,
+      imp:`Screen cabin materials at the mission's highest oxygen level, not at 21%. In microgravity the fitted limit for these rods falls to ${fmt(mn.o2, 1)}% O₂ (conservative ${fmt(cons, 1)}%), below the 15.4% normal-gravity upward-spread limit, so passing an Earth flammability test does not prove a material is safe in orbit.`,
+      cav:cav("PMMA rods in BASS-II on the ISS, about 1 atm, up to about 21% O₂.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25); Hirsch et al. 2003 as cited there", href:"#boundary"});
+    // 2. ventilation
+    const [ulo, uhi] = mn.U_ci90;
+    if (U >= ulo && U <= uhi) { st = "bad"; head = `Your air speed (${fmt(U)} cm/s) is in the most flammable range for PMMA rods (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s), where the limit is lowest: ${fmt(mn.o2, 1)}% O₂ at ${fmt(mn.U_cm_s, 1)} cm/s.`; }
+    else if (p) { st = "info"; head = `The most flammable air speed for PMMA rods is about ${fmt(mn.U_cm_s, 1)} cm/s (limit ${fmt(mn.o2, 1)}% O₂). At your ${fmt(U)} cm/s the limit is ${fmt(p.mid, 1)}%, only ${fmt(p.mid - mn.o2, 1)} points higher.`; }
+    else { st = "na"; head = `Your air speed (${fmt(U)} cm/s) was not tested. The most flammable tested speed is about ${fmt(mn.U_cm_s, 1)} cm/s, where the PMMA-rod limit is ${fmt(mn.o2, 1)}% O₂.`; }
+    T.push({id:"ventilation", area:"prevention", st, title:"Ventilation: avoid low-flow pockets", head,
+      short:`Ventilation: most flammable at about ${fmt(mn.U_cm_s, 1)} cm/s; your ${fmt(U)} cm/s ${st === "bad" ? "is in that range" : p ? "raises the limit by only " + fmt(p.mid - mn.o2, 1) + " points" : "was not tested"}.`,
+      imp:`Airflow is not a fire barrier: faster air raises the oxygen limit only slowly. Consider layouts and fan placement that avoid low-flow pockets (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s) behind racks and in stowage, where materials are most flammable. The BASS-II report calls this low-speed range typical of spacecraft ventilation.`,
+      cav:cav("PMMA rods in BASS-II on the ISS, about 1 atm.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25)", href:"#boundary"});
+  }
+  if (EV.bre.length) {
+    // 3. small fires in still air
+    const near = breNear(o2, psi), kept = near.filter(breKept).length, keptAll = EV.bre.filter(breKept);
+    const lowKept = Math.min(...keptAll.map(r => +r.o2_before * 100)), below = EV.bre.filter(r => +r.o2_before < .23);
+    const oMin = Math.min(...EV.bre.map(r => +r.o2_before * 100)), oMax = Math.max(...EV.bre.map(r => +r.o2_before * 100));
+    let st, head;
+    if (near.length) { st = kept ? "bad" : "ok"; head = kept ? `${kept} of ${near.length} small ISS flame${near.length > 1 ? "s" : ""} (BRE burner) near ${fmt(o2)}% O₂ and ${fmt(bar, 2)} bar kept burning in still air until the fuel was shut off.` : `${near.length > 1 ? "All " + near.length + " small ISS flames" : "The one small ISS flame"} (BRE burner) near ${fmt(o2)}% O₂ and ${fmt(bar, 2)} bar put themselves out in still air.`; }
+    else { const d = r => Math.abs(+r.o2_before * 100 - o2) / 3 + Math.abs(Math.log(+r.p_bar / bar)) / Math.log(1.3), nr = EV.bre.reduce((a, r) => d(r) < d(a) ? r : a);
+      st = "na"; head = `No BRE test was run within 3 O₂ points and 30% of your pressure${o2 > oMax || o2 < oMin ? ` (tests covered ${fmt(oMin, 1)}-${fmt(oMax, 1)}% O₂)` : ""}. Nearest: test ${nr.test_id} at ${fmt(+nr.o2_before * 100, 1)}% O₂ and ${fmt(+nr.p_bar, 2)} bar, which ${breKept(nr) ? "kept burning" : "put itself out"}.`; }
+    head += ` Across all ${EV.bre.length} tests the lowest O₂ that kept a flame burning was ${fmt(lowKept, 1)}%, and all ${below.length} flames below 23% O₂ went out.`;
+    T.push({id:"stillair", area:"prevention", st, title:"Small fires in still air", head,
+      short:near.length ? `Still air: ${kept} of ${near.length} small flame${near.length > 1 ? "s" : ""} near your O₂ and pressure kept burning.` : `Still air: no small-flame test near your O₂ and pressure.`,
+      imp:"Shutting off ventilation does not guarantee that a small fire goes out in an oxygen-enriched cabin. Oxygen fraction mattered more than pressure (0.56-1 bar), so treat a lower-pressure, higher-O₂ cabin as more flammable than ISS air, not less.",
+      cav:cav("Gas burner emulating a burning solid (25 mm), ISS; O₂ and pressure were not varied independently.", gNote), cite:"Dehghani & Quintiere 2023, Table A.1", href:"#evidence", anchor:"evbre"});
+  }
+  if (EV.smoke.length && EV.detector) {
+    // 4. smoke size vs detector
+    const det = EV.detector, gmd = r => +r.geometric_mean_diameter_nm / 1000, fr = EV.smoke.filter(r => r.state === "fresh"), ag = EV.smoke.filter(r => r.state === "aged");
+    const nb = fr.filter(r => gmd(r) < det.min_um), rng = a => `${fmt(Math.min(...a.map(gmd)), 2)}-${fmt(Math.max(...a.map(gmd)), 2)} µm`;
+    const tested = o2 >= 19 && o2 <= 23 && psi >= 13.5 && psi <= 15.5 && g === "0";
+    T.push({id:"smoke", area:"detection", st:tested ? (nb.length ? "bad" : "ok") : "na", title:"Smoke detectors: sense smaller particles",
+      head:`Fresh smoke from ${nb.length} of ${fr.length} spacecraft materials (${fr.map(r => r.material).join(", ")}) had geometric mean particle sizes of ${rng(fr)}, below the ${det.min_um} µm smallest size reported for the ISS smoke detector, which is most sensitive above ${det.best_above_um} µm. Aged smoke was larger (${rng(ag)}).`,
+      short:`Detection: fresh smoke averaged ${rng(fr)}, below the ISS detector's ${det.min_um} µm minimum.`,
+      imp:"Consider detectors that sense particles around 0.1 µm, or pair particle sensing with gas sensing (for example CO and CO₂), and test them with fresh as well as aged smoke.",
+      cav:cav("Materials heated short of ignition in ISS cabin air (about 21% O₂, 1 atm) in microgravity; not measured at other oxygen levels, pressures or gravity."), cite:"SAME Final Report (PSI-102), Table 1; Urban et al. 2007", href:"#evidence", anchor:"evsmoke"});
+  }
+  // 5. cool flames
+  const cfIn = o2 >= 14 && o2 <= 25 && psi >= 7.3 && psi <= 14.8 && g === "0";
+  T.push({id:"coolflame", area:"detection", st:cfIn ? "bad" : "na", title:"Invisible cool flames: confirm a fire is out",
+    head:`After the visible flame went out, n-heptane, n-octane and n-decane droplets kept burning with an invisible "cool flame" (FLEX on the ISS, 14-25% O₂, 0.5-1 atm).${cfIn ? "" : ` Your ${fmt(o2)}% O₂, ${fmt(psi)} psi${g !== "0" ? ", " + {moon:"Moon", mars:"Mars", earth:"Earth"}[g] + " gravity" : ""} is outside that range.`}`,
+    short:`Detection: liquid fuels can keep burning with an invisible cool flame${cfIn ? "" : " (seen at 14-25% O₂)"}.`,
+    imp:"Detection or crew checks that rely on seeing a flame can miss a liquid-fuel fire that is still reacting. Consider gas or temperature sensing near fuel and fluid systems, and confirm with sensors that a fire is out.",
+    cav:cav("Free-floating droplets, quiescent, CO₂- or helium-diluted, microgravity."), cite:"Nayagam et al. 2014 (FLEX cool flames)", href:"#explore", sel:"PSI-69"});
+  if (EV.loi.length) {
+    // 6. suppression
+    const L = (f, d) => +EV.loi.find(r => r.fuel === f && r.diluent_added_to_air === d).limiting_o2_pct;
+    const share = l => Math.max(0, 1 - l / o2), sh = l => Math.round(share(l) * 100) + "%";
+    const co2 = ["methanol", "heptane"].map(f => L(f, "carbon dioxide")), n2 = ["methanol", "heptane"].map(f => L(f, "nitrogen (O2/N2 only)"));
+    const all = EV.loi.map(r => +r.limiting_o2_pct);
+    let st, head;
+    if (o2 <= Math.min(...all)) { st = "ok"; head = `Your ${fmt(o2)}% O₂ is already at or below every droplet limit measured in FLEX (${fmt(Math.min(...all))}-${fmt(Math.max(...all))}% O₂).`; }
+    else { st = o2 > 21.5 ? "bad" : "info";
+      head = `To put out burning droplets at ${fmt(o2)}% O₂, CO₂ must bring oxygen below ${co2[0]}% (methanol) or ${co2[1]}% (heptane): estimated CO₂ share of the cabin gas about ${sh(co2[0])} and ${sh(co2[1])}. With nitrogen alone the targets are ${n2[0]}% and ${n2[1]}% (about ${sh(n2[0])} and ${sh(n2[1])}).` +
+        (o2 > 22 ? ` In Earth air (21% O₂) the CO₂ shares would be about ${Math.round(Math.max(0, 1 - co2[0] / 20.95) * 100)}% and ${Math.round(Math.max(0, 1 - co2[1] / 20.95) * 100)}%.` : ""); }
+    T.push({id:"suppression", area:"suppression", st, title:"Suppression: size inert gas for your oxygen", head,
+      short:st === "ok" ? "Suppression: your O₂ is already below the droplet limits." : `Suppression: CO₂ must cut O₂ to ${co2[0]}-${co2[1]}%, about ${sh(co2[1])}-${sh(co2[0])} of the cabin gas.`,
+      imp:"Size inert-gas suppression for the cabin's real oxygen level, not for Earth air: the higher the oxygen, the more gas must be added. CO₂ (and helium for methanol) put flames out with more oxygen left than nitrogen alone, so less oxygen has to be displaced.",
+      cav:cav("Shares are estimates: 1 − limit ÷ your O₂, assuming the gas mixes evenly.", "Droplets at 1 atm, quiescent; solid materials may need different limits.", pNote, gNote), cite:"Dietrich et al. 2014", href:"#evidence", anchor:"evloi"});
+  }
+  // 7. untested
+  const out = [];
+  if (g === "moon" || g === "mars") out.push(`${g === "moon" ? "Moon" : "Mars"} gravity (no PSI test has partial gravity)`);
+  if (psi < P_MIN) out.push(`pressure below ${fmt(P_MIN, 1)} psi (the lowest in any PSI test)`);
+  if (o2 > AMB_MAX) out.push(`room oxygen above ${fmt(AMB_MAX, 1)}% (the highest measured room O₂ in any PSI test)`);
+  else if (o2 > SOLID_MAX) out.push(`oxygen for solid materials (PSI solid-fuel flight tests reach ${fmt(SOLID_MAX, 1)}%)`);
+  const ext = (B.gaps_external || []).filter(x => /LUCI|FM2/.test(x.name)).map(x => x.name).join(" and ");
+  T.push({id:"untested", area:"all", st:out.length ? "na" : "ok", title:"What no PSI test covers yet",
+    head:out.length ? `Your scenario is outside the tested range for: ${out.join("; ")}.` : "Your scenario is inside the oxygen, pressure and gravity ranges that PSI tests cover.",
+    short:out.length ? `Untested: ${out.map(x => x.split(" (")[0]).join("; ")}.` : "Your scenario is inside the tested ranges.",
+    imp:out.length ? `Treat these conditions as design margin rather than known behaviour.${g === "moon" || g === "mars" ? ` For gravity, microgravity (PMMA limit ${FB ? fmt(FB.pmma_rod.minimum.o2, 1) : "13.9"}% O₂) and normal gravity (15.4%) bound the answer; ${ext || "LUCI and FM2"} are the first lunar-gravity results to watch.` : ""}` : "Results above come from conditions close to yours; check each card's tested conditions.",
+    cav:[], cite:"PSI test matrix (Gaps tab)" + (ext ? "; " + ext : ""), href:"#gaps"});
+  return T;
+}
+function tkVisible(){ const foc = [...S.pds]; return takeaways().filter(t => !foc.length || t.area === "all" || foc.includes(t.area)); }
+function tkCard(t){
+  const [c, lab] = TK_AREA[t.area];
+  return `<article class="tk ${t.st}"><div class="tkhead"><span class="tag ${c}">${lab}</span><span class="tkst">${TK_ST[t.st]}</span></div><h3>${esc(t.title)}</h3><p>${esc(t.head)}</p>
+    <p><b>What this means for equipment and controls:</b> ${esc(t.imp)}</p>${t.cav.length ? `<p class="small muted">Tested conditions: ${esc(t.cav.join(" "))}</p>` : ""}
+    <p class="small muted">Source: ${esc(t.cite)} · <a href="${t.href}"${t.sel ? ` data-sel="${t.sel}"` : ""}${t.anchor ? ` data-anchor="${t.anchor}"` : ""}>See the data</a></p></article>`;
+}
+function renderTakeaways(){
+  const T = tkVisible();
+  $("#tkscen").textContent = `${fmt(S.o2)}% O₂ · ${fmt(S.psi)} psi · ${fmt(S.flow)} cm/s · ${$("#grav").selectedOptions[0]?.textContent || ""}`;
+  $("#tkgrid").innerHTML = T.map(tkCard).join("");
+  evDownloads($("#tkdl"), [["takeaways (JSON)", "firesight_design_takeaways.json", () => JSON.stringify({about:EXPORT_ABOUT, rules:"Fixed rules over measured data, written with AI assistance (Claude); no AI model at run time. Design inputs from small-scale tests, not a safety certification.",
+    scenario:{o2_pct:S.o2, psi:S.psi, flow_cm_s:S.flow, gravity:S.g, focus:[...S.pds]}, takeaways:T.map(({href, sel, anchor, short, ...t}) => ({...t, status:TK_ST[t.st]}))}, null, 1)]]);
+}
+function renderTkSummary(){
+  const T = tkVisible(), top = [...T].sort((a, b) => TK_ORDER[a.st] - TK_ORDER[b.st]).slice(0, 3);
+  $("#tksumpanel").innerHTML = `<div class="rhead"><h2>Design takeaways</h2><a class="small" href="#evidence">All ${T.length} with details →</a></div>
+    <ul class="tksum small">${top.map(t => `<li><span class="tkdot ${t.st}" title="${esc(TK_ST[t.st])}"></span><span><span class="sr">${esc(TK_ST[t.st])}: </span>${esc(t.short)}</span></li>`).join("")}</ul>`;
+}
+document.addEventListener("click", e => { const a = e.target.closest("a[data-sel], a[data-anchor]"); if (!a) return;
+  if (a.dataset.sel) S.sel = a.dataset.sel;
+  if (a.dataset.anchor) setTimeout(() => document.getElementById(a.dataset.anchor)?.scrollIntoView({behavior:"smooth", block:"center"}), 120); });
 function renderEvidence(){
+  renderTakeaways();
   if (!EV.bre.length) return;
   /* prevention: BRE */
   const near = breNear(S.o2, S.psi), kept = near.filter(breKept).length;
@@ -1240,7 +1377,7 @@ const LEVELS = {
   undergrad:{label:"undergrad", hint:"Plain words, terms explained, the why behind the numbers.",
     prompt:"Audience: an undergraduate student. Start with a one-sentence plain answer. Then give only the 3-4 most important numbers, not full tables. Use plain words and short sentences. The first time you use a technical term, explain it in a few words (for example: limiting oxygen concentration, the lowest O2 that keeps a flame alive). Where it helps, add one intuitive reason, starting with 'In general,'. Keep the key numbers with units and keep every citation."},
   engineer:{label:"engineer", hint:"Concise and quantitative: values, units, conditions, uncertainty.",
-    prompt:"Audience: an aerospace engineer or researcher. Be concise and quantitative: give values with units, test conditions (O2, pressure, flow, fuel geometry), sample counts, and any ranges or uncertainty exactly as the tools report them (do not derive your own), and name data-quality caveats or assumed values. Use standard terms (LOI, Zst, opposed/concurrent flow, quenching vs blowoff) without defining them. When it adds something, end with the design implication in one sentence."}};
+    prompt:"Audience: an aerospace engineer or researcher. Be concise and quantitative: give values with units, test conditions (O2, pressure, flow, fuel geometry), sample counts, and any ranges or uncertainty exactly as the tools report them (do not derive your own), and name data-quality caveats or assumed values. Use standard terms (LOI, Zst, opposed/concurrent flow, quenching vs blowoff) without defining them. When it adds something, end with the design implication in one sentence, taken from design_takeaways when it covers the topic; otherwise start it with \"In general,\"."}};
 if (!LEVELS[S.level]) S.level = "undergrad";
 function renderLevel(){
   document.querySelectorAll("#lvlseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lvl === S.level)));
@@ -1346,6 +1483,11 @@ const TOOLS = [
        near_tests:{count:near.length, kept_burning:near.filter(breKept).length, self_extinguished:near.filter(r => !breKept(r)).length, rows:near.slice(0, 25).map(r => ({test:r.test_id, o2_pct:+(r.o2_before * 100).toFixed(1), p_bar:+r.p_bar, fuel_flow_g_m2s:+r.mass_flux_g_m2s, outcome:r.outcome}))},
        all_tests:{count:EV.bre.length, kept_burning:EV.bre.filter(breKept).length, lowest_o2_kept_burning_pct:25.1, below_23pct_o2:"all 10 self-extinguished (near 1 bar)"},
        caveat:"Oxygen and pressure were not varied independently; the paper concludes oxygen fraction dominated over 0.56-1 bar. Large flames (high fuel flow) self-extinguish by radiation."}; }},
+  {name:"design_takeaways", description:"Design takeaways for fire-safety equipment and controls (materials, ventilation, small fires in still air, smoke detectors, cool flames, inert-gas suppression, untested conditions), computed by fixed rules from the measured data for a scenario. Defaults to the user's current scenario. Use it for questions about what the data means for design, equipment, controls, detectors, suppression systems, ventilation or materials.",
+   inputSchema:{type:"object", properties:{o2_pct:{type:"number"}, psi:{type:"number"}, flow_cm_s:{type:"number"}, gravity:{type:"string", enum:["0", "moon", "mars", "earth"]}}},
+   execute:({o2_pct, psi, flow_cm_s, gravity}) => { const sc = {o2:o2_pct ?? S.o2, psi:psi ?? S.psi, flow:flow_cm_s ?? S.flow, g:gravity ?? S.g};
+     return {scenario:{o2_pct:sc.o2, psi:sc.psi, flow_cm_s:sc.flow, gravity:sc.g}, takeaways:takeaways(sc).map(t => ({area:t.area, status:TK_ST[t.st], title:t.title, finding:t.head, design_implication:t.imp, tested_conditions:t.cav.join(" "), cite:"[" + t.cite + "]"})),
+       note:"Fixed rules over measured small-scale data; design inputs, not certification. Copy numbers exactly and cite with the cite field."}; }},
   {name:"quality_issues", description:"Data-quality log entries, optionally for one investigation.", inputSchema:{type:"object", properties:{psi_id:{type:"string"}}},
    execute:({psi_id}) => B.quality.filter(q => !psi_id || q.psi_id === psi_id).slice(0, 60)}];
 /* Citation check: every bracketed citation in an answer is compared with what the lookups returned during that answer. */
@@ -1393,7 +1535,7 @@ function checkCites(text){
   }).replace(/ +([.,;:])/g, "$1").replace(/  +/g, " ");
   return {text:out, fixes, checked:n};
 }
-const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Investigation IDs: ${"${IDS}"}. To compare groups of tests (diluents, fuels, materials, outcomes), call summarize_tests with group_by and the right psi_id. For BRE burning at a given O2/pressure, suppressant limits, or smoke particle sizes, call safety_evidence. Cite its data with the cite field it returns (e.g. [Dietrich et al. 2014]), never with the topic name. For an investigation's headline results, call get_investigation first. For what a report or paper says (explanations, methods, details), call search_reports and copy its cite field. Passages marked "other" often summarize earlier studies: present a number as this investigation's own result only if the passage says so. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. Copy numbers exactly as the tools return them; never compute, round into new ranges, or invent uncertainty values. If a tool result has a summary field, take its numbers from there. Mention at most the two caveats that matter most for the question, and only caveats or data-quality notes that a tool returned. Never describe test conditions from the user's scenario; use the conditions the tool reports. Never state a result or ranking (which is better, more effective, more flammable) unless a tool returned it; you may add general physics to explain why, but start that sentence with "In general,". Use row numbers only for rows returned by query_tests, with that row's own psi_id; cite grouped summaries as [PSI-xx]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
+const SYS = `You answer questions about NASA PSI microgravity combustion investigations for spacecraft and habitat fire safety. Use ONLY the tools; never answer from memory. Investigation IDs: ${"${IDS}"}. To compare groups of tests (diluents, fuels, materials, outcomes), call summarize_tests with group_by and the right psi_id. For BRE burning at a given O2/pressure, suppressant limits, or smoke particle sizes, call safety_evidence. Cite its data with the cite field it returns (e.g. [Dietrich et al. 2014]), never with the topic name. For an investigation's headline results, call get_investigation first. For what the data means for design (equipment, controls, detectors, suppression, ventilation, materials), call design_takeaways and cite its cite field. For what a report or paper says (explanations, methods, details), call search_reports and copy its cite field. Passages marked "other" often summarize earlier studies: present a number as this investigation's own result only if the passage says so. Cite every fact as [PSI-xx] and, for table data, [PSI-xx row N]. Copy numbers exactly as the tools return them; never compute, round into new ranges, or invent uncertainty values. If a tool result has a summary field, take its numbers from there. Mention at most the two caveats that matter most for the question, and only caveats or data-quality notes that a tool returned. Never describe test conditions from the user's scenario; use the conditions the tool reports. Never state a result or ranking (which is better, more effective, more flammable) unless a tool returned it; you may add general physics to explain why, but start that sentence with "In general,". Use row numbers only for rows returned by query_tests, with that row's own psi_id; cite grouped summaries as [PSI-xx]. If the tools do not hold the answer, say so plainly and name which PSI investigation or publication might. Mention assumed values (o2_source starting with "assumed") when you rely on them. An o2_source of "burner oxidizer stream" is an inverse flame: that O2 flowed out of the burner into a fuel-filled chamber, so never present it as the room atmosphere. No PSI test has partial gravity, pure O2 in the room, or pressure below about 6 psi. Keep answers under 200 words, plain text, no markdown headings. Current scenario: O2 ${"${O2}"}%, ${"${PSI}"} psi, ${"${FLOW}"} cm/s, gravity ${"${G}"}.`;
 function addMsg(role, text){ const d = document.createElement("div"); d.className = "msg " + (role === "user" ? "u" : "a"); d.textContent = text; $("#msgs").appendChild(d); $("#msgs").scrollTop = 1e9; return d; }
 // Gemini generateContent call through the FireSight proxy (it holds the API key).
 async function callGemini(body){
@@ -1435,7 +1577,7 @@ async function runAgent(system, history, onStep){
   }
   return "I needed too many lookups for this question. Try asking something narrower.";
 }
-const TOOL_LABEL = {safety_evidence:"reading the safety evidence data", search_reports:"searching the reports", summarize_tests:"summarizing test groups", flammability_boundary:"reading the flammability boundary", list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
+const TOOL_LABEL = {safety_evidence:"reading the safety evidence data", design_takeaways:"reading the design takeaways", search_reports:"searching the reports", summarize_tests:"summarizing test groups", flammability_boundary:"reading the flammability boundary", list_investigations:"listing investigations", get_investigation:"reading an investigation card", query_tests:"searching the test matrix", quality_issues:"checking data-quality notes"};
 $("#askform").addEventListener("submit", async e => {
   e.preventDefault(); const q = $("#askq").value.trim(); if (!q) return;
   const route = aiRoute();
@@ -1536,7 +1678,7 @@ function route(){
   if (v === "quality") renderQuality();
 }
 window.addEventListener("hashchange", route);
-function update(){ save(); renderPresets(); renderReadout(); renderRank(); route(); }
+function update(){ save(); renderPresets(); renderReadout(); renderRank(); renderTkSummary(); route(); }
 
 syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderFbExport(); renderMethod(); renderRefs(); update();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { renderMap(); if (location.hash === "#boundary") renderBoundary(); });

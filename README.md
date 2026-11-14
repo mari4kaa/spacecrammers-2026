@@ -102,7 +102,9 @@ Three charts built from measured flight data in the papers (files in `data/evide
 - **Suppression:** FLEX limiting oxygen for methanol and heptane with nitrogen, CO2 or helium (Dietrich et al. 2014).
 - **Detection:** SAME smoke particle sizes for four materials, fresh and aged, against the ISS smoke detector's limits (SAME Final Science Report; Urban et al. 2007).
 
-The assistant reads the same data through its `safety_evidence` tool. The Data tab also has a **Search the reports** box over `docs/passages.json`.
+At the top of the tab, **Design takeaways for your scenario** turns this evidence into 7 points for fire-safety equipment and controls: material screening, ventilation, small fires in still air, smoke detectors, invisible cool flames, inert-gas suppression, and what no PSI test covers yet. Each card is recomputed by fixed rules from the data when the scenario changes, shows the conditions that were actually tested, and names its source; the three most important ones also appear on the Explore tab. The rules and wording were written with AI assistance (see `AI_USE.md`); no AI model runs in them. They are design inputs from small-scale tests, not a safety certification.
+
+The assistant reads the same data through its `safety_evidence` tool. Design takeaways are available to it through `design_takeaways`. The Data tab also has a **Search the reports** box over `docs/passages.json`.
 
 ## Report search for the assistant
 
