@@ -1,0 +1,372 @@
+{
+ "name": "firesight-psi-combustion",
+ "title": "FireSight: NASA PSI combustion data for spacecraft and habitat fire safety",
+ "description": "Data behind the FireSight dashboard (NASA Space Apps Challenge 2026, team Spacecrammers). AI use: cleaning rules, digitized points, extracted tables and written summaries were produced with Claude (Anthropic); see AI_USE.md. Every value keeps its source.",
+ "homepage": "https://mari4kaa.github.io/spacecrammers-2026/",
+ "x_ai_use": {
+  "tools": [
+   "Claude (Anthropic): code, data extraction, summaries",
+   "Google Gemini: live answers on the dashboard only, not in these files"
+  ],
+  "disclosure": "AI_USE.md"
+ },
+ "licenses": [
+  {
+   "name": "CC0-1.0",
+   "title": "NASA PSI data (psi.nasa.gov) are CC0; cite each investigation by its DOI"
+  }
+ ],
+ "sources": [
+  {
+   "title": "NASA Physical Sciences Informatics (PSI)",
+   "path": "https://psi.nasa.gov"
+  }
+ ],
+ "resources": [
+  {
+   "name": "tests",
+   "path": "tests.csv",
+   "format": "csv",
+   "description": "Unified test matrix: 1,958 rows from 19 PSI experiment tables. Produced by scripts written with AI assistance (Claude, Anthropic). (scripts/normalize.py); src_file and src_row point to the PSI table row.",
+   "x_ai_generated": "cleaning rules written with Claude; values come from PSI",
+   "schema": {
+    "fields": [
+     {
+      "name": "uid"
+     },
+     {
+      "name": "psi_id"
+     },
+     {
+      "name": "acronym"
+     },
+     {
+      "name": "src_file"
+     },
+     {
+      "name": "src_row"
+     },
+     {
+      "name": "granularity"
+     },
+     {
+      "name": "test_id"
+     },
+     {
+      "name": "date"
+     },
+     {
+      "name": "fuel"
+     },
+     {
+      "name": "fuel_phase"
+     },
+     {
+      "name": "fuel_class"
+     },
+     {
+      "name": "sample"
+     },
+     {
+      "name": "size_mm"
+     },
+     {
+      "name": "thickness_mm"
+     },
+     {
+      "name": "o2_pct"
+     },
+     {
+      "name": "o2_pct_max"
+     },
+     {
+      "name": "o2_source"
+     },
+     {
+      "name": "p_atm"
+     },
+     {
+      "name": "p_atm_max"
+     },
+     {
+      "name": "p_source"
+     },
+     {
+      "name": "flow_cm_s"
+     },
+     {
+      "name": "flow_cm_s_max"
+     },
+     {
+      "name": "flow_source"
+     },
+     {
+      "name": "flow_dir"
+     },
+     {
+      "name": "diluent"
+     },
+     {
+      "name": "outcome"
+     },
+     {
+      "name": "metric_name"
+     },
+     {
+      "name": "metric_value"
+     },
+     {
+      "name": "metric_unit"
+     },
+     {
+      "name": "metric2_name"
+     },
+     {
+      "name": "metric2_value"
+     },
+     {
+      "name": "metric2_unit"
+     },
+     {
+      "name": "flags"
+     },
+     {
+      "name": "notes"
+     }
+    ]
+   }
+  },
+  {
+   "name": "quality_log",
+   "path": "quality_log.csv",
+   "format": "csv",
+   "description": "157 data-quality issues found while cleaning and what was done. Produced by scripts written with AI assistance (Claude, Anthropic).",
+   "x_ai_generated": "rules written with Claude",
+   "schema": {
+    "fields": [
+     {
+      "name": "psi_id"
+     },
+     {
+      "name": "acronym"
+     },
+     {
+      "name": "field"
+     },
+     {
+      "name": "raw_value"
+     },
+     {
+      "name": "action"
+     },
+     {
+      "name": "code"
+     },
+     {
+      "name": "src_rows"
+     },
+     {
+      "name": "count"
+     }
+    ]
+   }
+  },
+  {
+   "name": "curated",
+   "path": "curated.json",
+   "format": "json",
+   "description": "Investigation summaries, findings, relevance notes, incidents, spinoffs and references. Written by Claude from the sources named in each finding; checked against them on 2026-11-14.",
+   "x_ai_generated": "text written by Claude"
+  },
+  {
+   "name": "bundle",
+   "path": "bundle.json",
+   "format": "json",
+   "description": "Everything above merged for the page by scripts/build_data.py. Produced by scripts written with AI assistance (Claude, Anthropic).",
+   "x_ai_generated": "derived"
+  },
+  {
+   "name": "boundary_points",
+   "path": "boundary/bass2_boundary_points.csv",
+   "format": "csv",
+   "description": "74 flammability-boundary points from the BASS-II Summary Report (NASA/TM-20210011385): Figure 6.10 digitized with Claude-written code and checked by Claude; Tables 7.1 and 2.1 copied by Claude. See boundary/README.md.",
+   "x_ai_generated": "digitized and copied with Claude",
+   "schema": {
+    "fields": [
+     {
+      "name": "material"
+     },
+     {
+      "name": "material_label"
+     },
+     {
+      "name": "configuration"
+     },
+     {
+      "name": "test_id"
+     },
+     {
+      "name": "flow_cm_s"
+     },
+     {
+      "name": "flow_cm_s_end"
+     },
+     {
+      "name": "a_per_s"
+     },
+     {
+      "name": "o2_pct"
+     },
+     {
+      "name": "outcome"
+     },
+     {
+      "name": "outcome_detail"
+     },
+     {
+      "name": "method"
+     },
+     {
+      "name": "source"
+     },
+     {
+      "name": "notes"
+     }
+    ]
+   }
+  },
+  {
+   "name": "boundary_model",
+   "path": "boundary/flammability_boundary.json",
+   "format": "json",
+   "description": "Fitted boundary curves, bootstrap bands and validation from scripts/flammability_boundary.py. Produced by scripts written with AI assistance (Claude, Anthropic).",
+   "x_ai_generated": "computed by AI-written code"
+  },
+  {
+   "name": "bre_iss_tests",
+   "path": "evidence/bre_iss_tests.csv",
+   "format": "csv",
+   "description": "83 ACME BRE ISS tests from Dehghani & Quintiere (2023), Combustion and Flame, Table A.1. Extracted by Claude and compared with the page images. See evidence/README.md.",
+   "x_ai_generated": "extracted by Claude",
+   "schema": {
+    "fields": [
+     {
+      "name": "test_id"
+     },
+     {
+      "name": "o2_before"
+     },
+     {
+      "name": "o2_after"
+     },
+     {
+      "name": "p_bar"
+     },
+     {
+      "name": "p_psi"
+     },
+     {
+      "name": "fuel"
+     },
+     {
+      "name": "dhc_kJ_g"
+     },
+     {
+      "name": "mass_flux_g_m2s"
+     },
+     {
+      "name": "q_center_kW_m2"
+     },
+     {
+      "name": "q_offset_kW_m2"
+     },
+     {
+      "name": "flame_height_mm"
+     },
+     {
+      "name": "flame_radius_mm"
+     },
+     {
+      "name": "radiant_fraction"
+     },
+     {
+      "name": "oscillation_time_s"
+     },
+     {
+      "name": "end_time_s"
+     },
+     {
+      "name": "end_condition"
+     },
+     {
+      "name": "outcome"
+     },
+     {
+      "name": "source"
+     }
+    ]
+   }
+  },
+  {
+   "name": "flex_loi_by_diluent",
+   "path": "evidence/flex_loi_by_diluent.csv",
+   "format": "csv",
+   "description": "FLEX limiting oxygen by diluent from Dietrich et al. (2014), abstract. Copied by Claude.",
+   "x_ai_generated": "extracted by Claude",
+   "schema": {
+    "fields": [
+     {
+      "name": "fuel"
+     },
+     {
+      "name": "diluent_added_to_air"
+     },
+     {
+      "name": "limiting_o2_pct"
+     },
+     {
+      "name": "atmosphere_at_limit"
+     },
+     {
+      "name": "pressure_atm"
+     },
+     {
+      "name": "source"
+     }
+    ]
+   }
+  },
+  {
+   "name": "same_smoke_particle_sizes",
+   "path": "evidence/same_smoke_particle_sizes.csv",
+   "format": "csv",
+   "description": "SAME smoke particle sizes from the SAME Final Science Report (PSI-102), Table 1, p. 27. Copied by Claude.",
+   "x_ai_generated": "extracted by Claude",
+   "schema": {
+    "fields": [
+     {
+      "name": "material"
+     },
+     {
+      "name": "state"
+     },
+     {
+      "name": "geometric_mean_diameter_nm"
+     },
+     {
+      "name": "arithmetic_mean_diameter_nm"
+     },
+     {
+      "name": "diameter_of_average_mass_nm"
+     },
+     {
+      "name": "geometric_std_dev"
+     },
+     {
+      "name": "source"
+     }
+    ]
+   }
+  }
+ ]
+}

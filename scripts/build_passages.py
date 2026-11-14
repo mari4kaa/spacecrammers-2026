@@ -1,3 +1,4 @@
+# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Build docs/passages.json: searchable text passages from the report files the cards were written from.
 The live assistant's search_reports tool loads this file on demand and quotes passages with page numbers.
 Usage: python3 scripts/build_passages.py <text_dir> docs/passages.json

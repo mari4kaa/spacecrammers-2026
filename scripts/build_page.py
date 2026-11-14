@@ -1,3 +1,4 @@
+# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Build the single-file dashboard.
 
 Usage: python3 scripts/build_page.py            (reads site.config.json, writes docs/index.html)

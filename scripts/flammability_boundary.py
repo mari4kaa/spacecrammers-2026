@@ -1,3 +1,4 @@
+# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Fit microgravity flammability boundaries from BASS-II (PSI-25) data.
 
 Input : data/boundary/bass2_boundary_points.csv  (verified points, see README in that folder)

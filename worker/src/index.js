@@ -1,3 +1,4 @@
+// Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 // FireSight AI proxy (Cloudflare Worker) for the Gemini API.
 // Keeps the Gemini API key secret, so the public GitHub Pages site can use the model.
 // The browser runs the tool loop on its own embedded data; this worker only forwards

@@ -1,3 +1,4 @@
+# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Merge PSI metadata + curated notes + normalized tests + quality log into one compact JSON bundle.
 Usage: python3 build_data.py <raw_meta_dir> <data_dir> <out_json>
 """
