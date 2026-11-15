@@ -1403,6 +1403,11 @@ const EV = B.evidence || {bre:[], loi:[], smoke:[], detector:null};
 const BAR_PER_PSI = 1 / 14.5038;
 const num = v => v === "" || v == null ? null : +v;
 const breKept = r => r.end_condition !== "SE";
+const BRE_BIG = 5;                                   // g/m²·s: above this, flames went out from radiation heat loss (paper's radiative-extinction limit)
+const breBig = r => +r.mass_flux_g_m2s > BRE_BIG;
+const pl = (n, w, ws = w + "s") => `${n} ${n === 1 ? w : ws}`;
+const rng1 = (a, d = 1) => { const lo = Math.min(...a), hi = Math.max(...a); return lo === hi ? fmt(lo, d) : `${fmt(lo, d)}-${fmt(hi, d)}`; };
+const BRE_EXT = "The same paper calculates that a 25 mm PMMA sample would keep burning even at 21% O₂ and 1 bar if it also received at least 7 kW/m² of radiant heat from outside, for example from a hot surface or a growing fire.";
 const pGroup = p => p < 0.65 ? "0.57-0.62 bar (8.2-9.0 psi)" : p < 0.9 ? "0.70-0.75 bar (10.2-10.9 psi)" : "1.0-1.06 bar (14.6-15.3 psi)";
 const plotBase = () => ({margin:{l:58, r:16, t:10, b:48}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)", font:{family:"IBM Plex Sans", color:css("--ink"), size:12}, hovermode:"closest", legend:{orientation:"h", y:-0.22, font:{size:11}}});
 const axis = (t, extra = {}) => ({title:{text:t, font:{color:css("--muted")}}, gridcolor:css("--line"), zerolinecolor:css("--line"), color:css("--muted"), ...extra});
@@ -1432,70 +1437,81 @@ function takeaways(sc = S){
     let st, head;
     if (p) { st = o2 > p.hi ? "bad" : o2 >= p.lo ? "mid" : "ok";
       head = `At ${fmt(o2)}% O₂ and ${fmt(U)} cm/s, PMMA rods ${st === "bad" ? "keep burning" : st === "mid" ? "are at the edge of burning" : "would not keep burning"}: their fitted limit there is ${fmt(p.mid, 1)}% O₂ (90% prediction band ${fmt(p.lo, 1)}-${fmt(p.hi, 1)}%).`; }
-    else { st = o2 > mn.o2 ? "bad" : o2 > cons ? "mid" : "ok";
-      head = `Your air speed (${fmt(U)} cm/s) is outside the tested range (${fmt(m.valid_U[0], 1)}-${fmt(m.valid_U[1], 1)} cm/s). At the most flammable tested speed the PMMA-rod limit is ${fmt(mn.o2, 1)}% O₂ (conservative ${fmt(cons, 1)}%), so at ${fmt(o2)}% O₂ they ${o2 > mn.o2 ? "can keep burning" : "would not keep burning"}.`; }
+    else if (U < m.valid_U[0]) { st = "na";
+      head = `Your air speed (${fmt(U)} cm/s) is below the slowest tested (${fmt(m.valid_U[0], 1)} cm/s). At the slow end the rod flames went out as the flow dropped, and in BASS a burning PMMA sphere went out only when the flow was stopped, so these tests cannot say whether materials keep burning in completely still air. The small-fire card below covers still air.`; }
+    else { const top = fbPredict(m.valid_U[1] * 0.999); st = "na";
+      head = `Your air speed (${fmt(U)} cm/s) is above the fastest tested (${fmt(m.valid_U[1], 1)} cm/s), where the fitted PMMA-rod limit is ${fmt(top.mid, 1)}% O₂ (90% prediction band ${fmt(top.lo, 1)}-${fmt(top.hi, 1)}%). Faster air raised the limit only slowly, but your speed itself was not tested.`; }
     T.push({id:"materials", area:"prevention", st, title:"Materials: screen at your oxygen level", head,
-      short:`Materials: PMMA ${st === "bad" ? "keeps burning" : st === "mid" ? "is at the edge" : "would not keep burning"} at ${fmt(o2)}% O₂; microgravity limit ${fmt(mn.o2, 1)}% vs 15.4% in 1 g.`,
-      imp:`Screen cabin materials at the mission's highest oxygen level, not at 21%. In microgravity the fitted limit for these rods falls to ${fmt(mn.o2, 1)}% O₂ (conservative ${fmt(cons, 1)}%), below the 15.4% normal-gravity upward-spread limit, so passing an Earth flammability test does not prove a material is safe in orbit.`,
-      cav:cav("PMMA rods in BASS-II on the ISS, about 1 atm, up to about 21% O₂.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25); Hirsch et al. 2003 as cited there", href:"#boundary"});
+      short:st === "na" ? `Materials: your air speed (${fmt(U)} cm/s) was not tested; microgravity limit ${fmt(mn.o2, 1)}% vs 15.4% in 1 g.` : `Materials: PMMA ${st === "bad" ? "keeps burning" : st === "mid" ? "is at the edge" : "would not keep burning"} at ${fmt(o2)}% O₂; microgravity limit ${fmt(mn.o2, 1)}% vs 15.4% in 1 g.`,
+      imp:`Screen cabin materials at the mission's highest oxygen level, not at 21%. In microgravity the fitted limit for these rods falls to ${fmt(mn.o2, 1)}% O₂ (the report gives about 13.5%; lower 90% bound of our fit ${fmt(cons, 1)}%), below the 15.4% normal-gravity upward-spread limit, so passing an Earth flammability test does not prove a material is safe in orbit.`,
+      cav:cav("PMMA rods in BASS-II on the ISS, about 1 atm, up to about 21% O₂. Air speeds are for a 6.35 mm rod: the report gives the most flammable flow as a stretch rate, which means faster air for larger objects.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25); Hirsch et al. 2003 as cited there", href:"#boundary"});
     // 2. ventilation
     const [ulo, uhi] = mn.U_ci90;
-    if (U >= ulo && U <= uhi) { st = "bad"; head = `Your air speed (${fmt(U)} cm/s) is in the most flammable range for PMMA rods (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s), where the limit is lowest: ${fmt(mn.o2, 1)}% O₂ at ${fmt(mn.U_cm_s, 1)} cm/s.`; }
+    if (U >= ulo && U <= uhi) { st = "bad"; head = `Your air speed (${fmt(U)} cm/s) is in the most flammable range for 6.35 mm PMMA rods (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s), where the limit is lowest: ${fmt(mn.o2, 1)}% O₂ at ${fmt(mn.U_cm_s, 1)} cm/s.`; }
     else if (p) { st = "info"; head = `The most flammable air speed for PMMA rods is about ${fmt(mn.U_cm_s, 1)} cm/s (limit ${fmt(mn.o2, 1)}% O₂). At your ${fmt(U)} cm/s the limit is ${fmt(p.mid, 1)}%, only ${fmt(p.mid - mn.o2, 1)} points higher.`; }
     else { st = "na"; head = `Your air speed (${fmt(U)} cm/s) was not tested. The most flammable tested speed is about ${fmt(mn.U_cm_s, 1)} cm/s, where the PMMA-rod limit is ${fmt(mn.o2, 1)}% O₂.`; }
     T.push({id:"ventilation", area:"prevention", st, title:"Ventilation: avoid low-flow pockets", head,
       short:`Ventilation: most flammable at about ${fmt(mn.U_cm_s, 1)} cm/s; your ${fmt(U)} cm/s ${st === "bad" ? "is in that range" : p ? "raises the limit by only " + fmt(p.mid - mn.o2, 1) + " points" : "was not tested"}.`,
-      imp:`Airflow is not a fire barrier: faster air raises the oxygen limit only slowly. Consider layouts and fan placement that avoid low-flow pockets (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s) behind racks and in stowage, where materials are most flammable. The BASS-II report calls this low-speed range typical of spacecraft ventilation.`,
-      cav:cav("PMMA rods in BASS-II on the ISS, about 1 atm.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25)", href:"#boundary"});
+      imp:`Airflow is not a fire barrier: faster air raises the oxygen limit only slowly. Consider layouts and fan placement that avoid low-flow pockets behind racks and in stowage, where materials are most flammable (about ${fmt(ulo, 1)}-${fmt(uhi, 1)} cm/s for these rods, faster for larger objects). The BASS-II report calls this weak flow typical of spacecraft ventilation near surfaces.`,
+      cav:cav("PMMA rods (6.35 mm) in BASS-II on the ISS, about 1 atm. The report gives the most flammable flow as a stretch rate, which means faster air for larger objects.", pNote, gNote), cite:"BASS-II Summary Report (PSI-25)", href:"#boundary"});
   }
   if (EV.bre.length) {
     // 3. small fires in still air
-    const near = breNear(o2, psi), kept = near.filter(breKept).length, keptAll = EV.bre.filter(breKept);
+    const nearAll = breNear(o2, psi), near = nearAll.filter(r => !breBig(r)), bigN = nearAll.length - near.length, kept = near.filter(breKept).length, keptAll = EV.bre.filter(breKept);
     const lowKept = Math.min(...keptAll.map(r => +r.o2_before * 100)), below = EV.bre.filter(r => +r.o2_before < .23);
     const oMin = Math.min(...EV.bre.map(r => +r.o2_before * 100)), oMax = Math.max(...EV.bre.map(r => +r.o2_before * 100));
+    const at = a => `${rng1(a.map(r => +r.o2_before * 100))}% O₂ and ${rng1(a.map(r => +r.p_bar), 2)} bar`;
+    const bigTx = bigN ? ` ${pl(bigN, "larger flame")} nearby (fuel flow above ${BRE_BIG} g/m²·s) ${bigN > 1 ? "are" : "is"} left out: large flames went out from radiation heat loss, which says nothing about a small fire.` : "";
     let st, head;
-    if (near.length) { st = kept ? "bad" : "ok"; head = kept ? `${kept} of ${near.length} small ISS flame${near.length > 1 ? "s" : ""} (BRE burner) near ${fmt(o2)}% O₂ and ${fmt(bar, 2)} bar kept burning in still air until the fuel was shut off.` : `${near.length > 1 ? "All " + near.length + " small ISS flames" : "The one small ISS flame"} (BRE burner) near ${fmt(o2)}% O₂ and ${fmt(bar, 2)} bar put themselves out in still air.`; }
-    else { const d = r => Math.abs(+r.o2_before * 100 - o2) / 3 + Math.abs(Math.log(+r.p_bar / bar)) / Math.log(1.3), nr = EV.bre.reduce((a, r) => d(r) < d(a) ? r : a);
-      st = "na"; head = `No BRE test was run within 3 O₂ points and 30% of your pressure${o2 > oMax || o2 < oMin ? ` (tests covered ${fmt(oMin, 1)}-${fmt(oMax, 1)}% O₂)` : ""}. Nearest: test ${nr.test_id} at ${fmt(+nr.o2_before * 100, 1)}% O₂ and ${fmt(+nr.p_bar, 2)} bar, which ${breKept(nr) ? "kept burning" : "put itself out"}.`; }
+    if (near.length) { st = kept ? "bad" : "info";
+      head = kept ? `${kept} of ${pl(near.length, "small ISS flame")} (BRE burner) run near your scenario, at ${at(near)}, kept burning in still air until the fuel was shut off.`
+                  : `${near.length > 2 ? "All " + near.length + " small ISS flames" : near.length === 2 ? "Both small ISS flames" : "The one small ISS flame"} (BRE burner) run near your scenario, at ${at(near)}, went out in still air. ${BRE_EXT}`;
+      head += bigTx; }
+    else { const small = EV.bre.filter(r => !breBig(r)), d = r => Math.abs(+r.o2_before * 100 - o2) / 3 + Math.abs(Math.log(+r.p_bar / bar)) / Math.log(1.3), nr = small.reduce((a, r) => d(r) < d(a) ? r : a);
+      st = "na"; head = `No small BRE flame was run within 3 O₂ points and 30% of your pressure${o2 > oMax || o2 < oMin ? ` (tests covered ${fmt(oMin, 1)}-${fmt(oMax, 1)}% O₂)` : ""}.${bigTx} Nearest small flame: test ${nr.test_id} at ${fmt(+nr.o2_before * 100, 1)}% O₂ and ${fmt(+nr.p_bar, 2)} bar, which ${breKept(nr) ? "kept burning" : "went out"}.`; }
     head += ` Across all ${EV.bre.length} tests the lowest O₂ that kept a flame burning was ${fmt(lowKept, 1)}%, and all ${below.length} flames below 23% O₂ went out.`;
     T.push({id:"stillair", area:"prevention", st, title:"Small fires in still air", head,
-      short:near.length ? `Still air: ${kept} of ${near.length} small flame${near.length > 1 ? "s" : ""} near your O₂ and pressure kept burning.` : `Still air: no small-flame test near your O₂ and pressure.`,
-      imp:"Shutting off ventilation does not guarantee that a small fire goes out in an oxygen-enriched cabin. Oxygen fraction mattered more than pressure (0.56-1 bar), so treat a lower-pressure, higher-O₂ cabin as more flammable than ISS air, not less.",
-      cav:cav("Gas burner emulating a burning solid (25 mm), ISS; O₂ and pressure were not varied independently.", gNote), cite:"Dehghani & Quintiere 2023, Table A.1", href:"#evidence", anchor:"evbre"});
+      short:near.length ? `Still air: ${kept} of ${pl(near.length, "small flame")} near your O₂ and pressure kept burning${kept ? "" : " (outside heat could change that)"}.` : `Still air: no small-flame test near your O₂ and pressure.`,
+      imp:"Shutting off ventilation does not guarantee that a small fire goes out in an oxygen-enriched cabin, and heat from a nearby hot surface or a growing fire can keep one burning even in ordinary air. Oxygen fraction mattered more than pressure (0.56-1 bar), so treat a lower-pressure, higher-O₂ cabin as more flammable than ISS air, not less.",
+      cav:cav("Gas burner emulating a burning solid (25 mm), ISS, no outside heat; O₂ and pressure were not varied independently.", gNote), cite:"Dehghani & Quintiere 2023, Table A.1", href:"#evidence", anchor:"evbre"});
   }
   if (EV.smoke.length && EV.detector) {
     // 4. smoke size vs detector
-    const det = EV.detector, gmd = r => +r.geometric_mean_diameter_nm / 1000, fr = EV.smoke.filter(r => r.state === "fresh"), ag = EV.smoke.filter(r => r.state === "aged");
-    const nb = fr.filter(r => gmd(r) < det.min_um), rng = a => `${fmt(Math.min(...a.map(gmd)), 2)}-${fmt(Math.max(...a.map(gmd)), 2)} µm`;
-    const tested = o2 >= 19 && o2 <= 23 && psi >= 13.5 && psi <= 15.5 && g === "0";
+    const det = EV.detector, dam = r => +r.diameter_of_average_mass_nm / 1000, fr = EV.smoke.filter(r => r.state === "fresh"), ag = EV.smoke.filter(r => r.state === "aged");
+    const nb = fr.filter(r => dam(r) < det.min_um), ab = fr.filter(r => dam(r) >= det.min_um), rng = a => `${fmt(Math.min(...a.map(dam)), 2)}-${fmt(Math.max(...a.map(dam)), 2)} µm`;
+    const tested = o2 >= 19 && o2 <= 23 && psi >= 13.5 && psi <= 15.5 && g === "0", mn = (a, cap) => a.map((r, i) => /^(Kapton|Teflon)$/.test(r.material) || (cap && !i) ? r.material : r.material.toLowerCase()).join(" and ");
     T.push({id:"smoke", area:"detection", st:tested ? (nb.length ? "bad" : "ok") : "na", title:"Smoke detectors: sense smaller particles",
-      head:`Fresh smoke from ${nb.length} of ${fr.length} spacecraft materials (${fr.map(r => r.material).join(", ")}) had geometric mean particle sizes of ${rng(fr)}, below the ${det.min_um} µm smallest size reported for the ISS smoke detector, which is most sensitive above ${det.best_above_um} µm. Aged smoke was larger (${rng(ag)}).`,
-      short:`Detection: fresh smoke averaged ${rng(fr)}, below the ISS detector's ${det.min_um} µm minimum.`,
-      imp:"Consider detectors that sense particles around 0.1 µm, or pair particle sensing with gas sensing (for example CO and CO₂), and test them with fresh as well as aged smoke.",
-      cav:cav("Materials heated short of ignition in ISS cabin air (about 21% O₂, 1 atm) in microgravity; not measured at other oxygen levels, pressures or gravity."), cite:"SAME Final Report (PSI-102), Table 1; Urban et al. 2007", href:"#evidence", anchor:"evsmoke"});
+      head:`Fresh smoke from ${mn(nb)} had a mass-weighted mean size (diameter of average mass) of ${rng(nb)}, below the ${det.min_um} µm smallest size reported for the ISS smoke detector, which is most sensitive above ${det.best_above_um} µm. ${mn(ab, true)} smoke was larger (${rng(ab)}), and aged smoke larger still (${rng(ag)}). The SAME report expects the small Kapton and Teflon smoke to be hard for light-scattering detectors; in flight the ISS detector gave a strong signal for silicone smoke but an erratic one for Teflon.`,
+      short:`Detection: fresh ${mn(nb)} smoke averaged ${rng(nb)} (mass-weighted), below the ISS detector's ${det.min_um} µm minimum.`,
+      imp:"Consider detectors that respond to particles well below 0.3 µm, and ones that measure more than one property of the particle sizes or sort particles by size, as the SAME report suggests; this also helps tell smoke from dust. Pair particle sensing with gas sensing (for example CO and CO₂), and test with fresh as well as aged smoke.",
+      cav:cav("Materials heated short of ignition in ISS cabin air (about 21% O₂, 1 atm) in microgravity; aged smoke was held for 720 s. Not measured at other oxygen levels, pressures or gravity."), cite:"SAME Final Report (PSI-102), Table 1; Urban et al. 2007", href:"#evidence", anchor:"evsmoke"});
   }
   // 5. cool flames
   const cfIn = o2 >= 14 && o2 <= 25 && psi >= 7.3 && psi <= 14.8 && g === "0";
   T.push({id:"coolflame", area:"detection", st:cfIn ? "bad" : "na", title:"Invisible cool flames: confirm a fire is out",
-    head:`After the visible flame went out, n-heptane, n-octane and n-decane droplets kept burning with an invisible "cool flame" (FLEX on the ISS, 14-25% O₂, 0.5-1 atm).${cfIn ? "" : ` Your ${fmt(o2)}% O₂, ${fmt(psi)} psi${g !== "0" ? ", " + {moon:"Moon", mars:"Mars", earth:"Earth"}[g] + " gravity" : ""} is outside that range.`}`,
-    short:`Detection: liquid fuels can keep burning with an invisible cool flame${cfIn ? "" : " (seen at 14-25% O₂)"}.`,
-    imp:"Detection or crew checks that rely on seeing a flame can miss a liquid-fuel fire that is still reacting. Consider gas or temperature sensing near fuel and fluid systems, and confirm with sensors that a fire is out.",
-    cav:cav("Free-floating droplets, quiescent, CO₂- or helium-diluted, microgravity."), cite:"Nayagam et al. 2014 (FLEX cool flames)", href:"#explore", sel:"PSI-69"});
+    head:`After the visible flame went out, large n-heptane, n-octane and n-decane droplets kept burning with a "cool flame" that the cameras could not see (FLEX on the ISS, 14-25% O₂, 0.5-1 atm); smaller droplets burned out completely.${cfIn ? "" : ` Your ${fmt(o2)}% O₂, ${fmt(psi)} psi${g !== "0" ? ", " + {moon:"Moon", mars:"Mars", earth:"Earth"}[g] + " gravity" : ""} is outside that range.`}`,
+    short:`Detection: large fuel droplets can keep burning with an invisible cool flame${cfIn ? "" : " (seen at 14-25% O₂)"}.`,
+    imp:"Detection or crew checks that rely on seeing a flame can miss a liquid-fuel fire that is still reacting. The radiometers did pick up the cool flames, so consider infrared, gas or temperature sensing near fuel and fluid systems, and confirm with sensors that a fire is out.",
+    cav:cav("Free-floating droplets about 2.5-4 mm across, quiescent, microgravity; oxygen-nitrogen mixtures, some with CO₂ or helium added."), cite:"Nayagam et al. 2014 (FLEX cool flames)", href:"#explore", sel:"PSI-69"});
   if (EV.loi.length) {
     // 6. suppression
     const L = (f, d) => +EV.loi.find(r => r.fuel === f && r.diluent_added_to_air === d).limiting_o2_pct;
     const share = l => Math.max(0, 1 - l / o2), sh = l => Math.round(share(l) * 100) + "%";
-    const co2 = ["methanol", "heptane"].map(f => L(f, "carbon dioxide")), n2 = ["methanol", "heptane"].map(f => L(f, "nitrogen (O2/N2 only)"));
-    const all = EV.loi.map(r => +r.limiting_o2_pct);
-    let st, head;
-    if (o2 <= Math.min(...all)) { st = "ok"; head = `Your ${fmt(o2)}% O₂ is already at or below every droplet limit measured in FLEX (${fmt(Math.min(...all))}-${fmt(Math.max(...all))}% O₂).`; }
+    const F = [["methanol", 0.30], ["heptane", 0.20]].map(([f, fc]) => ({f, fc, n2:L(f, "nitrogen (O2/N2 only)"), co2:L(f, "carbon dioxide")}));
+    const all = EV.loi.map(r => +r.limiting_o2_pct), live = F.filter(x => o2 > x.n2);
+    let st, head, short;
+    if (!live.length) { st = "ok"; head = `Your ${fmt(o2)}% O₂ is already at or below every droplet limit measured in FLEX (${fmt(Math.min(...all))}-${fmt(Math.max(...all))}% O₂).`; short = "Suppression: your O₂ is already below the droplet limits."; }
     else { st = o2 > 21.5 ? "bad" : "info";
-      head = `To put out burning droplets at ${fmt(o2)}% O₂, CO₂ must bring oxygen below ${co2[0]}% (methanol) or ${co2[1]}% (heptane): estimated CO₂ share of the cabin gas about ${sh(co2[0])} and ${sh(co2[1])}. With nitrogen alone the targets are ${n2[0]}% and ${n2[1]}% (about ${sh(n2[0])} and ${sh(n2[1])}).` +
-        (o2 > 22 ? ` In Earth air (21% O₂) the CO₂ shares would be about ${Math.round(Math.max(0, 1 - co2[0] / 20.95) * 100)}% and ${Math.round(Math.max(0, 1 - co2[1] / 20.95) * 100)}%.` : ""); }
-    T.push({id:"suppression", area:"suppression", st, title:"Suppression: size inert gas for your oxygen", head,
-      short:st === "ok" ? "Suppression: your O₂ is already below the droplet limits." : `Suppression: CO₂ must cut O₂ to ${co2[0]}-${co2[1]}%, about ${sh(co2[1])}-${sh(co2[0])} of the cabin gas.`,
-      imp:"Size inert-gas suppression for the cabin's real oxygen level, not for Earth air: the higher the oxygen, the more gas must be added. CO₂ (and helium for methanol) put flames out with more oxygen left than nitrogen alone, so less oxygen has to be displaced.",
-      cav:cav("Shares are estimates: 1 − limit ÷ your O₂, assuming the gas mixes evenly.", "Droplets at 1 atm, quiescent; solid materials may need different limits.", pNote, gNote), cite:"Dietrich et al. 2014", href:"#evidence", anchor:"evloi"});
+      const done = F.filter(x => o2 <= x.n2), co2ok = live.filter(x => share(x.co2) >= x.fc - 0.02), co2no = live.filter(x => share(x.co2) < x.fc - 0.02);
+      head = `To put out burning droplets at ${fmt(o2)}% O₂, the safe sizing case is to bring oxygen below ${live.map(x => `${x.n2}% (${x.f})`).join(" and ")}: about ${live.map(x => sh(x.n2)).join(" and ")} of the cabin gas as added inert gas. In FLEX, nitrogen alone needed the lowest oxygen; CO₂ and helium never needed less.` +
+        (co2ok.length ? ` With CO₂, flames went out at ${co2ok.map(x => `${x.co2}% O₂ (${x.f}, tested with ${Math.round(x.fc * 100)}% CO₂)`).join(" and ")}: about ${co2ok.map(x => sh(x.co2)).join(" and ")} CO₂ for your cabin.` : "") +
+        (co2no.length ? ` The CO₂ limit${co2no.length > 1 ? "s" : ""} for ${co2no.map(x => x.f).join(" and ")} (${co2no.map(x => x.co2 + "%").join(", ")}) ${co2no.length > 1 ? "were" : "was"} measured with ${co2no.map(x => Math.round(x.fc * 100) + "%").join(" and ")} CO₂ present, more than your cabin would need to reach ${co2no.length > 1 ? "them, so they do" : "it, so it does"} not apply here; use the nitrogen figure.` : "") +
+        (done.length ? ` Your ${fmt(o2)}% O₂ is already at or below the ${done.map(x => x.f).join(" and ")} limit (${done.map(x => x.n2 + "%").join(", ")}).` : "") +
+        (o2 > 22 ? ` In Earth air (21% O₂) the safe sizing case would be about ${live.map(x => Math.round(Math.max(0, 1 - x.n2 / 20.95) * 100) + "%").join(" and ")}.` : "");
+      short = `Suppression: bring O₂ below ${live.map(x => x.n2).join("-")}%, about ${live.map(x => sh(x.n2)).reverse().join("-")} of the cabin gas as inert gas (less with CO₂).`; }
+    T.push({id:"suppression", area:"suppression", st, title:"Suppression: size inert gas for your oxygen", head, short,
+      imp:"Size inert-gas suppression for the cabin's real oxygen level, not for Earth air: the higher the oxygen, the more gas must be added. In FLEX, CO₂ (and helium for methanol) put flames out with more oxygen left than nitrogen alone, but only at the CO₂ levels tested, so the nitrogen-only figures are the safe sizing case.",
+      cav:cav("Shares are estimates: 1 − limit ÷ your O₂, assuming the gas mixes evenly. CO₂ limits were measured with 30% (methanol) and 20% (heptane) CO₂ present and are used only where your cabin would need at least that much.", "Droplets at 1 atm, quiescent; solid materials may need different limits.", pNote, gNote), cite:"Dietrich et al. 2014", href:"#evidence", anchor:"evloi"});
   }
   // 7. untested
   const out = [];
@@ -1503,6 +1519,7 @@ function takeaways(sc = S){
   if (psi < P_MIN) out.push(`pressure below ${fmt(P_MIN, 1)} psi (the lowest in any PSI test)`);
   if (o2 > AMB_MAX) out.push(`room oxygen above ${fmt(AMB_MAX, 1)}% (the highest measured room O₂ in any PSI test)`);
   else if (o2 > SOLID_MAX) out.push(`oxygen for solid materials (PSI solid-fuel flight tests reach ${fmt(SOLID_MAX, 1)}%)`);
+  if (FB && (U < FB.pmma_rod.valid_U[0] || U > FB.pmma_rod.valid_U[1])) out.push(`air speed ${U < FB.pmma_rod.valid_U[0] ? "below " + fmt(FB.pmma_rod.valid_U[0], 1) : "above " + fmt(FB.pmma_rod.valid_U[1], 1)} cm/s (outside the flammability-boundary tests)`);
   const ext = (B.gaps_external || []).filter(x => /LUCI|FM2/.test(x.name)).map(x => x.name).join(" and ");
   T.push({id:"untested", area:"all", st:out.length ? "na" : "ok", title:"What no PSI test covers yet",
     head:out.length ? `Your scenario is outside the tested range for: ${out.join("; ")}.` : "Your scenario is inside the oxygen, pressure and gravity ranges that PSI tests cover.",
@@ -1538,16 +1555,16 @@ function renderEvidence(){
   renderTakeaways();
   if (!EV.bre.length) return;
   /* prevention: BRE */
-  const near = breNear(S.o2, S.psi), kept = near.filter(breKept).length;
+  const nearAll = breNear(S.o2, S.psi), near = nearAll.filter(r => !breBig(r)), bigN = nearAll.length - near.length, kept = near.filter(breKept).length;
   const lowKept = EV.bre.filter(breKept).reduce((a, r) => +r.o2_before < +a.o2_before ? r : a, EV.bre.filter(breKept)[0]);
   const maxSE = EV.bre.filter(r => +r.o2_before < 0.23);
   $("#evbreread").innerHTML = `
-    <div class="gap ${near.length ? (kept ? "bad" : "ok") : "mid"}"><div class="small muted">Tests near your scenario (±3 O₂ points, ±30% pressure)</div><div class="st">${near.length ? `${kept} of ${near.length} kept burning` : "none"}</div>
-      <div class="small">${near.length ? `At about ${fmt(S.o2)}% O₂ and ${fmt(S.psi * BAR_PER_PSI, 2)} bar. ${kept ? "Some small flames burned until the fuel was cut: a small fire can persist with no ventilation at all." : "All put themselves out."}` : `No BRE test ran near ${fmt(S.o2)}% O₂ and ${fmt(S.psi)} psi.`}</div></div>
+    <div class="gap ${near.length ? (kept ? "bad" : "") : "mid"}"><div class="small muted">Small flames near your scenario (±3 O₂ points, ±30% pressure)</div><div class="st">${near.length ? `${kept} of ${near.length} kept burning` : "none"}</div>
+      <div class="small">${near.length ? `Run at ${rng1(near.map(r => +r.o2_before * 100))}% O₂ and ${rng1(near.map(r => +r.p_bar), 2)} bar. ${kept ? "Some burned until the fuel was cut: a small fire can persist with no ventilation at all." : "All went out, but outside heat could change that (see below)."}` : `No small BRE flame ran near ${fmt(S.o2)}% O₂ and ${fmt(S.psi)} psi.`}${bigN ? ` ${pl(bigN, "larger flame")} (fuel flow above ${BRE_BIG} g/m²·s) left out: ${bigN > 1 ? "they" : "it"} went out from radiation heat loss.` : ""}</div></div>
     <div class="gap"><div class="small muted">Lowest O₂ with a flame that kept burning</div><div class="st num">${fmt(+lowKept.o2_before * 100, 1)}%</div>
       <div class="small">Test ${esc(lowKept.test_id)} at ${fmt(+lowKept.p_bar, 2)} bar (${fmt(+lowKept.p_psi)} psi), a small flame (fuel flow ${esc(lowKept.mass_flux_g_m2s)} g/m²·s).</div></div>
-    <div class="gap ok"><div class="small muted">Below 23% O₂ (all near 1 bar)</div><div class="st">${maxSE.filter(r => !breKept(r)).length} of ${maxSE.length} went out</div>
-      <div class="small">Every BRE flame near normal air put itself out, the longest after 37 s.</div></div>
+    <div class="gap"><div class="small muted">Below 23% O₂ (all near 1 bar)</div><div class="st">${maxSE.filter(r => !breKept(r)).length} of ${maxSE.length} went out</div>
+      <div class="small">Every BRE flame near normal air went out, the longest after 37 s. But these burners got no outside heat: ${BRE_EXT.replace(/^The same paper calculates/, "the paper calculates")}</div></div>
     <div class="gap"><div class="small muted">Big flames</div><div class="st">Go out by radiation</div>
       <div class="small">At 31% O₂ and above, every flame with fuel flow over 5 g/m²·s put itself out and every one under 3 g/m²·s kept burning: large flames lose too much heat as radiation.</div></div>`;
   const xm = $("#evbrex").value, X = r => xm === "p" ? +r.p_bar : +r.mass_flux_g_m2s;
@@ -1578,17 +1595,16 @@ function renderEvidence(){
      annotations:[{xref:"paper", x:0, xanchor:"left", y:20.95, yanchor:"bottom", text:"Earth air 20.9%", showarrow:false, font:{size:11, color:css("--muted")}}, (S.o2 <= 40 ? {xref:"paper", x:1, xanchor:"right", y:S.o2, yanchor:"bottom", text:`your O₂ ${fmt(S.o2)}%`, showarrow:false, font:{size:11, color:css("--accent")}} : {xref:"paper", x:1, xanchor:"right", yref:"paper", y:1, yanchor:"bottom", text:`your O₂ ${fmt(S.o2)}% is off this scale (above 40%)`, showarrow:false, font:{size:11, color:css("--accent")}})]}, {displayModeBar:false, responsive:true});
   const lim = d => Math.min(...EV.loi.filter(r => r.diluent_added_to_air === d).map(r => +r.limiting_o2_pct));
   const lCO2 = lim("carbon dioxide"), lHe = lim("helium"), lN2 = lim("nitrogen (O2/N2 only)"), gap = S.o2 - lCO2;
-  const supCls = S.o2 > lCO2 ? "bad" : S.o2 > lN2 ? "mid" : "ok";
-  const supSt = S.o2 > lCO2 ? `${fmt(gap, 1)} points below your ${fmt(S.o2)}%` : S.o2 > lN2 ? `your ${fmt(S.o2)}% is at or below it` : `your ${fmt(S.o2)}% is below every measured limit`;
-  const supTx = S.o2 > lCO2 ? `With helium the target is also about ${lHe}%; with nitrogen alone, ${lN2}%.`
-    : S.o2 > lN2 ? `But this is not safe by itself: with only nitrogen diluting the air, methanol droplets kept burning down to ${lN2}% O₂.`
+  const gN = S.o2 - lN2, supCls = S.o2 > lN2 ? "bad" : "ok";
+  const supSt = S.o2 > lN2 ? `${pl(+fmt(gN, 1), "point")} below your ${fmt(S.o2)}%` : `your ${fmt(S.o2)}% is at or below every measured limit`;
+  const supTx = S.o2 > lN2 ? `That is the nitrogen-only limit for methanol, the lowest measured, so it is the safe target for any of the three gases. With CO₂ the flames went out at about ${lCO2}% (methanol) and 17% (heptane), but only with 30% and 20% CO₂ present; with helium at about ${lHe}% and 15%.`
     : `Below the lowest limit measured for these droplets (${lN2}%, methanol with nitrogen). Other fuels and solids were not tested here.`;
   const pNote = Math.abs(S.psi - 14.7) > 1.5 ? ` These limits were measured at 1 atm (14.7 psi); your ${fmt(S.psi)} psi was not tested, so they may shift.` : " Measured at 1 atm, as in your scenario.";
   $("#evloitext").innerHTML = `
-    <div class="gap ${supCls}"><div class="small muted">To stop both droplet fuels with CO₂, oxygen must fall below about ${lCO2}%</div><div class="st num">${supSt}</div><div class="small">${supTx}${pNote} Droplet limits only: other materials differ.</div></div>
+    <div class="gap ${supCls}"><div class="small muted">To stop both droplet fuels with any of the three gases, oxygen must fall below about ${lN2}%</div><div class="st num">${supSt}</div><div class="small">${supTx}${pNote} Droplet limits only: other materials differ.</div></div>
     <ul style="margin:0;padding-left:18px;display:grid;gap:4px">
       <li>CO₂ raised heptane's limit to about 17%, helium only to about 15%: at these mixtures CO₂ was the stronger suppressant for heptane; for methanol both gave about 14%.</li>
-      <li>More CO₂ pushed methanol flames toward radiative extinction, as expected from its strong infrared emission [Nayagam et al. 2011].</li>
+      <li>More CO₂ pushed methanol flames toward radiative extinction, as expected from CO₂'s strong infrared emission [Nayagam et al. 2011].</li>
       <li>Large heptane droplets kept burning invisibly as a "cool flame" after the visible flame went out: a fire can look extinguished when it is not [Dietrich et al. 2014].</li>
       <li>On BASS, at 17% O₂ and under 1 cm/s flow, a nitrogen jet did not put out a burning PMMA sphere; the flame went out only when the air flow was stopped [BASS overview 2013].</li>
     </ul>
@@ -1605,12 +1621,12 @@ function renderEvidence(){
                   {xref:"paper", x:1, xanchor:"right", y:Math.log10(1000), yanchor:"bottom", text:"most sensitive above 1 µm", showarrow:false, font:{size:11, color:css("--good")}}]}, {displayModeBar:false, responsive:true});
   const below = EV.smoke.filter(r => +r.diameter_of_average_mass_nm < 300).map(r => `${r.material} ${r.state}`);
   $("#evsmoketext").innerHTML = `
-    <div class="gap bad"><div class="small muted">Below the ISS detector's 0.3 µm minimum (by diameter of average mass)</div><div class="st">${below.length} of ${EV.smoke.length}</div><div class="small">${esc(below.join(", "))}. None of the eight reached 1 µm, where the detector is most sensitive.</div></div>
+    <div class="gap bad"><div class="small muted">Below the ISS detector's 0.3 µm minimum (by diameter of average mass)</div><div class="st">${below.length} of ${EV.smoke.length}</div><div class="small">${esc(below.join(", "))}. No average size reached 1 µm, where the detector is most sensitive, but the report notes that a substantial share of lamp-wick and silicone smoke was larger than 1 µm.</div></div>
     ${Math.abs(S.o2 - 21) > 1.5 || Math.abs(S.psi - 14.7) > 1.5 ? `<div class="qnote">These sizes were measured only in ISS cabin air (about 21% O₂, 14.7 psi). No smoke-size data exist for your ${fmt(S.o2)}% O₂ and ${fmt(S.psi)} psi, so treat them as a reference, not a prediction for your habitat.</div>` : `<div class="small muted">Measured in ISS cabin air (about 21% O₂, 14.7 psi), close to your scenario.</div>`}
     <ul style="margin:0;padding-left:18px;display:grid;gap:4px">
-      <li>Kapton and Teflon smoke is very small, so light-scattering detectors will struggle; lamp wick and silicone make larger particles. The report concludes a detector must measure more than one moment of the size distribution [SAME Final Report, p. 27].</li>
+      <li>Kapton and Teflon smoke is very small, so light-scattering detectors will struggle; lamp wick and silicone make larger particles. The report concludes a detector will probably need to measure more than one moment of the size distribution, or sort particles by size [SAME Final Report, pp. 27, 29].</li>
       <li>Aging (smoke drifting from a closed space) grows particles: Kapton's mass-weighted size rose from 179 to 267 nm.</li>
-      <li>SAME-R flew a two-moment detector (MPASS) that can reject dust, important with lunar dust [SAME-R card].</li>
+      <li>SAME-R flew a two-moment detector (MPASS) that can tell a strong smoke signal from a few large dust particles, which reduces false alarms [SAME-R card]; that should help with lunar dust too (our inference).</li>
       <li>Flames are sootier in microgravity: SLICE methane flames had about 4-8 times the peak soot of the same flames on Earth, and CLD flames several times more [Ma et al. 2014; Stocker 2022].</li>
       <li>Cool flames give off little light or heat, a detection gap for liquid-fuel fires [CFI card].</li>
       <li>The ISS cabin was very clean of background particles, which helps detectors separate smoke from background [Urban et al. 2007].</li>
@@ -1818,13 +1834,13 @@ const TOOLS = [
   {name:"safety_evidence", description:"Measured fire-safety datasets from the papers: 'bre' = 83 ACME BRE ISS tests (O2, pressure, fuel flow, kept burning or self-extinguished), filtered near a given O2/pressure; 'suppressant' = FLEX limiting oxygen by diluent (N2, CO2, helium); 'smoke' = SAME smoke particle sizes by material vs ISS detector limits.",
    inputSchema:{type:"object", properties:{topic:{type:"string", enum:["bre", "suppressant", "smoke"]}, o2_pct:{type:"number", description:"only for topic bre"}, psi:{type:"number", description:"only for topic bre"}}, required:["topic"]},
    execute:({topic, o2_pct, psi}) => {
-     if (topic === "suppressant") return {source:"Dietrich et al. 2014, Microgravity Sci. Technol. 26:65-76 (FLEX, ISS, 1 atm)", cite:"[Dietrich et al. 2014]", test_conditions:"Free-floating droplets in the ISS Combustion Integrated Rack, quiescent, 1 atm, CO2 or helium dispersed into air. These are limits for droplets, not for your scenario atmosphere.", rows:EV.loi, note:"A suppressant must bring O2 below the limit: with CO2 about 14% (methanol) and 17% (heptane); with helium about 14% and 15%; nitrogen only 12% and 15%.", how_to_read:"A higher limiting O2 means the flame goes out while more oxygen is still left, so less oxygen has to be displaced: by this measure CO2 is more effective than nitrogen for both fuels, and helium is more effective than nitrogen for methanol and equal for heptane. These are droplet results at 1 atm."};
-     if (topic === "smoke") return {source:"SAME Final Science Report (PSI-102) Table 1; ISS detector limits from Urban et al. 2007 (NTRS 20070031686)", cite:"[SAME Final Report, p. 27] for particle sizes", test_conditions:"Materials heated short of ignition in ISS cabin air (about 21% O2, 1 atm) inside the Microgravity Science Glovebox. Not measured at other oxygen levels or pressures.", rows:EV.smoke, detector:{minimum_reported_sensitivity_um:0.3, most_sensitive_above_um:1.0, cite:"[Urban et al. 2007]"}};
-     const O = o2_pct ?? S.o2, P = psi ?? S.psi, near = breNear(O, P);
+     if (topic === "suppressant") return {source:"Dietrich et al. 2014, Microgravity Sci. Technol. 26:65-76 (FLEX, ISS, 1 atm)", cite:"[Dietrich et al. 2014]", test_conditions:"Free-floating droplets in the ISS Combustion Integrated Rack, quiescent, 1 atm, CO2 or helium dispersed into air. These are limits for droplets, not for your scenario atmosphere.", rows:EV.loi, note:"A suppressant must bring O2 below the limit: nitrogen only 12% (methanol) and 15% (heptane); with CO2 about 14% and 17%; with helium about 14% and 15%. The CO2 limits were measured with 30% (methanol) and 20% (heptane) CO2 present and apply only with that much CO2; the nitrogen-only limits are the safe sizing case for any of the three gases.", how_to_read:"A higher limiting O2 means the flame goes out while more oxygen is still left, so less oxygen has to be displaced: by this measure CO2 is more effective than nitrogen for both fuels, and helium is more effective than nitrogen for methanol and equal for heptane. These are droplet results at 1 atm."};
+     if (topic === "smoke") return {source:"SAME Final Science Report (PSI-102) Table 1; ISS detector limits from Urban et al. 2007 (NTRS 20070031686)", cite:"[SAME Final Report, p. 27] for particle sizes", test_conditions:"Materials heated short of ignition in ISS cabin air (about 21% O2, 1 atm) inside the Microgravity Science Glovebox. Not measured at other oxygen levels or pressures.", rows:EV.smoke, detector:{minimum_reported_sensitivity_um:0.3, most_sensitive_above_um:1.0, cite:"[Urban et al. 2007]"}, how_to_read:"Compare the detector limits with diameter_of_average_mass (mass-weighted; light scattering responds mostly to it), not the geometric mean. Aged = held 720 s. The report says a substantial share of lamp-wick and silicone smoke was larger than 1 um, and that in flight the ISS detector gave a strong signal for silicone smoke but an erratic one for Teflon."};
+     const O = o2_pct ?? S.o2, P = psi ?? S.psi, nearAll = breNear(O, P), near = nearAll.filter(r => !breBig(r));
      return {source:"Dehghani & Quintiere 2023, Combustion and Flame 253, 112809, Table A.1, doi:10.1016/j.combustflame.2023.112809 (ACME BRE, 25 mm burner, ISS)", cite:"[Dehghani & Quintiere 2023, Table A.1]", scenario:{o2_pct:O, psi:P, bar:+(P * BAR_PER_PSI).toFixed(3)}, window:"O2 within 3 points, pressure within 30%",
-       near_tests:{count:near.length, kept_burning:near.filter(breKept).length, self_extinguished:near.filter(r => !breKept(r)).length, rows:near.slice(0, 25).map(r => ({test:r.test_id, o2_pct:+(r.o2_before * 100).toFixed(1), p_bar:+r.p_bar, fuel_flow_g_m2s:+r.mass_flux_g_m2s, outcome:r.outcome}))},
+       near_small_flames:{note:`Flames with fuel flow above ${BRE_BIG} g/m2s left out (they went out from radiation heat loss): ${nearAll.length - near.length}`, count:near.length, kept_burning:near.filter(breKept).length, self_extinguished:near.filter(r => !breKept(r)).length, rows:near.slice(0, 25).map(r => ({test:r.test_id, o2_pct:+(r.o2_before * 100).toFixed(1), p_bar:+r.p_bar, fuel_flow_g_m2s:+r.mass_flux_g_m2s, outcome:r.outcome}))},
        all_tests:{count:EV.bre.length, kept_burning:EV.bre.filter(breKept).length, lowest_o2_kept_burning_pct:25.1, below_23pct_o2:"all 10 self-extinguished (near 1 bar)"},
-       caveat:"Oxygen and pressure were not varied independently; the paper concludes oxygen fraction dominated over 0.56-1 bar. Large flames (high fuel flow) self-extinguish by radiation."}; }},
+       caveat:"Oxygen and pressure were not varied independently; the paper concludes oxygen fraction dominated over 0.56-1 bar. Large flames (high fuel flow) self-extinguish by radiation, so a large flame going out says nothing about a small fire. These burners got no outside heat: the paper calculates a 25 mm PMMA sample would keep burning even at 21% O2, 1 bar with at least 7 kW/m2 of outside radiant heat."}; }},
   {name:"design_takeaways", description:"Design takeaways for fire-safety equipment and controls (materials, ventilation, small fires in still air, smoke detectors, cool flames, inert-gas suppression, untested conditions), computed by fixed rules from the measured data for a scenario. Defaults to the user's current scenario. Use it for questions about what the data means for design, equipment, controls, detectors, suppression systems, ventilation or materials.",
    inputSchema:{type:"object", properties:{o2_pct:{type:"number"}, psi:{type:"number"}, flow_cm_s:{type:"number"}, gravity:{type:"string", enum:["0", "moon", "mars", "earth"]}}},
    execute:({o2_pct, psi, flow_cm_s, gravity}) => { const sc = {o2:o2_pct ?? S.o2, psi:psi ?? S.psi, flow:flow_cm_s ?? S.flow, g:gravity ?? S.g};
