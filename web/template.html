@@ -456,6 +456,18 @@ nav.mainnav .primary a[aria-current="page"]:not(.asktab){background:var(--accent
 nav.mainnav .primary a.asktab{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--accent)}
 nav.mainnav .primary a.asktab:hover{background:var(--accent-soft)}
 nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent-soft);color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ===== NASA photos ===== */
+figure.photo{margin:0;display:grid;gap:6px;align-content:start}
+figure.photo img{display:block;width:100%;height:auto;border-radius:8px;background:#05070a}
+figure.photo figcaption{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+figure.photo .credit{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+figure.photo.famphoto img{height:150px;object-fit:contain}
+.pgintro{display:grid;gap:12px}
+.pgintro .lead{order:-1}
+figure.photo.side{grid-template-columns:260px minmax(0,1fr);gap:8px 16px;align-items:center;max-width:900px}
+figure.photo.side figcaption{font-size:13.5px}
+@media (max-width:600px){figure.photo.side{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -574,7 +586,8 @@ nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent-soft)
     </div>
     <div class="panel" style="display:grid;gap:10px">
       <h2>Partial gravity: bounds and what is coming</h2>
-      <p class="lead">PSI has no partial-gravity combustion data yet; NASA expects LUCI and FM2 results to be added. Until then, microgravity and normal-gravity results can bound the Moon and Mars case, and ACME E-FIELD imitates buoyancy with an electric field.</p>
+      <div class="pgintro"><figure class="photo side" id="candlefig"></figure><p class="lead">PSI has no partial-gravity combustion data yet; NASA expects LUCI and FM2 results to be added. Until then, microgravity and normal-gravity results can bound the Moon and Mars case, and ACME E-FIELD imitates buoyancy with an electric field.</p>
+      </div>
       <div class="gapgrid" id="gbounds"></div>
       <h3 style="margin-top:6px">Work outside PSI that will fill the gap:</h3>
       <div class="gapgrid" id="external"></div>
@@ -751,7 +764,7 @@ nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent-soft)
     </div>
     <div class="panel" style="display:grid;gap:8px" id="aiuse">
       <h2>How AI was used (Space Apps disclosure)</h2>
-      <p class="lead">InfoFlame was built by team Spacecrammers with AI assistance. The team chose the approach and features, supplied papers, reviewed the results, asked for corrections and published the site. The AI work is listed below; the same statement is in <code>AI_USE.md</code> in the repository, in the page metadata and in the script headers. The page contains no AI-generated images or video; charts are drawn by Plotly from the data. It uses no NASA logos, flags or mission insignia and is not an official NASA product.</p>
+      <p class="lead">InfoFlame was built by team Spacecrammers with AI assistance. The team chose the approach and features, supplied papers, reviewed the results, asked for corrections and published the site. The AI work is listed below; the same statement is in <code>AI_USE.md</code> in the repository, in the page metadata and in the script headers. The page contains no AI-generated images or video: the photos are NASA images credited under each one, and charts are drawn by Plotly from the data. It uses no NASA logos, flags or mission insignia and is not an official NASA product.</p>
       <div class="tablewrap"><table class="small aitable"><thead><tr><th>Part</th><th>What AI did</th><th>How it is kept honest</th></tr></thead><tbody>
         <tr><td>Code</td><td>Page code (HTML, JavaScript, CSS), data-pipeline Python scripts and the Cloudflare proxy were written with Claude (Anthropic).</td><td>Run, tested in a browser and published by the team; the code is open in the repository.</td></tr>
         <tr><td>Test matrix and data-quality log</td><td>Cleaning rules (units, typos, ranges, duplicates) were written with Claude and run as a script over the PSI tables.</td><td>Every value keeps its PSI file and row; every change is logged in the data-quality report on the Data &amp; export page.</td></tr>
@@ -759,6 +772,7 @@ nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent-soft)
         <tr><td>Safety-evidence tables</td><td>Extracted by Claude from published papers and a PSI report table (BRE, FLEX, SAME).</td><td>Rows compared with the source pages; each file names its source.</td></tr>
         <tr><td>Summaries, findings, page text</td><td>Investigation summaries, findings, relevance notes and explanations were written by Claude from the cited sources.</td><td>Each finding names its source; all were checked by Claude against the source passages on 2026-11-14.</td></tr>
         <tr><td>Design takeaways</td><td>Rules and wording of the Safety evidence takeaways were written with Claude.</td><td>Every number is computed from the data for your scenario when you change it; each card names its source and tested conditions.</td></tr>
+        <tr><td>Images</td><td>None: the five photos are NASA images, credited and linked under each one (Gaps and Compare tabs).</td><td>Listed under Sources below with their NASA source pages.</td></tr>
         <tr><td>Scores, fits, counts</td><td>None at run time: computed by deterministic code from the data.</td><td>Formulas are shown above and in the code.</td></tr>
         <tr><td>Live answers (Ask the data)</td><td>Generated when you ask, by Google Gemini (gemini-3.5-flash-lite, fallback gemini-3.1-flash-lite), using only lookup tools over this data.</td><td>Every answer is labelled as AI-generated; the page checks its citations against the lookups and corrects or removes wrong ones.</td></tr>
       </tbody></table></div>
@@ -1091,6 +1105,12 @@ function cmpSameDiff(cols){
 
 /* ---------------- compare ---------------- */
 let CMP = [];
+/* NASA photos (not AI-generated): file, alt text, caption, credit and source come from data/curated.json "images" */
+function photoFig(im, cls = "photo"){
+  if (!im) return "";
+  return `<a href="${esc(im.src)}" target="_blank" rel="noopener" title="Open the source page"><img src="${esc(im.file)}" alt="${esc(im.alt)}" width="${im.w}" height="${im.h}" loading="lazy" decoding="async"></a>
+    <figcaption>${esc(im.caption)} <span class="credit">Image: ${esc(im.credit)} · <a href="${esc(im.src)}" target="_blank" rel="noopener">source</a></span></figcaption>`;
+}
 function renderCompare(){
   if (!CMP.length) CMP = RANKED.slice(0, 3).map(x => x.i.id);
   const CC = ["--accent", "--o2", "--ph-gas", "--ph-emu"], ccol = id => `var(${CC[CMP.indexOf(id)] || "--line"})`;
@@ -1120,7 +1140,8 @@ function renderCompare(){
     G.map(([g, R]) => `<tr class="grp"><th colspan="${cols.length + 1}">${g}</th></tr>` +
       R.map(([n, f]) => `<tr><th scope="row">${n}</th>${cols.map(i => `<td>${f(i)}</td>`).join("")}</tr>`).join("")).join("") + "</tbody>";
   const fam = {}; INV.forEach(i => (fam[i.family] = fam[i.family] || []).push(i));
-  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div class="famcard"><h3>${esc(f)}</h3><div class="small" style="margin-top:2px">${esc((B.families || {})[f] || "")}</div><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
+  const IM = B.images || {};
+  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div class="famcard">${IM[f] ? `<figure class="photo famphoto">${photoFig(IM[f])}</figure>` : ""}<h3>${esc(f)}</h3><div class="small" style="margin-top:2px">${esc((B.families || {})[f] || "")}</div><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
   $("#sharedlinks").innerHTML = (B.shared_links || []).map(L => `<li><b>${esc(L.what)}:</b> ${L.ids.map(id => esc(BYID[id]?.acr || id)).join(", ")}. ${esc(L.note)}</li>`).join("");
   $("#families").querySelectorAll("button").forEach(b => b.onclick = () => { S.sel = b.dataset.id; location.hash = "explore"; });
 }
@@ -1149,6 +1170,7 @@ const GAPCATS = [["Solid fuels", r => r.fuel_phase === "solid" && !/smoke/.test(
   ["Solid emulator (BRE)", r => r.fuel_phase === "gas (solid emulator)"], ["Liquid droplets", r => r.fuel_phase === "liquid" && !["PSI-101", "PSI-102"].includes(r.psi_id)],
   ["Gaseous flames", r => r.fuel_phase === "gas"], ["Smoke / dust detection", r => ["PSI-101", "PSI-102", "PSI-47"].includes(r.psi_id)]];
 function renderGaps(){
+  if (!$("#candlefig").dataset.done && (B.images || {}).candle) { $("#candlefig").innerHTML = photoFig(B.images.candle); $("#candlefig").dataset.done = "1"; }
   $("#gapgrid").innerHTML = GAPCATS.map(([n, f]) => {
     const all = ROWS.filter(f), amb = all.filter(ambient);
     const hit = amb.filter(r => inWindow(r, S.o2, S.psi)), meas = hit.filter(r => o2Kind(r) === "meas").length, air = hit.length - meas;

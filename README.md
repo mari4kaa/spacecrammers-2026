@@ -131,6 +131,8 @@ python3 scripts/build_page.py                    # -> docs/index.html
 
 Data: NASA Physical Sciences Informatics, https://psi.nasa.gov (CC0).
 
+Photos: five NASA images in `docs/img/` (a candle flame in 1 g and microgravity on the Gaps tab, and one photo per hardware family on the Compare tab). Each shows its caption, credit and a link to the NASA source page; the list is in the "Images" section of `SOURCES.md`. None shows a NASA logo or insignia.
+
 Flammability boundary sources:
 - Olson, S.L., et al.: Burning and Suppression of Solids-II (BASS-II) Summary Report, NASA/TM-20210011385, 2021 (https://ntrs.nasa.gov/citations/20210011385; copy in PSI-25, DOI 10.60555/4qc4-de67). Figure 6.10, Eq. 6.1, Tables 2.1 and 7.1.
 - Hirsch, D., et al.: ASTM STP1454, 2003, pp. 21-26. Only the 15.4% O2 normal-gravity upward-spread limit for PMMA, as quoted in the BASS-II report (not read directly).

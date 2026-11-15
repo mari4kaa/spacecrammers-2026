@@ -72,7 +72,7 @@ _snap = max((f.stat().st_mtime for f in pathlib.Path(sys.argv[1]).glob("PSI-*.js
 PSI_SNAPSHOT = _dt.date.fromtimestamp(_snap).isoformat() if _snap else ""
 bundle = {"built": "2026-11-14", "psi_snapshot": PSI_SNAPSHOT, "about": cur["_about"], "sources": cur["sources"], "inv": inv, "cols": cols, "rows": rows,
           "quality": qlog, "incidents": cur["incidents"], "spinoffs": cur["spinoffs"], "gaps_external": cur["gaps_external"], "boundary": boundary,
-          "families": cur.get("families", {}), "shared_links": cur.get("shared_links", []), "references": cur.get("references", []), "evidence": evidence}
+          "families": cur.get("families", {}), "shared_links": cur.get("shared_links", []), "references": cur.get("references", []), "images": cur.get("images", {}), "evidence": evidence}
 s = json.dumps(bundle, separators=(",", ":"), ensure_ascii=False)
 OUT.write_text(s)
 print("bundle KB", len(s) // 1024, "inv", len(inv), "rows", len(rows), "quality", len(qlog))

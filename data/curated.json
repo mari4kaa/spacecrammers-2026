@@ -1229,6 +1229,117 @@
      "https://ntrs.nasa.gov/citations/20070031686"
     ]
    ]
+  },
+  {
+   "group": "Images",
+   "cite": "NASA: Candle Flame – 1g vs Microgravity. Image credit: NASA.",
+   "used": "Photo in the Gaps tab, Partial gravity panel.",
+   "links": [
+    [
+     "NASA image page",
+     "https://www.nasa.gov/image-detail/candle-flames-3/"
+    ]
+   ]
+  },
+  {
+   "group": "Images",
+   "cite": "NASA Physical Sciences Informatics, PSI-25 (BASS-II): file \"PSI-25_Representative Image(s)_BASS-II_flame testing.jpg\". Image credit: NASA.",
+   "used": "Photo on the Compare tab, MSG flow duct family card.",
+   "links": [
+    [
+     "PSI-25 investigation",
+     "https://psi.nasa.gov/physci/repo/data/investigations/PSI-25"
+    ],
+    [
+     "DOI 10.60555/4qc4-de67",
+     "https://doi.org/10.60555/4qc4-de67"
+    ]
+   ]
+  },
+  {
+   "group": "Images",
+   "cite": "NASA: Flame Extinguishment Experiment (FLEX), \"1-g and micro-g droplet combustion\". Image credit: NASA.",
+   "used": "Photo on the Compare tab, droplet (MDCA) family card.",
+   "links": [
+    [
+     "NASA image page",
+     "https://science.nasa.gov/image-detail/screenshot-2024-03-29-at-10-02-47-am/"
+    ]
+   ]
+  },
+  {
+   "group": "Images",
+   "cite": "NASA Science: Advanced Combustion via Microgravity Experiments (ACME) investigation page, photo of the CIR/ACME/Flame Design hardware replacement aboard the ISS. NASA photo.",
+   "used": "Photo on the Compare tab, ACME family card.",
+   "links": [
+    [
+     "NASA ACME page",
+     "https://science.nasa.gov/biological-physical/investigations/acme/"
+    ]
+   ]
+  },
+  {
+   "group": "Images",
+   "cite": "NASA TechPort: Spacecraft Fire Safety Demonstration (Saffire), project 13543, image \"2024 Saffire Flames\" (Saffire-IV flame, light-off panel cropped). NASA image.",
+   "used": "Photo on the Compare tab, Saffire family card.",
+   "links": [
+    [
+     "NASA TechPort project",
+     "https://techport.nasa.gov/projects/13543"
+    ]
+   ]
   }
- ]
+ ],
+ "images": {
+  "candle": {
+   "file": "img/candle-1g-vs-microgravity.webp",
+   "w": 800,
+   "h": 624,
+   "alt": "Two candle flames side by side: on the left a tall yellow teardrop flame in normal gravity, on the right a small round blue flame in microgravity.",
+   "caption": "A candle flame on Earth (1 g, left) and in microgravity (µg, right). On Earth, rising hot gas stretches the flame into a teardrop and carries soot to the tip, which glows yellow; without buoyancy the flame is round, blue and soot-free, and oxygen reaches it only by diffusion.",
+   "credit": "NASA",
+   "title": "Candle Flame – 1g vs Microgravity",
+   "src": "https://www.nasa.gov/image-detail/candle-flames-3/"
+  },
+  "MSG flow duct (SPICE hardware)": {
+   "file": "img/bass2-flame.webp",
+   "w": 900,
+   "h": 598,
+   "alt": "An orange flame burning on a solid sample inside the dark BASS-II flow duct.",
+   "caption": "A BASS-II flame test in the flow duct inside the Microgravity Science Glovebox (representative image from the PSI-25 record).",
+   "credit": "NASA, PSI investigation PSI-25 (BASS-II), DOI 10.60555/4qc4-de67",
+   "title": "PSI-25 Representative Image(s): BASS-II flame testing",
+   "src": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-25"
+  },
+  "CIR + MDCA (droplets)": {
+   "file": "img/flex-droplet-iss-vs-1g.webp",
+   "w": 292,
+   "h": 800,
+   "alt": "Two droplet flames: on top a small round blue flame around a free-floating droplet on the ISS, below a tall yellow flame around a droplet hanging on a fibre in normal gravity.",
+   "caption": "FLEX droplet flames: on the ISS (top) the flame is a small sphere around the droplet; in normal gravity (bottom) it is stretched upward and yellow with soot.",
+   "credit": "NASA",
+   "title": "Flame Extinguishment Experiment (FLEX): 1-g and micro-g droplet combustion",
+   "src": "https://science.nasa.gov/image-detail/screenshot-2024-03-29-at-10-02-47-am/"
+  },
+  "CIR + ACME": {
+   "file": "img/acme-flame-design-hardware.webp",
+   "w": 1000,
+   "h": 667,
+   "alt": "Close-up of ACME hardware inside the Combustion Integrated Rack: a small grey ball on a thin tube among cables and mounts.",
+   "caption": "ACME Flame Design hardware in the Combustion Integrated Rack on the ISS, photographed during a hardware change; the grey ball is the porous spherical burner.",
+   "credit": "NASA",
+   "title": "ACME / Flame Design hardware replacement in the Combustion Integrated Rack (ISS photo)",
+   "src": "https://science.nasa.gov/biological-physical/investigations/acme/"
+  },
+  "Saffire (Cygnus)": {
+   "file": "img/saffire4-flame.webp",
+   "w": 191,
+   "h": 156,
+   "alt": "A vertical orange flame front moving across a dark fabric sheet, with small glowing spots of smouldering cotton behind it.",
+   "caption": "Saffire-IV: a cotton-fiberglass sheet about 40 cm wide burning inside an uncrewed Cygnus cargo craft at 21% O₂ and 14.6 psia; the bright dots behind the flame are smouldering cotton. Saffire-IV is a later flight of the same series, and its data are not in PSI.",
+   "credit": "NASA, Spacecraft Fire Safety Demonstration (Saffire) project, image \"2024 Saffire Flames\"",
+   "title": "2024 Saffire Flames (Saffire-IV flame image, light off)",
+   "src": "https://techport.nasa.gov/projects/13543"
+  }
+ }
 }
