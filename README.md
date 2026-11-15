@@ -6,7 +6,7 @@ InfoFlame ranks and explains the combustion investigations in NASA's Physical Sc
 
 - **Live site:** https://mari4kaa.github.io/spacecrammers-2026/
 - **Data:** 24 PSI investigations, 1,958 cleaned test rows from 19 PSI experiment tables, 157 logged data-quality issues
-- **AI:** built with AI assistance. The code, data-cleaning rules, digitized boundary points, evidence tables and investigation summaries were produced with Claude (Anthropic); the live assistant ("Ask the data") uses Google Gemini and answers only with lookups into the dataset. The demo video's voice-over was generated with ElevenLabs. Full disclosure: [AI_USE.md](AI_USE.md).
+- **AI:** built with AI assistance. The code, data-cleaning rules, digitized boundary points, evidence tables and investigation summaries were produced with the assistance of Claude (Anthropic); the live assistant ("Ask the data") uses Google Gemini and answers only with lookups into the dataset. The demo video's voice-over was generated with ElevenLabs. Full disclosure: [AI_USE.md](AI_USE.md).
 
 ## What's in the repo
 
@@ -14,7 +14,7 @@ InfoFlame ranks and explains the combustion investigations in NASA's Physical Sc
 |---|---|
 | `docs/index.html` | The whole dashboard in one file (served by GitHub Pages) |
 | `web/template.html` | Page source; data is inserted at build time |
-| `data/` | Cleaned dataset (`tests.csv`), data-quality log, AI-written cards (`curated.json`), bundle used by the page; described in `data/README.md` and `data/datapackage.json` |
+| `data/` | Cleaned dataset (`tests.csv`), data-quality log, cards written with AI assistance (`curated.json`), bundle used by the page; described in `data/README.md` and `data/datapackage.json` |
 | `data/evidence/` | Fire-safety evidence tables (BRE, FLEX, SAME) used by the Safety evidence tab (see its README) |
 | `AI_USE.md` | How AI was used (Space Apps disclosure) |
 | `scripts/` | Data pipeline: PSI snapshot → cleaning → bundle → page; `flammability_boundary.py` fits the boundary model |
@@ -137,4 +137,4 @@ Flammability boundary sources:
 - Olson, S.L., et al.: Burning and Suppression of Solids-II (BASS-II) Summary Report, NASA/TM-20210011385, 2021 (https://ntrs.nasa.gov/citations/20210011385; copy in PSI-25, DOI 10.60555/4qc4-de67). Figure 6.10, Eq. 6.1, Tables 2.1 and 7.1.
 - Hirsch, D., et al.: ASTM STP1454, 2003, pp. 21-26. Only the 15.4% O2 normal-gravity upward-spread limit for PMMA, as quoted in the BASS-II report (not read directly).
 
-The full source list, with what each source was used for, is on the dashboard's Method tab. Cite each investigation by its DOI, shown on every card. Investigation summaries and findings were written by Claude (AI) from the files named on each card and fact-checked against those files on 2026-11-14 (each finding traced to a source passage or computed from the PSI table); habitat-relevance notes are interpretation. Check the source before citing.
+The full source list, with what each source was used for, is on the dashboard's Method tab. Cite each investigation by its DOI, shown on every card. Investigation summaries and findings were written with Claude (AI) assistance from the files named on each card and fact-checked against those files on 2026-11-14 (each finding traced to a source passage or computed from the PSI table); habitat-relevance notes are interpretation. Check the source before citing.

@@ -678,7 +678,7 @@ figure.photo.side figcaption{font-size:13.5px}
         <label><input type="checkbox" id="dclean"> Hide flagged rows</label>
       </div>
       <div class="chips" id="exportbtns"></div>
-      <p class="small muted" style="margin:0">CSV files hold data only. How they were made, including AI use (cleaning rules written with Claude), is described in <code>data/README.md</code> and <code>data/datapackage.json</code> in the repository; the JSON export carries the same note.</p>
+      <p class="small muted" style="margin:0">CSV files hold data only. How they were made, including AI use (cleaning rules written with Claude's assistance), is described in <code>data/README.md</code> and <code>data/datapackage.json</code> in the repository; the JSON export carries the same note.</p>
       <div class="small muted" id="dcount"></div>
       <div class="tablewrap" style="max-height:560px;overflow:auto"><table id="dtable"></table></div>
     </div>
@@ -1643,7 +1643,7 @@ function renderData(){
 }
 ["dinv", "dphase", "dmeasured", "dclean"].forEach(id => $("#" + id).addEventListener("change", renderData));
 const EXPORT_ABOUT = {project:"InfoFlame (NASA Space Apps Challenge 2026, team Spacecrammers)", data:"NASA Physical Sciences Informatics, psi.nasa.gov (CC0); cite each investigation by its DOI", built:B.built,
-  ai_use:"Cleaning rules, digitized points and extracted tables were produced with Claude (Anthropic); summaries and findings were written by Claude from the cited sources and checked against them. Values keep their PSI file and row. See AI_USE.md in the repository."};
+  ai_use:"Cleaning rules, digitized points and extracted tables were produced with the assistance of Claude (Anthropic); summaries and findings were written with Claude's assistance from the cited sources and checked against them. Values keep their PSI file and row. See AI_USE.md in the repository."};
 const toCSV = (cols, rows) => [cols.join(","), ...rows.map(r => cols.map(c => { const v = r[c] ?? ""; const s = String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }).join(","))].join("\n");
 let DL = null;
 async function saveFile(name, text, btn){

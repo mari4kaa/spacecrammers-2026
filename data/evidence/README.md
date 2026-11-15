@@ -2,7 +2,7 @@
 
 Small datasets behind the dashboard's **Safety evidence** tab, each copied from a published source and checked against it.
 
-**AI use:** these tables were extracted from the sources by Claude (Anthropic) and compared with the source pages by Claude. See [`../../AI_USE.md`](../../AI_USE.md).
+**AI use:** these tables were extracted from the sources with the assistance of Claude (Anthropic) and compared with the source pages with Claude's assistance. See [`../../AI_USE.md`](../../AI_USE.md).
 
 | File | What | Source | How it was captured |
 |---|---|---|---|

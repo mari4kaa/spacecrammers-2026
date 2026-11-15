@@ -4,7 +4,7 @@ Microgravity flammability boundaries used by the dashboard's **Flammability boun
 
 The 15.4% O2 normal-gravity comparison value is the upward flame-spread limit for PMMA with an extra 4 cm/s forced flow, which the report quotes from Hirsch, D., et al., ASTM STP1454 (2003), pp. 21-26 (its ref. 23, chapter 6). It is not a BASS-II measurement, and the Hirsch paper was not read directly.
 
-**AI use:** the points were digitized with code written by Claude (Anthropic), and every candidate marker was checked by Claude on zoomed crops of the figure (step 3 below); Tables 7.1 and 2.1 were copied by Claude. The fitting script was also written with Claude. See [`../../AI_USE.md`](../../AI_USE.md).
+**AI use:** the points were digitized with code written with the assistance of Claude (Anthropic), and every candidate marker was checked with Claude's assistance on zoomed crops of the figure (step 3 below); Tables 7.1 and 2.1 were transcribed with Claude's assistance. The fitting script was also written with Claude's assistance. See [`../../AI_USE.md`](../../AI_USE.md).
 
 | File | What it is |
 |---|---|

@@ -1,5 +1,5 @@
 {
- "_about": "AI-written (Claude) summaries built from PSI investigation metadata, PSI experiment tables and the PSI report files listed in each finding's source. Written and fact-checked against those sources on 2026-11-14 (every finding traced to a passage or computed from the table); habitat-relevance notes are interpretation. Verify against the sources before citing.",
+ "_about": "Summaries written with AI assistance (Claude) built from PSI investigation metadata, PSI experiment tables and the PSI report files listed in each finding's source. Written and fact-checked against those sources on 2026-11-14 (every finding traced to a passage or computed from the table); habitat-relevance notes are interpretation. Verify against the sources before citing.",
  "sources": {
   "meta": "PSI investigation page (objectives, approach, hypothesis, impacts)",
   "table": "PSI Experimental Table (computed in this dashboard)",

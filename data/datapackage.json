@@ -1,11 +1,11 @@
 {
  "name": "firesight-psi-combustion",
  "title": "InfoFlame: NASA PSI combustion data for spacecraft and habitat fire safety",
- "description": "Data behind the InfoFlame dashboard (NASA Space Apps Challenge 2026, team Spacecrammers). AI use: cleaning rules, digitized points, extracted tables and written summaries were produced with Claude (Anthropic); see AI_USE.md. Every value keeps its source.",
+ "description": "Data behind the InfoFlame dashboard (NASA Space Apps Challenge 2026, team Spacecrammers). AI use: cleaning rules, digitized points, extracted tables and written summaries were produced with the assistance of Claude (Anthropic); see AI_USE.md. Every value keeps its source.",
  "homepage": "https://mari4kaa.github.io/spacecrammers-2026/",
  "x_ai_use": {
   "tools": [
-   "Claude (Anthropic): code, data extraction, summaries",
+   "Claude (Anthropic): assistance with code, data extraction, summaries",
    "Google Gemini: live answers on the dashboard only, not in these files"
   ],
   "disclosure": "AI_USE.md"
@@ -28,7 +28,7 @@
    "path": "tests.csv",
    "format": "csv",
    "description": "Unified test matrix: 1,958 rows from 19 PSI experiment tables. Produced by scripts written with AI assistance (Claude, Anthropic). (scripts/normalize.py); src_file and src_row point to the PSI table row.",
-   "x_ai_generated": "cleaning rules written with Claude; values come from PSI",
+   "x_ai_generated": "cleaning rules written with Claude's assistance; values come from PSI",
    "schema": {
     "fields": [
      {
@@ -141,7 +141,7 @@
    "path": "quality_log.csv",
    "format": "csv",
    "description": "157 data-quality issues found while cleaning and what was done. Produced by scripts written with AI assistance (Claude, Anthropic).",
-   "x_ai_generated": "rules written with Claude",
+   "x_ai_generated": "rules written with Claude's assistance",
    "schema": {
     "fields": [
      {
@@ -175,8 +175,8 @@
    "name": "curated",
    "path": "curated.json",
    "format": "json",
-   "description": "Investigation summaries, findings, relevance notes, incidents, spinoffs and references. Written by Claude from the sources named in each finding; checked against them on 2026-11-14.",
-   "x_ai_generated": "text written by Claude"
+   "description": "Investigation summaries, findings, relevance notes, incidents, spinoffs and references. Written with Claude's assistance from the sources named in each finding; checked against them on 2026-11-14.",
+   "x_ai_generated": "text written with Claude's assistance"
   },
   {
    "name": "bundle",
@@ -189,8 +189,8 @@
    "name": "boundary_points",
    "path": "boundary/bass2_boundary_points.csv",
    "format": "csv",
-   "description": "74 flammability-boundary points from the BASS-II Summary Report (NASA/TM-20210011385): Figure 6.10 digitized with Claude-written code and checked by Claude; Tables 7.1 and 2.1 copied by Claude. See boundary/README.md.",
-   "x_ai_generated": "digitized and copied with Claude",
+   "description": "74 flammability-boundary points from the BASS-II Summary Report (NASA/TM-20210011385): Figure 6.10 digitized with code written with Claude's assistance and checked with Claude's assistance; Tables 7.1 and 2.1 transcribed with Claude's assistance. See boundary/README.md.",
+   "x_ai_generated": "digitized and transcribed with Claude's assistance",
    "schema": {
     "fields": [
      {
@@ -240,14 +240,14 @@
    "path": "boundary/flammability_boundary.json",
    "format": "json",
    "description": "Fitted boundary curves, bootstrap bands and validation from scripts/flammability_boundary.py. Produced by scripts written with AI assistance (Claude, Anthropic).",
-   "x_ai_generated": "computed by AI-written code"
+   "x_ai_generated": "computed by code written with AI assistance"
   },
   {
    "name": "bre_iss_tests",
    "path": "evidence/bre_iss_tests.csv",
    "format": "csv",
-   "description": "83 ACME BRE ISS tests: measured values from Dehghani & Quintiere (2023), Combustion and Flame 253, 112809, Table A.1, doi:10.1016/j.combustflame.2023.112809. Extracted by Claude and compared with the page images. See evidence/README.md.",
-   "x_ai_generated": "extracted by Claude",
+   "description": "83 ACME BRE ISS tests: measured values from Dehghani & Quintiere (2023), Combustion and Flame 253, 112809, Table A.1, doi:10.1016/j.combustflame.2023.112809. Extracted with Claude's assistance and compared with the page images. See evidence/README.md.",
+   "x_ai_generated": "extracted with Claude's assistance",
    "schema": {
     "fields": [
      {
@@ -323,8 +323,8 @@
    "name": "flex_loi_by_diluent",
    "path": "evidence/flex_loi_by_diluent.csv",
    "format": "csv",
-   "description": "FLEX limiting oxygen by diluent from Dietrich et al. (2014), abstract. Copied by Claude.",
-   "x_ai_generated": "extracted by Claude",
+   "description": "FLEX limiting oxygen by diluent from Dietrich et al. (2014), abstract. Transcribed with Claude's assistance.",
+   "x_ai_generated": "extracted with Claude's assistance",
    "schema": {
     "fields": [
      {
@@ -365,8 +365,8 @@
    "name": "same_smoke_particle_sizes",
    "path": "evidence/same_smoke_particle_sizes.csv",
    "format": "csv",
-   "description": "SAME smoke particle sizes from the SAME Final Science Report (PSI-102), Table 1, p. 27. Copied by Claude.",
-   "x_ai_generated": "extracted by Claude",
+   "description": "SAME smoke particle sizes from the SAME Final Science Report (PSI-102), Table 1, p. 27. Transcribed with Claude's assistance.",
+   "x_ai_generated": "extracted with Claude's assistance",
    "schema": {
     "fields": [
      {
