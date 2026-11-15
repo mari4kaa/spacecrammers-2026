@@ -11,7 +11,7 @@ NASA Space Apps Challenge 2026, team Spacecrammers. This file is the project's A
 | Part | What AI did | How it is checked |
 |---|---|---|
 | Code: `web/template.html`, `docs/index.html`, `scripts/*.py`, `worker/` | Written with Claude | Run, tested in a browser and published by the team; all code is in this repository |
-| Test matrix and data-quality log: `data/tests.csv`, `data/quality_log.csv` | Cleaning rules (units, typos, ranges, duplicates) written with Claude and run by `scripts/normalize.py` over the PSI tables | Every value keeps its PSI file and row; every change is logged with a code and shown on the Data quality tab |
+| Test matrix and data-quality log: `data/tests.csv`, `data/quality_log.csv` | Cleaning rules (units, typos, ranges, duplicates) written with Claude and run by `scripts/normalize.py` over the PSI tables | Every value keeps its PSI file and row; every change is logged with a code and shown in the data-quality report on the Data & export page |
 | Flammability-boundary points: `data/boundary/` | Digitized from BASS-II report Figure 6.10 with Claude-written code and checked by Claude against zoomed crops of the figure; Tables 7.1 and 2.1 copied by Claude | Method in `data/boundary/README.md`; the refit is compared with the report's own equation |
 | Safety-evidence tables: `data/evidence/` | Extracted by Claude from published papers and a PSI report table | Rows compared with the source pages; every row names its source |
 | Investigation summaries, findings, relevance notes, page text: `data/curated.json` | Written by Claude from the sources named in each finding | All findings checked by Claude against the source passages on 2026-11-14 |

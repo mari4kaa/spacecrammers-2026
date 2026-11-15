@@ -169,34 +169,326 @@ select{max-width:100%}
 .tkdot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--muted);transform:translateY(1px)} .tkdot.bad{background:var(--bad)} .tkdot.mid{background:var(--warn)} .tkdot.ok{background:var(--good)} .tkdot.na{background:var(--o2)}
 .aitable td:first-child{font-weight:600;white-space:nowrap}
 @media (max-width:600px){.aitable td:first-child{white-space:normal}}
+
+/* ===== Redesign (layout and hierarchy only) ===== */
+:root{--ink2:#334150;--info:#1d6fd1;--info-soft:#e8f1fc;--good-soft:#e6f3ec;--warn-soft:#fbf1df;--bad-soft:#fbe8e6;--radius:12px;--shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink2:#c3ccd6;--info:#5aa2f5;--info-soft:#14283f;--good-soft:#16301f;--warn-soft:#352a14;--bad-soft:#3a1a18;--shadow:none}}
+:root[data-theme="dark"]{--ink2:#c3ccd6;--info:#5aa2f5;--info-soft:#14283f;--good-soft:#16301f;--warn-soft:#352a14;--bad-soft:#3a1a18;--shadow:none}
+.panel{border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+.wrap{gap:18px}
+h2{font-size:20px}
+/* header */
+header.top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px 24px}
+@media (max-width:760px){header.top{grid-template-columns:1fr}}
+.brandrow{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;border-radius:9px;flex:none;background:radial-gradient(circle at 50% 70%,#ffd27a 0 18%,#f59e0b 19% 38%,var(--accent) 39% 62%,transparent 63%),linear-gradient(160deg,#1b2a3a,#0e1419);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+h1{font-size:30px}
+header.top p{max-width:72ch}
+.topright{display:grid;gap:10px;justify-items:end}
+.utilbtn{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);text-decoration:none;font-weight:500;font-size:14px;box-shadow:var(--shadow)}
+.utilbtn:hover{border-color:var(--muted)}
+.utilbtn[aria-current="page"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.utilbtn .ico{font-size:15px;line-height:1}
+@media (max-width:760px){.topright{justify-items:start}}
+/* navigation */
+nav.mainnav{display:grid;gap:8px;border:0}
+nav.mainnav .primary{display:flex;gap:6px;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:var(--shadow);overflow-x:auto;scrollbar-width:thin}
+nav.mainnav .primary a{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;color:var(--ink2);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap;border:0;margin:0}
+nav.mainnav .primary a:hover{background:var(--chip)}
+nav.mainnav .primary a .step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--chip);color:var(--muted);font:600 12px/1 var(--mono)}
+nav.mainnav .primary a[aria-current="page"]{background:var(--ink);color:var(--surface)}
+nav.mainnav .primary a[aria-current="page"] .step{background:var(--accent);color:#fff}
+nav.mainnav .primary .navsep{flex:1 1 12px;min-width:12px}
+nav.mainnav .primary a.asktab{background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+nav.mainnav .primary a.asktab:hover{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+nav.mainnav .secondary{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 18px;align-items:center;padding:0 6px;font-size:13.5px}
+nav.mainnav .secondary .grp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+nav.mainnav .navlabel{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+nav.mainnav .secondary a{color:var(--muted);text-decoration:none;padding:3px 2px;border-bottom:2px solid transparent}
+nav.mainnav .secondary a:hover{color:var(--ink)}
+nav.mainnav .secondary a[aria-current="page"]{color:var(--ink);border-color:var(--accent)}
+nav.mainnav .secondary a.storylink{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--warn-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);font-weight:500}
+nav.mainnav .secondary a.storylink[aria-current="page"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+nav.mainnav a:focus-visible{outline:2px solid var(--o2);outline-offset:2px}
+/* scenario bar */
+.scenhead{display:flex;align-items:baseline;gap:10px}
+.eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;font-family:var(--body)}
+body[data-view="data"] section.scenario,body[data-view="quality"] section.scenario,body[data-view="method"] section.scenario,body[data-view="incidents"] section.scenario{display:none}
+/* shared text blocks */
+.lead{margin:0;max-width:88ch;color:var(--ink2);font-size:14px;line-height:1.55}
+.infobox{display:flex;gap:10px;align-items:flex-start;background:var(--info-soft);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--ink2);max-width:110ch}
+.infobox::before{content:"i";flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--info);color:#fff;font:700 12px/1 var(--body);margin-top:1px}
+.infobox p{margin:0}
+.warnlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.warnlist li{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);border-radius:8px;padding:8px 12px;font-size:13.5px;line-height:1.45}
+.warnlist li::before{content:"!";flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--warn);color:#fff;font:700 12px/1 var(--body);margin-top:1px}
+.warnlist.ok li{background:var(--good-soft)} .warnlist.ok li::before{content:"✓";background:var(--good)}
+.sechead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.sechead h2{display:flex;align-items:center;gap:10px}
+.area-p{border-left:4px solid var(--accent)} .area-s{border-left:4px solid var(--good)} .area-d{border-left:4px solid var(--o2)}
+/* accordions */
+details.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+details.acc>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;color:var(--ink);font:600 18px/1.3 var(--display)}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .15s;margin-right:4px}
+details.acc[open]>summary::after{transform:rotate(-135deg)}
+details.acc>.accbody{padding:0 20px 18px;display:grid;gap:10px}
+details.sub{border-top:1px solid var(--line);padding-top:10px}
+details.sub>summary{list-style:none;display:flex;align-items:center;gap:8px;color:var(--ink);font:600 16px/1.3 var(--display)}
+details.sub>summary::-webkit-details-marker{display:none}
+details.sub>summary::before{content:"";flex:none;width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
+details.sub[open]>summary::before{transform:rotate(45deg)}
+details.sub>summary .count{font:500 12px/1 var(--mono);color:var(--muted);background:var(--chip);border-radius:999px;padding:3px 8px}
+details.sub>summary .count.warn{background:var(--warn-soft);color:var(--warn)}
+details.sub>.subbody{margin-top:8px;display:grid;gap:8px}
+/* explore detail */
+.plainwords{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plainwords>div{border-radius:10px;padding:10px 14px;font-size:14px;line-height:1.5}
+.plainwords .pw{background:var(--accent-soft)} .plainwords .pe{background:var(--chip)}
+.plainwords b{display:block;font:600 11.5px/1.4 var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+@media (max-width:760px){.plainwords{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.stat{background:var(--chip);border-radius:10px;padding:8px 12px;display:grid;gap:2px;align-content:start}
+.stat .k{font-size:12px;color:var(--muted)} .stat .v{font:500 16px/1.3 var(--mono)} .stat .v .flag{font-size:11px}
+.stat.wide{grid-column:span 2} @media (max-width:500px){.stat.wide{grid-column:auto}}
+.findings2{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.findings2 li{padding:8px 12px;border-left:3px solid var(--line);background:color-mix(in srgb,var(--chip) 55%,transparent);border-radius:0 8px 8px 0;font-size:14px;line-height:1.5}
+.findings2 li .src{display:block;margin-top:3px}
+.relbox{border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));background:color-mix(in srgb,var(--accent-soft) 45%,var(--surface));border-radius:10px;padding:12px 14px;display:grid;gap:6px}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:14px}
+.checklist li{display:flex;gap:8px;align-items:flex-start;line-height:1.45}
+.checklist li::before{content:"→";color:var(--accent);font-weight:700;flex:none}
+.morebtn{justify-self:start;border:1px dashed var(--line);background:transparent;color:var(--o2);border-radius:8px;padding:4px 12px;font-size:13px}
+/* compare */
+.cmpbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px}
+.cmpcount{font:500 12.5px/1 var(--mono);color:var(--muted);background:var(--chip);padding:5px 10px;border-radius:999px}
+#cmppick .chipbtn{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;font-size:13px}
+#cmppick .chipbtn[aria-pressed="true"]{background:var(--surface);border-color:var(--cc);box-shadow:inset 0 0 0 1px var(--cc);font-weight:600}
+#cmppick .chipbtn .dot{width:9px;height:9px;border-radius:50%;background:var(--cc,var(--line))}
+#cmppick .chipbtn[aria-pressed="false"] .dot{background:transparent;border:1.5px solid var(--line)}
+.sdgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.sdgrid{grid-template-columns:1fr}}
+.sdcard{border-radius:10px;padding:12px 14px;display:grid;gap:8px;align-content:start}
+.sdcard.same{background:var(--good-soft)} .sdcard.diff{background:var(--warn-soft)}
+.sdcard h3{display:flex;align-items:center;gap:8px}
+.sdcard h3 .ic{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#fff;font:700 13px/1 var(--body)}
+.sdcard.same .ic{background:var(--good)} .sdcard.diff .ic{background:var(--warn)}
+.sdcard ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px;line-height:1.45}
+.sdcard li{padding-left:12px;border-left:2px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+#cmptable{font-size:13.5px;table-layout:fixed;min-width:640px}
+#cmptable thead th{background:var(--surface);vertical-align:bottom;white-space:normal;padding:10px 10px 8px;border-bottom:0}
+#cmptable thead th:first-child{width:170px}
+.cmphead{border-top:5px solid var(--cc);border-radius:8px 8px 0 0;background:var(--chip);padding:10px 12px;display:grid;gap:4px}
+.cmphead .acr{font:700 18px/1.2 var(--display);color:var(--ink)}
+.cmphead .pid{font:500 12px/1 var(--mono);color:var(--muted)}
+.scorebar{display:flex;align-items:center;gap:8px}
+.scorebar .sbt{flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.scorebar .sbt i{display:block;height:100%;background:var(--cc)}
+.scorebar .num{font-size:15px;font-weight:600}
+#cmptable tbody th{position:sticky;left:0;z-index:1;background:var(--surface);color:var(--muted);font-weight:500;white-space:normal;font-size:12.5px;text-transform:none}
+#cmptable tbody tr:not(.grp):nth-child(even) td,#cmptable tbody tr:not(.grp):nth-child(even) th{background:color-mix(in srgb,var(--chip) 50%,var(--surface))}
+#cmptable tr.grp th{background:var(--surface);color:var(--ink);font:600 12px/1 var(--body);text-transform:uppercase;letter-spacing:.07em;padding:16px 8px 6px;border-bottom:2px solid var(--line)}
+#cmptable td{line-height:1.45}
+.rangebar{position:relative;height:10px;margin:6px 0 2px;background:var(--line);border-radius:5px}
+.rangebar i{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--cc);min-width:6px}
+.rangebar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:1px}
+.rangelegend{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.rangelegend b{display:inline-block;width:2px;height:12px;background:var(--ink)}
+.famgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:10px}
+.famcard{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;align-content:start}
+.famcard h3{font-size:15.5px}
+.sharedgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:8px}
+.sharedgrid li{background:var(--chip);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.45}
+.sharedgrid li b{display:block;margin-bottom:2px}
+/* gaps */
+.gap{border-radius:10px;align-content:start}
+#gapgrid .gap{border-top:4px solid var(--line)}
+#gapgrid .gap.ok{border-top-color:var(--good)} #gapgrid .gap.mid{border-top-color:var(--warn)} #gapgrid .gap.bad{border-top-color:var(--bad)}
+.gaphead{font:600 15px/1.3 var(--display);color:var(--ink)}
+.gap .st{font-size:28px;line-height:1.1}
+.gapparts{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:4px;font-size:12.5px;color:var(--ink2)}
+.gapparts li{padding-left:10px;border-left:2px solid var(--line)}
+/* boundary */
+.howread{display:flex;flex-wrap:wrap;gap:8px}
+.howread span{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:13.5px;font-weight:500}
+.howread .below{background:var(--good-soft)} .howread .above{background:var(--bad-soft)}
+.howread span::before{content:"";width:10px;height:10px;border-radius:50%}
+.howread .below::before{background:var(--good)} .howread .above::before{background:var(--bad)}
+#fbreadout .gap:first-child{background:var(--chip)}
+#fbreadout .gap.bad:first-child{background:var(--bad-soft)} #fbreadout .gap.ok:first-child{background:var(--good-soft)} #fbreadout .gap.mid:first-child{background:var(--warn-soft)}
+#fbcaveats{list-style:none;padding:0!important}
+#fbcaveats li{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);border-radius:8px;padding:8px 12px;line-height:1.45}
+#fbcaveats li::before{content:"!";flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--warn);color:#fff;font:700 12px/1 var(--body)}
+/* evidence */
+.jumpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.jump{display:grid;gap:4px;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface)}
+.jump:hover{border-color:var(--muted)}
+.jump .t{font:600 15px/1.35 var(--display)}
+.jump.p{border-top:4px solid var(--accent)} .jump.s{border-top:4px solid var(--good)} .jump.d{border-top:4px solid var(--o2)}
+.tk .imp{background:var(--chip);border-radius:8px;padding:8px 10px}
+.tk .imp b{display:block;font:600 11.5px/1.4 var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.tk .tkfoot{border-top:1px dashed var(--line);padding-top:6px;display:grid;gap:4px}
+.tk h3{font-size:16px}
+/* ask */
+.askgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+@media (max-width:980px){.askgrid{grid-template-columns:1fr}}
+.askgrid>*{min-width:0}
+.askside .exgroups .chipbtn{white-space:normal}
+.askmain{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;position:sticky;top:12px}
+@media (max-width:980px){.askmain{position:static}}
+.askhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-width:0}
+.askhead>*{min-width:0}
+#askform>*{min-width:0}
+.askhead h2{font-size:24px;display:flex;align-items:center;gap:10px}
+.askhead h2 .spark{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);font-size:18px}
+.msgs{min-height:340px;max-height:60vh;border:1px solid var(--line);border-radius:12px;padding:14px;background:color-mix(in srgb,var(--chip) 40%,var(--surface))}
+.msgs:empty{display:grid;place-items:center}
+.msgs:empty::before{content:"✨";font-size:34px;opacity:.35}
+#askform{gap:10px}
+#askq{padding:12px 14px;font-size:16px;border-radius:10px;border-width:1.5px}
+#askq:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+#askbtn{padding:10px 22px;font-size:16px;border-radius:10px;font-weight:600}
+.askside{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.sidebox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.sidebox h3{font-size:14px}
+.askside .exgroups .chips{display:grid;gap:6px}
+.askside .exgroups .chipbtn{border-radius:8px;padding:6px 10px;line-height:1.35;background:var(--surface)}
+.askside .exgroups .chipbtn:hover{border-color:var(--accent)}
+.askside #exwrap>summary{font:600 14px/1.3 var(--display);color:var(--ink)}
+/* data table */
+#dtable td{max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* method/quality as reference pages */
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc a{font-size:13px;text-decoration:none;color:var(--ink2);background:var(--chip);border-radius:999px;padding:4px 12px}
+.toc a:hover{color:var(--ink)}
+body[data-view="quality"] .view.on .panel,body[data-view="method"] .view.on .panel{box-shadow:none}
+/* incidents */
+.timeline{position:relative;gap:16px}
+.timeline::before{content:"";position:absolute;left:31px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl{grid-template-columns:64px 1fr}
+.tl .yr{position:relative;z-index:1;justify-self:center;background:var(--surface);border:2px solid var(--accent);border-radius:999px;padding:2px 8px;font-size:14px}
+#spinoffs .tl .yr{border-color:var(--good);color:var(--good)}
+.tl>div:last-child{background:color-mix(in srgb,var(--chip) 55%,transparent);border-radius:10px;padding:10px 12px}
+@media (max-width:600px){nav.mainnav .primary a{padding:8px 10px;font-size:14px}}
+
+/* ===== Round 2 ===== */
+/* inactive tabs look like buttons */
+nav.mainnav .primary{gap:8px;padding:8px}
+nav.mainnav .primary a:not(.asktab){background:var(--chip);border:1px solid var(--line);color:var(--ink);transition:background .15s,border-color .15s}
+nav.mainnav .primary a:not(.asktab):hover{background:var(--surface);border-color:var(--muted)}
+nav.mainnav .primary a[aria-current="page"]:not(.asktab){background:var(--ink);border-color:var(--ink);color:var(--surface)}
+/* tabs: active = dark; Ask = outlined until active */
+
+/* secondary links as real buttons */
+nav.mainnav .secondary{padding:0}
+nav.mainnav .secondary .grp{gap:8px}
+nav.mainnav .secondary a.navbtn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-weight:500;font-size:13.5px;text-decoration:none;box-shadow:var(--shadow);cursor:pointer}
+nav.mainnav .secondary a.navbtn::after{content:"→";color:var(--muted);font-size:13px;transition:transform .15s}
+nav.mainnav .secondary a.navbtn:hover{border-color:var(--muted)}
+nav.mainnav .secondary a.navbtn:hover::after{transform:translateX(2px);color:var(--ink)}
+nav.mainnav .secondary a.navbtn.story{border-left:4px solid var(--warn);font-weight:600}
+nav.mainnav .secondary a.navbtn[aria-current="page"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+nav.mainnav .secondary a.navbtn[aria-current="page"]::after{color:var(--surface)}
+/* mission scenario stands out */
+section.scenario{border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line));background:linear-gradient(180deg,var(--accent-soft) 0,var(--surface) 70px);box-shadow:0 2px 10px rgba(194,65,12,.08)}
+.scenhead{align-items:center}
+.scenhead h2{font-size:20px}
+.scenicon{width:22px;height:22px;border-radius:50%;flex:none;background:radial-gradient(circle,var(--accent) 0 26%,transparent 27% 47%,var(--accent) 48% 58%,transparent 59%)}
+.ctl label{font-weight:600;color:var(--ink2)}
+/* safety focus: original checkboxes, whole block framed */
+.focushint{font-size:12px;color:var(--muted);line-height:1.35}
+.ctl.focusbox{margin-top:-6px;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:10px;padding:8px 8px 10px;background:var(--surface);display:grid;gap:6px;align-content:start}
+#pds label{font-weight:400;color:var(--muted);padding:4px 8px}
+#pds{gap:5px}
+/* compare table: calm */
+#cmptable tbody tr:not(.grp):nth-child(even) td,#cmptable tbody tr:not(.grp):nth-child(even) th{background:transparent}
+#cmptable tbody th{color:var(--muted);font-weight:500}
+#cmptable tr.grp th{color:var(--muted);font:600 11.5px/1 var(--body);letter-spacing:.07em;padding:18px 8px 6px;border-bottom:1px solid var(--line)}
+#cmptable td,#cmptable tbody th{border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);padding:8px 10px}
+.cmphead{border-top:3px solid var(--cc);border-radius:0;background:transparent;padding:8px 2px 4px}
+
+/* ===== Round 3 ===== */
+/* compact tabs */
+nav.mainnav .primary{gap:5px;padding:5px;border-radius:12px}
+nav.mainnav .primary a{padding:6px 12px;font-size:14px;border-radius:8px;gap:6px}
+/* mission scenario: plain light tint, safety focus beside the controls */
+section.scenario{background:color-mix(in srgb,var(--accent) 4%,var(--surface));box-shadow:var(--shadow);gap:10px;padding:14px 18px}
+.scengrid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px 20px;align-items:start}
+.scenmain{display:grid;gap:10px;min-width:0}
+.scengrid .controls{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.ctl.focusbox{margin-top:0;align-self:start}
+@media (max-width:860px){.scengrid{grid-template-columns:1fr}}
+/* compact stat tiles on the investigation card */
+.stats{display:flex;flex-wrap:wrap;gap:6px}
+.stat{padding:5px 10px;border-radius:8px;gap:0}
+.stat .k{font-size:11.5px}
+.stat .v{font-size:13.5px}
+.stat.wide{grid-column:auto}
+
+/* ===== Round 4: calmer top ===== */
+header.top{padding-top:6px;gap:12px 24px;align-items:start}
+h1{font-size:26px}
+.logo{width:26px;height:26px;border-radius:8px}
+header.top .brand{display:grid;gap:4px}
+header.top .brand>p{margin:0;font-size:14.5px}
+.aiuse{color:var(--muted)}
+.utilnav{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center;padding-top:4px}
+.utilnav a{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none;font-size:13px;font-weight:500}
+.utilnav a:hover{border-color:var(--muted)}
+.utilnav a[aria-current="page"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+@media (max-width:760px){.utilnav{justify-content:flex-start}}
+nav.mainnav .primary{background:none;border:0;box-shadow:none;padding:0;gap:6px}
+section.scenario{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.scenhead h2{font-size:18px}
+.ctl.focusbox{border:1px solid var(--line);background:transparent}
+
+/* ===== Round 5 ===== */
+/* info behind an "i" button */
+.ibtn{display:inline-grid;place-items:center;width:22px;height:22px;margin-left:6px;padding:0;border-radius:50%;border:1.5px solid var(--info);background:transparent;color:var(--info);font:700 12px/1 var(--body);cursor:pointer;vertical-align:middle}
+.ibtn:hover,.ibtn[aria-expanded="true"]{background:var(--info);color:#fff}
+.infobox[hidden]{display:none}
+/* tabs: classic underline tabs, accented */
+nav.mainnav .primary{gap:2px;padding:0;border-bottom:1px solid var(--line);border-radius:0;overflow-x:auto}
+nav.mainnav .primary a,nav.mainnav .primary a:not(.asktab){background:transparent;border:0;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;padding:10px 16px 9px;margin-bottom:-1px;font-size:15.5px!important;font-weight:600;color:var(--ink2)}
+nav.mainnav .primary a:not(.asktab):hover{background:var(--chip);color:var(--ink);border-color:transparent;border-bottom-color:var(--line)}
+nav.mainnav .primary a[aria-current="page"]:not(.asktab){background:var(--accent-soft);color:var(--ink);border-color:transparent;border-bottom-color:var(--accent)}
+nav.mainnav .primary a.asktab{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--accent)}
+nav.mainnav .primary a.asktab:hover{background:var(--accent-soft)}
+nav.mainnav .primary a.asktab[aria-current="page"]{background:var(--accent-soft);color:var(--accent);border-bottom-color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <div>
-      <h1>FireSight</h1>
+    <div class="brand">
+      <div class="brandrow"><span class="logo" aria-hidden="true"></span><h1>FireSight</h1></div>
       <p>Ranks and explains NASA's microgravity combustion experiments from the Physical Sciences Informatics (PSI) repository against the fire-safety needs of a crewed habitat you describe.</p>
-      <p class="aiuse">Built with AI assistance: code, data extraction and summaries written with Claude (Anthropic); live answers by Google Gemini. <a href="#method">How AI was used</a></p>
+      <p class="aiuse">Built with AI assistance: code, data extraction and summaries written with Claude (Anthropic); live answers by Google Gemini. <a href="#method">How AI was used</a><span id="stamp"></span></p>
     </div>
-    <div class="stamp" id="stamp"></div>
+    <nav class="utilnav" id="utilnav" aria-label="More pages">
+      <a href="#incidents" class="story"><span aria-hidden="true">🔥</span>Incidents &amp; Earth benefits</a>
+      <a href="#method">Method</a>
+      <a href="#data"><span aria-hidden="true">⤓</span>Data &amp; export</a>
+    </nav>
   </header>
 
-  <nav class="tabs" id="tabs" aria-label="Views">
-    <a href="#explore">Explore &amp; rank</a>
-    <a href="#compare">Compare</a>
-    <a href="#gaps">Gaps &amp; partial gravity</a>
-    <a href="#boundary">Flammability boundary</a>
-    <a href="#evidence">Safety evidence</a>
-    <a href="#data">Data &amp; export</a>
-    <a href="#quality">Data quality</a>
-    <a href="#incidents">Incidents &amp; Earth benefits</a>
-    <a href="#ask">Ask the data</a>
-    <a href="#method">Method</a>
+  <nav class="mainnav" id="tabs" aria-label="Views">
+    <div class="primary">
+      <a href="#explore">Explore &amp; rank</a>
+      <a href="#compare">Compare</a>
+      <a href="#gaps">Gaps &amp; partial gravity</a>
+      <a href="#boundary">Flammability boundary</a>
+      <a href="#evidence">Safety evidence</a>
+      <a href="#ask" class="asktab"><span aria-hidden="true">✨</span>Ask the data</a>
+    </div>
   </nav>
 
   <!-- Scenario bar, shared by all views -->
   <section class="panel scenario" aria-label="Mission scenario">
+    <div class="scengrid">
+    <div class="scenmain">
+    <div class="scenhead"><h2>Mission scenario</h2></div>
     <div class="presets" id="presets"></div>
     <div class="controls">
       <div class="ctl"><label for="o2">Oxygen <b id="o2v"></b></label><input id="o2" type="range" min="10" max="100" step="0.5"></div>
@@ -204,7 +496,9 @@ select{max-width:100%}
       <div class="ctl"><label for="flow">Air speed near surfaces <b id="flowv"></b></label><input id="flow" type="range" min="0" max="60" step="1"></div>
       <div class="ctl"><label for="grav">Gravity</label>
         <select id="grav"><option value="0">Microgravity (0 g)</option><option value="moon">Moon (0.165 g)</option><option value="mars">Mars (0.38 g)</option><option value="earth">Earth (1 g)</option></select></div>
-      <div class="ctl"><label>Safety focus</label>
+    </div>
+    </div>
+      <div class="ctl focusbox"><label>Safety focus</label><span class="focushint">Tick or untick to change the ranking and the design takeaways.</span>
         <div class="checks" id="pds">
           <label><input type="checkbox" value="prevention" checked> Prevention</label>
           <label><input type="checkbox" value="detection" checked> Detection</label>
@@ -245,42 +539,44 @@ select{max-width:100%}
 
   <!-- COMPARE -->
   <section class="view" id="v-compare">
-    <div class="panel" style="display:grid;gap:10px">
-      <h2>Side-by-side comparison</h2>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="cmpbar"><h2>Side-by-side comparison</h2><span class="cmpcount" id="cmpcount"></span></div>
       <div class="small muted">Pick up to 4 investigations. The top 3 for your scenario are preselected.</div>
       <div class="chips" id="cmppick"></div>
-      <div id="cmpsame"></div>
-      <div class="tablewrap"><table id="cmptable"></table></div>
     </div>
-    <div class="panel" style="display:grid;gap:8px">
+    <div id="cmpsame"></div>
+    <div class="panel" style="display:grid;gap:10px">
+      <div class="tablewrap" style="border:0"><table id="cmptable"></table></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
       <h2>Hardware families</h2>
       <div class="small muted">Investigations that shared flight hardware, so their data are directly comparable. Click one to open it.</div>
-      <div id="families" class="cols2"></div>
-      <h3 style="margin-top:6px">Shared hardware and instruments</h3>
-      <ul class="small" id="sharedlinks" style="margin:0;padding-left:18px;display:grid;gap:4px"></ul>
+      <div id="families" class="famgrid"></div>
+      <h3 style="margin-top:8px">Shared hardware and instruments</h3>
+      <ul class="sharedgrid" id="sharedlinks"></ul>
     </div>
   </section>
 
   <!-- GAPS -->
   <section class="view" id="v-gaps">
     <div class="panel" style="display:grid;gap:12px">
-      <h2>What PSI covers for your scenario</h2>
-      <p class="small muted" style="margin:0;max-width:90ch">Every PSI flight test ran in microgravity: aboard the ISS (in the Microgravity Science Glovebox, the Combustion Integrated Rack, or hand-held in the cabin) or, for Saffire, inside an uncrewed Cygnus after it left the ISS. Counts are table rows; one test can have several rows (SAME-R logs each smoke sample at several aging times).</p>
+      <h2>What PSI covers for your scenario <button type="button" class="ibtn" aria-expanded="false" aria-controls="gapinfo" title="About these counts" aria-label="About these counts">i</button></h2>
+      <p class="infobox" id="gapinfo" hidden>Every PSI flight test ran in microgravity: aboard the ISS (in the Microgravity Science Glovebox, the Combustion Integrated Rack, or hand-held in the cabin) or, for Saffire, inside an uncrewed Cygnus after it left the ISS. Counts are table rows; one test can have several rows (SAME-R logs each smoke sample at several aging times).</p>
       <div class="gapgrid" id="gapgrid"></div>
-      <div class="callout" id="gaptext"></div>
+      <ul class="warnlist" id="gaptext"></ul>
     </div>
     <div class="panel" style="display:grid;gap:10px">
-      <h2>Atmospheres from Earth to spacesuit</h2>
-      <p class="small" style="margin:0;max-width:85ch">Spacesuits hold pure O₂ at only 4.3 psi so they stay flexible, and crews pre-breathe O₂ before a spacewalk to purge nitrogen and avoid the bends. A Moon base or pressurized rover at an in-between atmosphere (expected 30% O₂ or more at 10.2 psi or less) shortens that pre-breathe, but it has over 40% more O₂ by fraction than Earth air, which makes materials burn more easily. This chart shows where PSI tests sit on that path.</p>
+      <h2>Atmospheres from Earth to spacesuit <button type="button" class="ibtn" aria-expanded="false" aria-controls="ladderinfo" title="About this chart" aria-label="About this chart">i</button></h2>
+      <p class="lead">Spacesuits hold <b>pure O₂ at only 4.3 psi</b> so they stay flexible, and crews pre-breathe O₂ before a spacewalk to purge nitrogen and avoid the bends. A Moon base or pressurized rover at an in-between atmosphere (expected <b>30% O₂ or more at 10.2 psi or less</b>) shortens that pre-breathe, but it has <b>over 40% more O₂ by fraction than Earth air</b>, which makes materials burn more easily. This chart shows where PSI tests sit on that path.</p>
       <div id="ladder" style="height:400px"></div>
-      <div class="small muted" id="laddernote"></div>
+      <div class="infobox" id="ladderinfo" hidden><p id="laddernote"></p></div>
       <div class="tablewrap"><table id="laddertable"></table></div>
     </div>
     <div class="panel" style="display:grid;gap:10px">
       <h2>Partial gravity: bounds and what is coming</h2>
-      <p class="small" style="margin:0;max-width:80ch">PSI has no partial-gravity combustion data yet; NASA expects LUCI and FM2 results to be added. Until then, microgravity and normal-gravity results can bound the Moon and Mars case, and ACME E-FIELD imitates buoyancy with an electric field.</p>
+      <p class="lead">PSI has no partial-gravity combustion data yet; NASA expects LUCI and FM2 results to be added. Until then, microgravity and normal-gravity results can bound the Moon and Mars case, and ACME E-FIELD imitates buoyancy with an electric field.</p>
       <div class="gapgrid" id="gbounds"></div>
-      <p class="small" style="margin:0;max-width:80ch">Work outside PSI that will fill the gap:</p>
+      <h3 style="margin-top:6px">Work outside PSI that will fill the gap:</h3>
       <div class="gapgrid" id="external"></div>
     </div>
   </section>
@@ -293,60 +589,68 @@ select{max-width:100%}
           <option value="pmma_rod">PMMA rods, stagnation flow (Olson): fitted model</option>
           <option value="sibal_22">Cotton-fiberglass fabric (SIBAL), concurrent flow (T'ien)</option>
           <option value="pmma_thin">Thin PMMA sheet, opposed flow (Bhattacharjee)</option></select></label></div>
-      <p class="small" style="margin:0;max-width:95ch">Below the boundary a flame cannot survive; above it the material keeps burning. The curve is the lowest oxygen level at which a burning sample stays lit, as a function of how fast air moves past it. Data: BASS-II on the ISS (PSI-25), about 1 atm, from the BASS-II Summary Report (NASA/TM-20210011385, 2021); see Sources below. Air speed sets the scenario value; change it in the bar above.</p>
+      <div class="howread"><span class="below">Below the boundary a flame cannot survive;</span><span class="above">above it the material keeps burning.</span></div>
+      <p class="lead">The curve is the lowest oxygen level at which a burning sample stays lit, as a function of how fast air moves past it. Data: BASS-II on the ISS (PSI-25), about 1 atm, from the BASS-II Summary Report (NASA/TM-20210011385, 2021); see Sources below. Air speed sets the scenario value; change it in the bar above.</p>
       <div class="gapgrid" id="fbreadout"></div>
       <div class="maptools" id="fbtoggles"><label><input type="checkbox" id="fbpub" checked> Show the report's own equation</label><label><input type="checkbox" id="fbpred" checked> Show 90% prediction band</label></div>
       <div id="fbchart" style="width:100%;height:500px" role="img" aria-label="Flammability boundary: oxygen percentage versus air speed, with test outcomes"></div>
       <div class="small muted" id="fbnote"></div>
     </div>
     <div class="cols2">
+      <div class="panel" style="display:grid;gap:8px;align-content:start"><h2>Limits of this model</h2><ul class="small" id="fbcaveats" style="margin:0;padding-left:18px;display:grid;gap:6px"></ul></div>
       <div class="panel" style="display:grid;gap:8px;align-content:start"><h2>Model and validation</h2><div class="small" id="fbmodel"></div></div>
-      <div class="panel" style="display:grid;gap:8px;align-content:start"><h2>Limits of this model</h2><ul class="small" id="fbcaveats" style="margin:0;padding-left:18px;display:grid;gap:4px"></ul></div>
     </div>
-    <div class="panel" style="display:grid;gap:10px">
-      <h2>Boundary data points</h2>
+    <details class="acc">
+      <summary>Boundary data points</summary>
+      <div class="accbody">
       <div class="chips" id="fbexport"></div>
       <div class="tablewrap" style="max-height:420px;overflow:auto"><table id="fbtable"></table></div>
-    </div>
-    <div class="panel" style="display:grid;gap:8px">
-      <h2>Sources</h2>
-      <ol class="small refs" id="fbrefs"></ol>
-    </div>
+      </div>
+    </details>
+    <details class="acc" open>
+      <summary>Sources</summary>
+      <div class="accbody"><ol class="small refs" id="fbrefs"></ol></div>
+    </details>
   </section>
 
   <!-- SAFETY EVIDENCE -->
   <section class="view" id="v-evidence">
     <div class="panel" style="display:grid;gap:10px" id="tkpanel">
       <div class="rhead" style="flex-wrap:wrap"><h2>Design takeaways for your scenario</h2><span class="small muted" id="tkscen"></span></div>
-      <p class="small" style="margin:0;max-width:95ch">What the flight data on this tab and the Flammability boundary tab suggest for fire-safety equipment and controls at the oxygen, pressure, air speed and gravity set in the bar above. Each card is recomputed from the data when you change the scenario and follows your Prevention / Detection / Suppression choice. The rules and wording were written with AI assistance (Claude); no AI model runs here. These are design inputs from small-scale tests, not a safety certification.</p>
+      <p class="lead">What the flight data on this tab and the Flammability boundary tab suggest for fire-safety equipment and controls at the oxygen, pressure, air speed and gravity set in the bar above. Each card is recomputed from the data when you change the scenario and follows your Prevention / Detection / Suppression choice. The rules and wording were written with AI assistance (Claude); no AI model runs here. These are design inputs from small-scale tests, not a safety certification.</p>
       <div class="tkgrid" id="tkgrid"></div>
       <div class="chips" id="tkdl"></div>
     </div>
-    <div class="panel" style="display:grid;gap:8px">
-      <h2>Fire-safety evidence from the experiments</h2>
-      <p class="small" style="margin:0;max-width:90ch">Three questions a habitat designer asks, answered with measured flight data copied from the reports and papers behind the cards: will a small fire keep burning (prevention), how far must a suppressant cut the oxygen (suppression), and will the smoke be seen (detection). The data are fixed published measurements; your scenario from the bar above is compared against them (oxygen and pressure for prevention, oxygen for suppression), and each panel says when your conditions were never tested.</p>
-    </div>
     <div class="panel" style="display:grid;gap:10px">
+      <h2>Fire-safety evidence from the experiments</h2>
+      <div class="jumpgrid">
+        <a class="jump p" href="#evidence" data-anchor="evp"><span class="tag p" style="justify-self:start">Prevention</span><span class="t">Do small flames keep burning in still air?</span></a>
+        <a class="jump s" href="#evidence" data-anchor="evs"><span class="tag s" style="justify-self:start">Suppression</span><span class="t">How low must a suppressant push the oxygen?</span></a>
+        <a class="jump d" href="#evidence" data-anchor="evd"><span class="tag d" style="justify-self:start">Detection</span><span class="t">Will a smoke detector see it?</span></a>
+      </div>
+      <p class="small muted" style="margin:0;max-width:100ch">Three questions a habitat designer asks, answered with measured flight data copied from the reports and papers behind the cards: will a small fire keep burning (prevention), how far must a suppressant cut the oxygen (suppression), and will the smoke be seen (detection). The data are fixed published measurements; your scenario from the bar above is compared against them (oxygen and pressure for prevention, oxygen for suppression), and each panel says when your conditions were never tested.</p>
+    </div>
+    <div class="panel area-p" style="display:grid;gap:10px" id="evp">
       <div class="rhead" style="flex-wrap:wrap"><h2>Prevention: do small flames keep burning in still air?</h2>
         <label class="small muted">Horizontal axis <select id="evbrex"><option value="flux">Fuel flow (bigger flame →)</option><option value="p">Pressure</option></select></label></div>
-      <p class="small" style="margin:0;max-width:90ch">ACME BRE on the ISS: a 25 mm gas burner set up to burn like a solid material, with no air flow. 83 tests, each either burned until the fuel was shut off or put itself out. Oxygen and pressure were not varied independently: most 1-bar tests ran at 18-25% O₂.</p>
+      <p class="lead">ACME BRE on the ISS: a 25 mm gas burner set up to burn like a solid material, with no air flow. 83 tests, each either burned until the fuel was shut off or put itself out. Oxygen and pressure were not varied independently: most 1-bar tests ran at 18-25% O₂.</p>
       <div class="gapgrid" id="evbreread"></div>
       <div id="evbre" style="height:430px" role="img" aria-label="BRE ISS tests: oxygen versus fuel flow or pressure, by outcome"></div>
       <div class="small muted" id="evbrenote"></div>
       <div class="chips" id="evbredl"></div>
     </div>
-    <div class="panel" style="display:grid;gap:10px">
+    <div class="panel area-s" style="display:grid;gap:10px" id="evs">
       <h2>Suppression: how low must a suppressant push the oxygen?</h2>
-      <p class="small" style="margin:0;max-width:90ch">FLEX on the ISS: the lowest oxygen at which a burning fuel droplet can keep going (limiting oxygen index) at 1 atm, with the air diluted by nitrogen, carbon dioxide or helium. A suppressant works only if it brings the oxygen below the bar.</p>
+      <p class="lead">FLEX on the ISS: the lowest oxygen at which a burning fuel droplet can keep going (limiting oxygen index) at 1 atm, with the air diluted by nitrogen, carbon dioxide or helium. A suppressant works only if it brings the oxygen below the bar.</p>
       <div class="cols2">
         <div id="evloi" style="height:360px" role="img" aria-label="FLEX limiting oxygen index by fuel and diluent"></div>
         <div class="small" style="display:grid;gap:8px;align-content:start" id="evloitext"></div>
       </div>
       <div class="chips" id="evloidl"></div>
     </div>
-    <div class="panel" style="display:grid;gap:10px">
+    <div class="panel area-d" style="display:grid;gap:10px" id="evd">
       <h2>Detection: will a smoke detector see it?</h2>
-      <p class="small" style="margin:0;max-width:90ch">SAME on the ISS: smoke from four spacecraft materials heated short of ignition, measured fresh and after aging. The lines mark the ISS smoke detector's stated limits: minimum reported sensitivity 0.3 µm, most sensitive above 1 µm.</p>
+      <p class="lead">SAME on the ISS: smoke from four spacecraft materials heated short of ignition, measured fresh and after aging. The lines mark the ISS smoke detector's stated limits: minimum reported sensitivity 0.3 µm, most sensitive above 1 µm.</p>
       <div class="cols2">
         <div id="evsmoke" style="height:380px" role="img" aria-label="SAME smoke particle sizes by material, fresh and aged, against ISS detector limits"></div>
         <div class="small" style="display:grid;gap:8px;align-content:start" id="evsmoketext"></div>
@@ -359,7 +663,7 @@ select{max-width:100%}
   <section class="view" id="v-data">
     <div class="panel" style="display:grid;gap:10px">
       <h2>Unified test matrix</h2>
-      <p class="small" style="margin:0;max-width:85ch">19 PSI experiment tables cleaned into one schema: fuel, phase, size, O₂, pressure, air speed, diluent, outcome, a key measurement, plus where each value came from (<span class="mono">o2_source</span>, <span class="mono">p_source</span>) and quality flags. Every row keeps its PSI file and row number.</p>
+      <p class="lead">19 PSI experiment tables cleaned into one schema: fuel, phase, size, O₂, pressure, air speed, diluent, outcome, a key measurement, plus where each value came from (<span class="mono">o2_source</span>, <span class="mono">p_source</span>) and quality flags. Every row keeps its PSI file and row number.</p>
       <div class="maptools">
         <label>Investigation <select id="dinv"><option value="">All</option></select></label>
         <label>Fuel phase <select id="dphase"><option value="">All</option></select></label>
@@ -371,9 +675,16 @@ select{max-width:100%}
       <div class="small muted" id="dcount"></div>
       <div class="tablewrap" style="max-height:560px;overflow:auto"><table id="dtable"></table></div>
     </div>
+    <div class="panel" style="display:grid;gap:10px" id="dq">
+      <h2>Data-quality report</h2>
+      <p class="lead">Everything the cleaning step found and what it did. Fixes are applied in the unified matrix; items marked <b>check</b> are kept as-is and flagged for a human.</p>
+      <div class="chips" id="qchips"></div>
+      <div class="tablewrap" style="max-height:600px;overflow:auto"><table id="qtable"></table></div>
+    </div>
+    <div class="panel" style="display:grid;gap:8px"><h2>Investigation-level issues</h2><div id="qinv"></div></div>
     <div class="panel" style="display:grid;gap:10px">
       <h2>Search the reports</h2>
-      <p class="small" style="margin:0;max-width:85ch">Full-text search of the public reports and papers behind the cards (PSI final reports, NASA and NTRS papers, NASA's Researcher's Guide) and of every card's findings and data-quality notes. Results show the document and page. Journal papers supplied for this project are not included (copyright); their findings are on the cards.</p>
+      <p class="lead">Full-text search of the public reports and papers behind the cards (PSI final reports, NASA and NTRS papers, NASA's Researcher's Guide) and of every card's findings and data-quality notes. Results show the document and page. Journal papers supplied for this project are not included (copyright); their findings are on the cards.</p>
       <form id="rsform" style="display:flex;gap:8px;flex-wrap:wrap">
         <label for="rsq" style="position:absolute;left:-9999px">Search terms</label>
         <input type="text" id="rsq" style="flex:1;min-width:220px" placeholder="e.g. helium limiting oxygen index, smoke detector particle size, quenching 1 cm/s">
@@ -386,21 +697,12 @@ select{max-width:100%}
   </section>
 
   <!-- QUALITY -->
-  <section class="view" id="v-quality">
-    <div class="panel" style="display:grid;gap:10px">
-      <h2>Data-quality report</h2>
-      <p class="small" style="margin:0;max-width:85ch">Everything the cleaning step found and what it did. Fixes are applied in the unified matrix; items marked <b>check</b> are kept as-is and flagged for a human.</p>
-      <div class="chips" id="qchips"></div>
-      <div class="tablewrap" style="max-height:600px;overflow:auto"><table id="qtable"></table></div>
-    </div>
-    <div class="panel" style="display:grid;gap:8px"><h2>Investigation-level issues</h2><div id="qinv"></div></div>
-  </section>
 
   <!-- INCIDENTS -->
   <section class="view" id="v-incidents">
     <div class="cols2">
-      <div class="panel" style="display:grid;gap:10px"><h2>Real spacecraft fire events</h2><div class="timeline" id="incidents"></div></div>
-      <div class="panel" style="display:grid;gap:10px"><h2>Earth benefits</h2><div class="timeline" id="spinoffs"></div>
+      <div class="panel" style="display:grid;gap:10px;align-content:start"><h2>Real spacecraft fire events</h2><div class="timeline" id="incidents"></div></div>
+      <div class="panel" style="display:grid;gap:10px;align-content:start"><h2>Earth benefits</h2><div class="timeline" id="spinoffs"></div>
         <p class="small muted" style="margin:0">Same physics on Earth: O₂-enriched rooms (hospitals, hyperbaric chambers), submarines and mines face the same low-flow, high-O₂ flammability questions.</p></div>
     </div>
   </section>
@@ -408,45 +710,51 @@ select{max-width:100%}
   <!-- ASK -->
   <section class="view" id="v-ask">
     <div class="panel chat">
-      <h2>Ask the data</h2>
-      <p class="small" style="margin:0;max-width:80ch">Answers are generated by an AI model, Google Gemini (on the public site), that may only use this dashboard's PSI data through lookup tools and cites investigation IDs, table rows and report pages. The page checks every citation against what the lookups returned. AI answers can still be wrong: check the cited sources before relying on them.</p>
-      <div class="small" id="aistatus" role="status"></div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
-        <span class="small" id="lvllabel">Explain like:</span>
-        <div class="seg" role="group" aria-labelledby="lvllabel" id="lvlseg">
-          <button type="button" data-lvl="undergrad" aria-pressed="false">An undergrad</button>
-          <button type="button" data-lvl="engineer" aria-pressed="false">An engineer</button>
+      <div class="askgrid">
+        <div class="askmain">
+          <div class="askhead"><h2><span class="spark" aria-hidden="true">✨</span>Ask the data</h2><div class="small" id="aistatus" role="status"></div></div>
+          <div class="msgs" id="msgs" aria-live="polite"></div>
+          <form id="askform" style="display:flex;gap:8px">
+            <label for="askq" class="small muted" style="position:absolute;left:-9999px">Question</label>
+            <input type="text" id="askq" style="flex:1;min-width:0" placeholder="e.g. Which tests come closest to 34% O2 at 8.2 psi?">
+            <button class="btn primary" type="submit" id="askbtn">Ask</button>
+          </form>
+          <p class="infobox" style="margin:0">Answers are generated by an AI model, Google Gemini (on the public site), that may only use this dashboard's PSI data through lookup tools and cites investigation IDs, table rows and report pages. The page checks every citation against what the lookups returned. AI answers can still be wrong: check the cited sources before relying on them.</p>
         </div>
-        <span class="small muted" id="lvlhint"></span>
+        <aside class="askside">
+          <div class="sidebox">
+            <span class="small" id="lvllabel" style="font-weight:600">Explain like:</span>
+            <div class="seg" role="group" aria-labelledby="lvllabel" id="lvlseg">
+              <button type="button" data-lvl="undergrad" aria-pressed="false">An undergrad</button>
+              <button type="button" data-lvl="engineer" aria-pressed="false">An engineer</button>
+            </div>
+            <span class="small muted" id="lvlhint"></span>
+          </div>
+          <div class="sidebox"><details id="exwrap" open><summary class="small">Example questions</summary><div class="exgroups" id="askexamples" style="margin-top:8px"></div></details></div>
+        </aside>
       </div>
-      <details id="exwrap" open><summary class="small">Example questions</summary><div class="exgroups" id="askexamples" style="margin-top:8px"></div></details>
-      <div class="msgs" id="msgs" aria-live="polite"></div>
-      <form id="askform" style="display:flex;gap:8px">
-        <label for="askq" class="small muted" style="position:absolute;left:-9999px">Question</label>
-        <input type="text" id="askq" style="flex:1" placeholder="e.g. Which tests come closest to 34% O2 at 8.2 psi?">
-        <button class="btn primary" type="submit" id="askbtn">Ask</button>
-      </form>
     </div>
   </section>
 
   <!-- METHOD -->
   <section class="view" id="v-method">
+    <nav class="toc" aria-label="On this page"><a href="#method" data-anchor="m-score">How the score works</a><a href="#method" data-anchor="m-data">Where the data comes from</a><a href="#method" data-anchor="aiuse">How AI was used (Space Apps disclosure)</a><a href="#method" data-anchor="m-sources">Sources</a><a href="#method" data-anchor="m-road">Roadmap</a></nav>
     <div class="cols2">
-      <div class="panel" style="display:grid;gap:8px">
+      <div class="panel" style="display:grid;gap:8px" id="m-score">
         <h2>How the score works</h2>
         <div class="small" id="methodscore"></div>
       </div>
-      <div class="panel" style="display:grid;gap:8px">
+      <div class="panel" style="display:grid;gap:8px" id="m-data">
         <h2>Where the data comes from</h2>
         <div class="small" id="methoddata"></div>
       </div>
     </div>
     <div class="panel" style="display:grid;gap:8px" id="aiuse">
       <h2>How AI was used (Space Apps disclosure)</h2>
-      <p class="small" style="margin:0;max-width:95ch">FireSight was built by team Spacecrammers with AI assistance. The team chose the approach and features, supplied papers, reviewed the results, asked for corrections and published the site. The AI work is listed below; the same statement is in <code>AI_USE.md</code> in the repository, in the page metadata and in the script headers. The page contains no AI-generated images or video; charts are drawn by Plotly from the data. It uses no NASA logos, flags or mission insignia and is not an official NASA product.</p>
+      <p class="lead">FireSight was built by team Spacecrammers with AI assistance. The team chose the approach and features, supplied papers, reviewed the results, asked for corrections and published the site. The AI work is listed below; the same statement is in <code>AI_USE.md</code> in the repository, in the page metadata and in the script headers. The page contains no AI-generated images or video; charts are drawn by Plotly from the data. It uses no NASA logos, flags or mission insignia and is not an official NASA product.</p>
       <div class="tablewrap"><table class="small aitable"><thead><tr><th>Part</th><th>What AI did</th><th>How it is kept honest</th></tr></thead><tbody>
         <tr><td>Code</td><td>Page code (HTML, JavaScript, CSS), data-pipeline Python scripts and the Cloudflare proxy were written with Claude (Anthropic).</td><td>Run, tested in a browser and published by the team; the code is open in the repository.</td></tr>
-        <tr><td>Test matrix and data-quality log</td><td>Cleaning rules (units, typos, ranges, duplicates) were written with Claude and run as a script over the PSI tables.</td><td>Every value keeps its PSI file and row; every change is logged on the Data quality tab.</td></tr>
+        <tr><td>Test matrix and data-quality log</td><td>Cleaning rules (units, typos, ranges, duplicates) were written with Claude and run as a script over the PSI tables.</td><td>Every value keeps its PSI file and row; every change is logged in the data-quality report on the Data &amp; export page.</td></tr>
         <tr><td>Flammability-boundary points</td><td>Digitized from BASS-II report Figure 6.10 with Claude-written code; Tables 7.1 and 2.1 copied by Claude.</td><td>Each point checked by Claude against the figure; the refit is compared with the report's own equation.</td></tr>
         <tr><td>Safety-evidence tables</td><td>Extracted by Claude from published papers and a PSI report table (BRE, FLEX, SAME).</td><td>Rows compared with the source pages; each file names its source.</td></tr>
         <tr><td>Summaries, findings, page text</td><td>Investigation summaries, findings, relevance notes and explanations were written by Claude from the cited sources.</td><td>Each finding names its source; all were checked by Claude against the source passages on 2026-11-14.</td></tr>
@@ -455,11 +763,11 @@ select{max-width:100%}
         <tr><td>Live answers (Ask the data)</td><td>Generated when you ask, by Google Gemini (gemini-3.5-flash-lite, fallback gemini-3.1-flash-lite), using only lookup tools over this data.</td><td>Every answer is labelled as AI-generated; the page checks its citations against the lookups and corrects or removes wrong ones.</td></tr>
       </tbody></table></div>
     </div>
-    <div class="panel" style="display:grid;gap:8px">
+    <div class="panel" style="display:grid;gap:8px" id="m-sources">
       <h2>Sources</h2>
       <div class="small" id="methodrefs"></div>
     </div>
-    <div class="panel" style="display:grid;gap:8px">
+    <div class="panel" style="display:grid;gap:8px" id="m-road">
       <h2>Roadmap</h2>
       <ul class="small roadmap" id="roadmap"></ul>
     </div>
@@ -699,42 +1007,43 @@ function renderDetail(){
   const fl = i.rows.map(r => r.flow_cm_s).filter(v => v != null), flx = i.rows.map(r => r.flow_cm_s_max ?? r.flow_cm_s).filter(v => v != null);
   const rng = (a, b, f = 1, u = "") => a.length ? `${fmt(Math.min(...a) * f)}–${fmt(Math.max(...b) * f)}${u}` : "not tabulated";
   const flagged = i.rows.filter(r => r.flags).length;
+  const NF = 4, fli = i.findings.map(f => `<li>${esc(f.t)} <span class="src">[${esc(srcLabel(f.src))}]</span></li>`);
   $("#detail").innerHTML = `
     <div class="dhead"><div><h2>${esc(i.acr)} <span class="muted" style="font-weight:500">· ${i.id}</span></h2><div class="small muted">${esc(i.title)}</div></div>
       <div class="chips"><a class="chipbtn" href="${i.url}">Open in PSI</a>${i.doi ? `<a class="chipbtn" href="https://doi.org/${esc(i.doi)}">DOI ${esc(i.doi)}</a>` : ""}${(i.id === "PSI-25" || i.id === "PSI-26") ? `<a class="chipbtn" href="#boundary">Flammability boundary</a>` : ""}<button class="chipbtn" id="addcmp">Add to compare</button></div></div>
     <div class="callout"><b>In plain words:</b> ${esc(i.summary)}<br><b>For engineers:</b> ${esc(i.engineer)}</div>
-    <div class="cols2">
-      <dl class="kv">
-        <dt>Objective</dt><dd>${esc(i.objective_short || "")}</dd>
-        <dt>Fuel &amp; samples</dt><dd>${esc(i.fuel_geom || "")}</dd>
-        <dt>Varied</dt><dd>${esc(i.varied)}</dd>
-        <dt>Held fixed</dt><dd>${esc(i.fixed)}</dd>
-        <dt>Sensors</dt><dd>${esc(i.sensors)}</dd>
-        <dt>Hardware</dt><dd>${esc(i.hw || i.family)}</dd>
-        <dt>Platform</dt><dd>${esc(i.platform || (i.tier === "G" ? "Ground study of flight data" : ""))} ${i.start ? `· ${esc(i.start)} → ${esc(i.end || "?")}` : ""}</dd>
-      </dl>
-      <dl class="kv">
-        <dt>Test rows</dt><dd class="num">${i.ntests} ${flagged ? `<span class="flag">(${flagged} flagged)</span>` : ""}</dd>
-        <dt>O₂ range</dt><dd class="num">${rng(o2s, o2x, 1, " %")}</dd>
-        <dt>Pressure</dt><dd class="num">${rng(ps, px, PSI_PER_ATM, " psi")}</dd>
-        <dt>Air speed</dt><dd class="num">${rng(fl, flx, 1, " cm/s")}</dd>
-        <dt>PSI holdings</dt><dd class="num">${fmt(i.sizeGB)} GB · ${i.nfiles ? i.nfiles + " files" : "file list not in PSI metadata"} · ${i.pubs.length} publications</dd>
-      </dl>
+    <div class="stats">
+      <div class="stat"><span class="k">Test rows</span><span class="v">${i.ntests} ${flagged ? `<span class="flag">(${flagged} flagged)</span>` : ""}</span></div>
+      <div class="stat"><span class="k">O₂ range</span><span class="v">${rng(o2s, o2x, 1, " %")}</span></div>
+      <div class="stat"><span class="k">Pressure</span><span class="v">${rng(ps, px, PSI_PER_ATM, " psi")}</span></div>
+      <div class="stat"><span class="k">Air speed</span><span class="v">${rng(fl, flx, 1, " cm/s")}</span></div>
+      <div class="stat wide"><span class="k">PSI holdings</span><span class="v" style="font-size:13px">${fmt(i.sizeGB)} GB · ${i.nfiles ? i.nfiles + " files" : "file list not in PSI metadata"} · ${i.pubs.length} publications</span></div>
     </div>
-    <div><h3>Key findings</h3><ul class="findings">${i.findings.map(f => `<li>${esc(f.t)} <span class="src">[${esc(srcLabel(f.src))}]</span></li>`).join("")}</ul></div>
-    <div><h3>Relevance to your habitat</h3>
-      <div class="small muted" style="margin-top:4px">For your scenario: ${esc(S.preset ? (PRESETS.find(p => p.k === S.preset) || {}).n || "custom" : "custom")} · ${fmt(S.o2)}% O₂ · ${fmt(S.psi)} psi · ${fmt(S.flow)} cm/s · ${esc({"0":"0 g", moon:"Moon", mars:"Mars", earth:"Earth"}[S.g] || S.g)}</div>
-      <ul class="findings" style="margin-top:4px">${scenarioRelevance(i).map(t => `<li>${esc(t)}</li>`).join("")}</ul>
-      ${sc ? `<p class="small muted" style="margin:4px 0 0">Ranking: ${esc(why(i, sc))}</p>${assumedNote(sc) ? `<div class="qnote" style="font-size:12.5px;margin-top:4px">${esc(assumedNote(sc))}</div>` : ""}` : ""}
-      <p style="margin:8px 0 0"><span class="small muted">In general (written in advance, same for every scenario):</span> ${esc(i.habitat)}</p></div>
-    ${i.quality.length ? `<div style="display:grid;gap:6px"><h3>Data-quality notes</h3>${i.quality.map(q => `<div class="qnote">${esc(q)}</div>`).join("")}</div>` : ""}
-    <details><summary>Original PSI text: objective, approach, hypothesis, impacts <span class="srctag">Quoted from NASA PSI</span></summary>
+    <dl class="kv">
+      <dt>Objective</dt><dd>${esc(i.objective_short || "")}</dd>
+      <dt>Fuel &amp; samples</dt><dd>${esc(i.fuel_geom || "")}</dd>
+      <dt>Varied</dt><dd>${esc(i.varied)}</dd>
+      <dt>Held fixed</dt><dd>${esc(i.fixed)}</dd>
+      <dt>Sensors</dt><dd>${esc(i.sensors)}</dd>
+      <dt>Hardware</dt><dd>${esc(i.hw || i.family)}</dd>
+      <dt>Platform</dt><dd>${esc(i.platform || (i.tier === "G" ? "Ground study of flight data" : ""))} ${i.start ? `· ${esc(i.start)} → ${esc(i.end || "?")}` : ""}</dd>
+    </dl>
+    <details class="sub" open><summary>Key findings <span class="count">${i.findings.length}</span></summary><div class="subbody">
+      <ul class="findings2">${fli.slice(0, NF).join("")}</ul>
+      ${fli.length > NF ? `<details class="moref"><summary class="morebtn">Show ${fli.length - NF} more findings</summary><ul class="findings2" style="margin-top:8px">${fli.slice(NF).join("")}</ul></details>` : ""}</div></details>
+    <details class="sub" open><summary>Relevance to your habitat</summary><div class="subbody relbox">
+      <div class="small muted">For your scenario: ${esc(S.preset ? (PRESETS.find(p => p.k === S.preset) || {}).n || "custom" : "custom")} · ${fmt(S.o2)}% O₂ · ${fmt(S.psi)} psi · ${fmt(S.flow)} cm/s · ${esc({"0":"0 g", moon:"Moon", mars:"Mars", earth:"Earth"}[S.g] || S.g)}</div>
+      <ul class="checklist">${scenarioRelevance(i).map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+      ${sc ? `<p class="small muted" style="margin:0">Ranking: ${esc(why(i, sc))}</p>${assumedNote(sc) ? `<div class="qnote" style="font-size:12.5px">${esc(assumedNote(sc))}</div>` : ""}` : ""}
+      <p style="margin:2px 0 0;font-size:14px"><span class="small muted">In general (written in advance, same for every scenario):</span> ${esc(i.habitat)}</p></div></details>
+    ${i.quality.length ? `<details class="sub"><summary>Data-quality notes <span class="count warn">${i.quality.length}</span></summary><div class="subbody">${i.quality.map(q => `<div class="qnote">${esc(q)}</div>`).join("")}</div></details>` : ""}
+    <details class="sub"><summary>Original PSI text: objective, approach, hypothesis, impacts <span class="srctag">Quoted from NASA PSI</span></summary>
       <div class="small muted" style="margin-top:8px;max-width:90ch">Source: NASA Physical Sciences Informatics (PSI), investigation ${esc(i.id)}, “${esc(i.title)}”. FireSight fetched this text from the investigation's PSI record${B.psi_snapshot ? ` on ${esc(B.psi_snapshot)}` : ""} and shows it verbatim below; it was not written or edited by FireSight. The AI summary above was written from it and from the PSI files named in brackets.</div>
       <blockquote class="psiquote small" cite="${esc(i.url)}">
         <p><b>Objective.</b> ${esc(i.objective)}</p><p><b>Approach.</b> ${esc(i.approach)}</p><p><b>Hypothesis.</b> ${esc(i.hypothesis)}</p><p><b>Impacts.</b> ${esc(i.impacts)}</p>
         <footer>— NASA PSI, ${esc(i.id)} ${esc(i.acr)} · <a href="${esc(i.url)}">psi.nasa.gov investigation page</a>${i.doi ? ` · <a href="https://doi.org/${esc(i.doi)}">DOI ${esc(i.doi)}</a>` : ""}</footer>
       </blockquote></details>
-    ${i.pubs.length ? `<details><summary>${i.pubs.length} publications listed in PSI</summary><ul class="small">${i.pubs.map(p => `<li>${esc(p.t)}${p.doi ? ` <a href="https://doi.org/${esc(p.doi)}">${esc(p.doi)}</a>` : ""} <span class="muted">${esc(p.a)}</span></li>`).join("")}</ul></details>` : ""}
+    ${i.pubs.length ? `<details class="sub"><summary>${i.pubs.length} publications listed in PSI</summary><ul class="small">${i.pubs.map(p => `<li>${esc(p.t)}${p.doi ? ` <a href="https://doi.org/${esc(p.doi)}">${esc(p.doi)}</a>` : ""} <span class="muted">${esc(p.a)}</span></li>`).join("")}</ul></details>` : ""}
     <p class="small muted" style="margin:0">Summaries and findings were written by Claude (AI) from the PSI files named in brackets.</p>`;
   $("#addcmp").onclick = () => { if (!CMP.includes(i.id)) { CMP.push(i.id); if (CMP.length > 4) CMP.shift(); } location.hash = "compare"; };
 }
@@ -775,34 +1084,43 @@ function cmpSameDiff(cols){
   };
   setLine("Variables changed", VARIED_KW, "varied");
   setLine("Measurements", SENSOR_KW, "sensors");
-  return `<div class="cols2"><div><h3>What they share</h3><ul class="small" style="margin:4px 0 0;padding-left:18px;display:grid;gap:4px">${same.map(t => `<li>${t}</li>`).join("") || "<li>Little in common.</li>"}</ul></div>
-    <div><h3>How they differ</h3><ul class="small" style="margin:4px 0 0;padding-left:18px;display:grid;gap:4px">${diff.map(t => `<li>${t}</li>`).join("") || "<li>No major differences found.</li>"}</ul></div></div>`;
+  const lead = t => t.replace(/^(.{3,70}?)(:| overlap| do not overlap| in common)/, (m, a, b) => `<b>${a}</b>${b}`);
+  return `<div class="sdgrid"><div class="sdcard same"><h3><span class="ic" aria-hidden="true">✓</span>What they share</h3><ul>${same.map(t => `<li>${lead(t)}</li>`).join("") || "<li>Little in common.</li>"}</ul></div>
+    <div class="sdcard diff"><h3><span class="ic" aria-hidden="true">≠</span>How they differ</h3><ul>${diff.map(t => `<li>${lead(t)}</li>`).join("") || "<li>No major differences found.</li>"}</ul></div></div>`;
 }
 
 /* ---------------- compare ---------------- */
 let CMP = [];
 function renderCompare(){
   if (!CMP.length) CMP = RANKED.slice(0, 3).map(x => x.i.id);
-  $("#cmppick").innerHTML = INV.map(i => `<button class="chipbtn" aria-pressed="${CMP.includes(i.id)}" data-id="${i.id}" style="${CMP.includes(i.id) ? "background:var(--ink);color:var(--surface)" : ""}">${esc(i.acr)}</button>`).join("");
+  const CC = ["--accent", "--o2", "--ph-gas", "--ph-emu"], ccol = id => `var(${CC[CMP.indexOf(id)] || "--line"})`;
+  $("#cmpcount").textContent = `${CMP.length} of 4 selected`;
+  $("#cmppick").innerHTML = INV.map(i => `<button class="chipbtn" aria-pressed="${CMP.includes(i.id)}" data-id="${i.id}" style="--cc:${ccol(i.id)}"><span class="dot" aria-hidden="true"></span>${esc(i.acr)}</button>`).join("");
   $("#cmppick").querySelectorAll("button").forEach(b => b.onclick = () => { const id = b.dataset.id; CMP = CMP.includes(id) ? CMP.filter(x => x !== id) : [...CMP, id].slice(-4); renderCompare(); });
   const cols = CMP.map(id => BYID[id]);
   const sc = id => RANKED.find(x => x.i.id === id)?.s;
-  const rng = (i, f, g, m = 1) => { const ok = i.rows.filter(r => !/NEGATIVE_VALUE/.test(r.flags || "")), a = ok.map(f).filter(v => v != null), b = ok.map(g).filter(v => v != null); if (!a.length) return "–"; const x = fmt(Math.min(...a) * m), y = fmt(Math.max(...b) * m); return x === y ? x : `${x}–${y}`; };
-  const R = [
-    ["Score for your scenario", i => `<span class="num">${fmt(sc(i.id)?.total, 0)}</span>`],
-    ["Tier", i => tierLabel(i.tier)], ["Safety focus", i => i.pds.join(", ")], ["Hardware family", i => esc(i.family)],
-    ["Objective", i => esc(i.objective_short || "")], ["Fuel phase", i => esc(i.phase)], ["Fuel, sample shape &amp; size", i => esc(i.fuel_geom || "")], ["Fuels in table", i => esc([...new Set(i.rows.map(r => r.fuel_class))].join("; ") || "–")],
-    ["O₂ (%)", i => `<span class="num">${rng(i, r => r.o2_pct, r => r.o2_pct_max ?? r.o2_pct)}</span>`],
-    ["Pressure (psi)", i => `<span class="num">${rng(i, r => r.p_atm, r => r.p_atm_max ?? r.p_atm, PSI_PER_ATM)}</span>`],
-    ["Air speed (cm/s)", i => `<span class="num">${rng(i, r => r.flow_cm_s, r => r.flow_cm_s_max ?? r.flow_cm_s)}</span>`],
-    ["Varied", i => esc(i.varied)], ["Held fixed", i => esc(i.fixed)], ["Sensors", i => esc(i.sensors)],
-    ["Test rows", i => `<span class="num">${i.ntests}</span>`], ["Publications", i => `<span class="num">${i.pubs.length}</span>`],
-    ["Headline finding", i => esc(i.findings[0]?.t || "")]];
-  $("#cmpsame").innerHTML = cmpSameDiff(cols);
-  $("#cmptable").innerHTML = `<thead><tr><th></th>${cols.map(i => `<th>${esc(i.acr)}<div class="small muted">${i.id}</div></th>`).join("")}</tr></thead><tbody>` +
-    R.map(([n, f]) => `<tr><th scope="row" style="position:static">${n}</th>${cols.map(i => `<td>${f(i)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  const okRows = i => i.rows.filter(r => !/NEGATIVE_VALUE/.test(r.flags || ""));
+  const rng = (i, f, g, m = 1) => { const ok = okRows(i), a = ok.map(f).filter(v => v != null), b = ok.map(g).filter(v => v != null); if (!a.length) return "–"; const x = fmt(Math.min(...a) * m), y = fmt(Math.max(...b) * m); return x === y ? x : `${x}–${y}`; };
+  const G = [
+    ["Overview", [
+      ["Score for your scenario", i => `<span class="num">${fmt(sc(i.id)?.total, 0)}</span>`],
+      ["Tier", i => tierLabel(i.tier)], ["Safety focus", i => i.pds.join(", ")], ["Hardware family", i => esc(i.family)]]],
+    ["What was tested", [
+      ["Objective", i => esc(i.objective_short || "")], ["Fuel phase", i => esc(i.phase)], ["Fuel, sample shape &amp; size", i => esc(i.fuel_geom || "")], ["Fuels in table", i => esc([...new Set(i.rows.map(r => r.fuel_class))].join("; ") || "–")]]],
+    ["Conditions", [
+      ["O₂ (%)", i => `<span class="num">${rng(i, r => r.o2_pct, r => r.o2_pct_max ?? r.o2_pct)}</span>`],
+      ["Pressure (psi)", i => `<span class="num">${rng(i, r => r.p_atm, r => r.p_atm_max ?? r.p_atm, PSI_PER_ATM)}</span>`],
+      ["Air speed (cm/s)", i => `<span class="num">${rng(i, r => r.flow_cm_s, r => r.flow_cm_s_max ?? r.flow_cm_s)}</span>`],
+      ["Varied", i => esc(i.varied)], ["Held fixed", i => esc(i.fixed)]]],
+    ["Data", [
+      ["Sensors", i => esc(i.sensors)], ["Test rows", i => `<span class="num">${i.ntests}</span>`], ["Publications", i => `<span class="num">${i.pubs.length}</span>`]]],
+    ["Result", [["Headline finding", i => esc(i.findings[0]?.t || "")]]]];
+  $("#cmpsame").innerHTML = `<div class="panel" style="display:grid;gap:10px">${cmpSameDiff(cols)}</div>`;
+  $("#cmptable").innerHTML = `<thead><tr><th></th>${cols.map(i => `<th style="--cc:${ccol(i.id)}"><div class="cmphead"><span class="acr">${esc(i.acr)}</span><span class="pid">${i.id}</span></div></th>`).join("")}</tr></thead><tbody>` +
+    G.map(([g, R]) => `<tr class="grp"><th colspan="${cols.length + 1}">${g}</th></tr>` +
+      R.map(([n, f]) => `<tr><th scope="row">${n}</th>${cols.map(i => `<td>${f(i)}</td>`).join("")}</tr>`).join("")).join("") + "</tbody>";
   const fam = {}; INV.forEach(i => (fam[i.family] = fam[i.family] || []).push(i));
-  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div><h3>${esc(f)}</h3><div class="small" style="margin-top:2px">${esc((B.families || {})[f] || "")}</div><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
+  $("#families").innerHTML = Object.entries(fam).map(([f, l]) => `<div class="famcard"><h3>${esc(f)}</h3><div class="small" style="margin-top:2px">${esc((B.families || {})[f] || "")}</div><div class="chips" style="margin-top:6px">${l.map(i => `<button class="chipbtn" data-id="${i.id}">${esc(i.acr)}</button>`).join("")}</div></div>`).join("");
   $("#sharedlinks").innerHTML = (B.shared_links || []).map(L => `<li><b>${esc(L.what)}:</b> ${L.ids.map(id => esc(BYID[id]?.acr || id)).join(", ")}. ${esc(L.note)}</li>`).join("");
   $("#families").querySelectorAll("button").forEach(b => b.onclick = () => { S.sel = b.dataset.id; location.hash = "explore"; });
 }
@@ -846,7 +1164,7 @@ function renderGaps(){
     parts.push(`${o2only} match O₂ alone, out of ${all.length}.`);
     if (stream) parts.push(`Plus ${stream} inverse-flame tests where only the burner stream had this much O₂ (the room held fuel).`);
     if (unsure) parts.push(`${unsure} BASS rows left out: O₂ not logged and some tests were N₂-diluted.`);
-    return `<div class="gap ${cls}"><div class="small muted">${n}</div><div class="st">${hit.length}</div><div class="small">table rows within ±3 O₂ points and ±30% pressure of your scenario. ${parts.join(" ")}</div></div>`;
+    return `<div class="gap ${cls}"><div class="gaphead">${n}</div><div class="st">${hit.length}</div><div class="small">table rows within ±3 O₂ points and ±30% pressure of your scenario.</div><ul class="gapparts">${parts.map(t => `<li>${t}</li>`).join("")}</ul></div>`;
   }).join("");
   const solids = ROWS.filter(r => r.fuel_phase === "solid" && o2Kind(r) === "meas" && !/NEEDS_VERIFICATION/.test(r.flags || ""));
   const smax = Math.max(...solids.map(r => r.o2_pct_max ?? r.o2_pct));
@@ -861,7 +1179,8 @@ function renderGaps(){
   if (S.g === "moon" || S.g === "mars") msgs.push(`No partial-gravity data in PSI. Bound the ${S.g === "moon" ? "lunar" : "Martian"} case with microgravity (PSI) and 1-g tests; LUCI reports suggest lunar gravity may be close to the most flammable condition.`);
   if (S.flow < 5) msgs.push(`At ${S.flow} cm/s you are in the low-flow range where BASS-II found quenching (1-5 cm/s) and the lowest O₂ limits.`);
   if (!msgs.length) msgs.push("Your scenario sits inside well-covered PSI conditions.");
-  $("#gaptext").innerHTML = msgs.map(esc).join("<br>");
+  $("#gaptext").className = "warnlist" + (msgs.length === 1 && /well-covered/.test(msgs[0]) ? " ok" : "");
+  $("#gaptext").innerHTML = msgs.map(m => `<li>${esc(m)}</li>`).join("");
   renderLadder();
   renderGravityBounds();
   $("#external").innerHTML = B.gaps_external.map(g => `<div class="gap"><h3>${esc(g.name)}</h3><div class="small">${esc(g.what)}</div><a class="small" href="${g.src}">Source</a></div>`).join("");
@@ -1041,7 +1360,7 @@ function renderBoundary(){
     legend:{orientation:"h", y:-0.2, font:{size:11}, entrywidth:0.33, entrywidthmode:"fraction"}, shapes, annotations:ann};
   Plotly.react("fbchart", traces, layout, {displayModeBar:false, responsive:true});
   $("#fbreadout").innerHTML = readout;
-  $("#fbnote").innerHTML = note + (scen.length ? `<div class="qnote" style="margin-top:6px">${scen.map(esc).join("<br>")}</div>` : "");
+  $("#fbnote").innerHTML = note + (scen.length ? `<ul class="warnlist" style="margin-top:8px">${scen.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
   $("#fbcaveats").innerHTML = FB.caveats.map(x => `<li>${esc(x)}</li>`).join("");
   const cols = ["material_label", "configuration", "test_id", "flow_cm_s", "a_per_s", "o2_pct", "outcome", "outcome_detail", "method", "notes"];
   const rows = fbPoints(mat);
@@ -1174,8 +1493,8 @@ function tkVisible(){ const foc = [...S.pds]; return takeaways().filter(t => !fo
 function tkCard(t){
   const [c, lab] = TK_AREA[t.area];
   return `<article class="tk ${t.st}"><div class="tkhead"><span class="tag ${c}">${lab}</span><span class="tkst">${TK_ST[t.st]}</span></div><h3>${esc(t.title)}</h3><p>${esc(t.head)}</p>
-    <p><b>What this means for equipment and controls:</b> ${esc(t.imp)}</p>${t.cav.length ? `<p class="small muted">Tested conditions: ${esc(t.cav.join(" "))}</p>` : ""}
-    <p class="small muted">Source: ${esc(t.cite)} · <a href="${t.href}"${t.sel ? ` data-sel="${t.sel}"` : ""}${t.anchor ? ` data-anchor="${t.anchor}"` : ""}>See the data</a></p></article>`;
+    <p class="imp"><b>What this means for equipment and controls:</b> ${esc(t.imp)}</p><div class="tkfoot">${t.cav.length ? `<p class="small muted">Tested conditions: ${esc(t.cav.join(" "))}</p>` : ""}
+    <p class="small muted">Source: ${esc(t.cite)} · <a href="${t.href}"${t.sel ? ` data-sel="${t.sel}"` : ""}${t.anchor ? ` data-anchor="${t.anchor}"` : ""}>See the data</a></p></div></article>`;
 }
 function renderTakeaways(){
   const T = tkVisible();
@@ -1189,6 +1508,7 @@ function renderTkSummary(){
   $("#tksumpanel").innerHTML = `<div class="rhead"><h2>Design takeaways</h2><a class="small" href="#evidence">All ${T.length} with details →</a></div>
     <ul class="tksum small">${top.map(t => `<li><span class="tkdot ${t.st}" title="${esc(TK_ST[t.st])}"></span><span><span class="sr">${esc(TK_ST[t.st])}: </span>${esc(t.short)}</span></li>`).join("")}</ul>`;
 }
+document.addEventListener("click", e => { const b = e.target.closest(".ibtn"); if (!b) return; const t = document.getElementById(b.getAttribute("aria-controls")); if (!t) return; t.hidden = !t.hidden; b.setAttribute("aria-expanded", String(!t.hidden)); });
 document.addEventListener("click", e => { const a = e.target.closest("a[data-sel], a[data-anchor]"); if (!a) return;
   if (a.dataset.sel) S.sel = a.dataset.sel;
   if (a.dataset.anchor) setTimeout(() => document.getElementById(a.dataset.anchor)?.scrollIntoView({behavior:"smooth", block:"center"}), 120); });
@@ -1305,7 +1625,7 @@ function renderData(){
   $("#dcount").textContent = `${rows.length.toLocaleString()} of ${ROWS.length.toLocaleString()} rows. Table shows the first 300; exports include all filtered rows.`;
   const numc = new Set(["size_mm", "o2_pct", "o2_pct_max", "p_atm", "flow_cm_s", "metric_value", "src_row"]);
   $("#dtable").innerHTML = `<thead><tr>${DCOLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>` +
-    rows.slice(0, 300).map(r => `<tr>${DCOLS.map(c => numc.has(c) ? `<td class="n">${r[c] ?? ""}</td>` : c === "flags" ? `<td class="flag">${esc(r[c])}</td>` : `<td>${esc(r[c])}</td>`).join("")}</tr>`).join("") + "</tbody>";
+    rows.slice(0, 300).map(r => `<tr>${DCOLS.map(c => numc.has(c) ? `<td class="n">${r[c] ?? ""}</td>` : c === "flags" ? `<td class="flag" title="${esc(r[c])}">${esc(r[c])}</td>` : `<td title="${esc(r[c])}">${esc(r[c])}</td>`).join("")}</tr>`).join("") + "</tbody>";
 }
 ["dinv", "dphase", "dmeasured", "dclean"].forEach(id => $("#" + id).addEventListener("change", renderData));
 const EXPORT_ABOUT = {project:"FireSight (NASA Space Apps Challenge 2026, team Spacecrammers)", data:"NASA Physical Sciences Informatics, psi.nasa.gov (CC0); cite each investigation by its DOI", built:B.built,
@@ -1661,23 +1981,24 @@ function renderMethod(){
 /* ---------------- stamp, routing, init ---------------- */
 function renderStamp(){
   const nq = B.quality.reduce((a, q) => a + +q.count, 0);
-  $("#stamp").innerHTML = `<span class="pill"><b>${INV.length}</b> investigations</span><span class="pill"><b>${ROWS.length.toLocaleString()}</b> test rows</span><span class="pill"><b>${nq}</b> data fixes &amp; flags</span><span class="pill">PSI snapshot <b>${B.built}</b></span>`;
+  $("#stamp").innerHTML = ` · PSI snapshot ${esc(B.built)}`;
 }
-const VIEWS = ["explore", "compare", "gaps", "boundary", "evidence", "data", "quality", "incidents", "ask", "method"];
+const VIEWS = ["explore", "compare", "gaps", "boundary", "evidence", "data", "incidents", "ask", "method"];
 function route(){
-  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "explore";
+  const h = location.hash.slice(1), toDQ = h === "quality";   // old #quality links open the data-quality section of Data & export
+  const v = toDQ ? "data" : VIEWS.includes(h) ? h : "explore";
   VIEWS.forEach(x => $("#v-" + x).classList.toggle("on", x === v));
   $("#fab").hidden = v === "ask";
-  document.querySelectorAll("#tabs a").forEach(a => { if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  document.body.dataset.view = v;
+  document.querySelectorAll("#tabs a, #utilnav a").forEach(a => { if (a.getAttribute("href") === "#" + v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   if (v === "explore") { renderMap(); renderDetail(); }
   if (v === "compare") renderCompare();
   if (v === "gaps") renderGaps();
   if (v === "boundary") renderBoundary();
   if (v === "evidence") renderEvidence();
-  if (v === "data") renderData();
-  if (v === "quality") renderQuality();
+  if (v === "data") { renderData(); renderQuality(); if (toDQ) setTimeout(() => $("#dq").scrollIntoView({block:"start"}), 50); }
 }
-window.addEventListener("hashchange", route);
+window.addEventListener("hashchange", () => { route(); const t = $("#tabs").getBoundingClientRect().top + scrollY - 8; if (scrollY > t) scrollTo({top:t}); });
 function update(){ save(); renderPresets(); renderReadout(); renderRank(); renderTkSummary(); route(); }
 
 syncInputs(); renderWeights(); renderStamp(); renderIncidents(); renderExport(); renderFbExport(); renderMethod(); renderRefs(); update();
