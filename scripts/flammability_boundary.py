@@ -1,4 +1,4 @@
-# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+# Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Fit microgravity flammability boundaries from BASS-II (PSI-25) data.
 
 Input : data/boundary/bass2_boundary_points.csv  (verified points, see README in that folder)
@@ -130,7 +130,7 @@ sib_out = {
 }
 
 out = {
-    "about": "Microgravity flammability boundaries from PSI-25 (BASS-II) at about 1 atm in N2-diluted cabin air. Fitted by FireSight; PMMA-rod points digitized from the report's Figure 6.10, SIBAL and thin-PMMA values copied from Tables 7.1 and 2.1.",
+    "about": "Microgravity flammability boundaries from PSI-25 (BASS-II) at about 1 atm in N2-diluted cabin air. Fitted by InfoFlame; PMMA-rod points digitized from the report's Figure 6.10, SIBAL and thin-PMMA values copied from Tables 7.1 and 2.1.",
     "source_doc": "BASS-II Summary Report, NASA/TM-20210011385 (2021), file PSI-25_Reports_BASS-II Summary Report.pdf in PSI-25",
     "pressure_atm": 1.0,
     "pmma_rod": rod_out, "sibal_22": sib_out,

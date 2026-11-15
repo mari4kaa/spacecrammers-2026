@@ -1,8 +1,8 @@
-# FireSight: fire-safety insights from NASA's microgravity combustion data
+# InfoFlame: fire-safety insights from NASA's microgravity combustion data
 
 NASA Space Apps Challenge 2026 submission by team Spacecrammers.
 
-FireSight ranks and explains the combustion investigations in NASA's Physical Sciences Informatics (PSI) repository against the fire-safety needs of a crewed habitat you describe: a lunar base at 30% O₂ / 10.2 psi, a Mars habitat, the ISS, a spacesuit, or your own settings.
+InfoFlame ranks and explains the combustion investigations in NASA's Physical Sciences Informatics (PSI) repository against the fire-safety needs of a crewed habitat you describe: a lunar base at 30% O₂ / 10.2 psi, a Mars habitat, the ISS, a spacesuit, or your own settings.
 
 - **Live site:** https://mari4kaa.github.io/spacecrammers-2026/
 - **Data:** 24 PSI investigations, 1,958 cleaned test rows from 19 PSI experiment tables, 157 logged data-quality issues
@@ -71,7 +71,7 @@ How the page connects:
 - `MODEL` / `FALLBACK_MODEL`: `gemini-3.5-flash-lite`, falling back to `gemini-3.1-flash-lite` when the first one's free quota is used up (each has its own free quota, roughly doubling the daily capacity). If you enable billing you can switch to a stronger model such as `gemini-3.8-flash`; then set a budget alert in Google Cloud Billing.
 - `MAX_OUTPUT_TOKENS`: caps each answer.
 - `RATE_PER_MINUTE`: per-visitor request cap.
-- A fixed system instruction keeps the assistant on the FireSight topic.
+- A fixed system instruction keeps the assistant on the InfoFlame topic.
 
 Where the key lives: only in `worker/.env` on your computer (git-ignored, never pushed) and, encrypted, in Cloudflare's secret store. Never put it in `site.config.json`, `docs/` or any page file: everything in `docs/` is public.
 

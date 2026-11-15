@@ -966,7 +966,7 @@
   },
   {
    "group": "Flammability boundary",
-   "cite": "FireSight: digitized points, fitting script and method notes (this project).",
+   "cite": "InfoFlame: digitized points, fitting script and method notes (this project).",
    "used": "How the points were captured and checked, the refit (same equation form as the report, 3,000 bootstrap resamples, 90% bands, leave-one-out check) and all results.",
    "links": [
     [

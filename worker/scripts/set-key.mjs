@@ -1,4 +1,4 @@
-// Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+// Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 // Reads GEMINI_API_KEY from worker/.env and stores it as an encrypted Cloudflare secret.
 // The key is passed to wrangler on stdin, so it never appears in your shell history or in git.
 import { readFileSync } from "node:fs";

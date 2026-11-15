@@ -1,6 +1,6 @@
-# FireSight data
+# InfoFlame data
 
-Data behind the FireSight dashboard. Machine-readable description: `datapackage.json` (Frictionless Data format).
+Data behind the InfoFlame dashboard. Machine-readable description: `datapackage.json` (Frictionless Data format).
 
 **AI use:** these files were produced with AI assistance (Claude, Anthropic). Cleaning rules and scripts were written with Claude; the boundary points were digitized and the evidence tables extracted by Claude; the summaries in `curated.json` were written by Claude from the sources named in each finding. Every value keeps its source (PSI file and row, or the report table and page). Full statement: [`../AI_USE.md`](../AI_USE.md).
 

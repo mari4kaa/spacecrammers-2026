@@ -1,7 +1,7 @@
 {
  "name": "firesight-psi-combustion",
- "title": "FireSight: NASA PSI combustion data for spacecraft and habitat fire safety",
- "description": "Data behind the FireSight dashboard (NASA Space Apps Challenge 2026, team Spacecrammers). AI use: cleaning rules, digitized points, extracted tables and written summaries were produced with Claude (Anthropic); see AI_USE.md. Every value keeps its source.",
+ "title": "InfoFlame: NASA PSI combustion data for spacecraft and habitat fire safety",
+ "description": "Data behind the InfoFlame dashboard (NASA Space Apps Challenge 2026, team Spacecrammers). AI use: cleaning rules, digitized points, extracted tables and written summaries were produced with Claude (Anthropic); see AI_USE.md. Every value keeps its source.",
  "homepage": "https://mari4kaa.github.io/spacecrammers-2026/",
  "x_ai_use": {
   "tools": [

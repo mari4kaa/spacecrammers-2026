@@ -1,4 +1,4 @@
-# How AI was used in FireSight
+# How AI was used in InfoFlame
 
 NASA Space Apps Challenge 2026, team Spacecrammers. This file is the project's AI-use disclosure, as required by the Space Apps rules for SI (AI) tools. The same statement appears on the dashboard (header, footer and **Method → How AI was used**), in the page's `<meta name="ai-disclosure">` tag, in the header of every script and in the data READMEs.
 
@@ -22,4 +22,4 @@ NASA Space Apps Challenge 2026, team Spacecrammers. This file is the project's A
 
 **Images, video, audio:** the dashboard has no AI-generated images, video or audio. Charts are drawn by Plotly from the data. Any AI-generated image or video in the demo will carry a visible watermark.
 
-**NASA branding:** FireSight uses no NASA logos, flags or mission insignia, and it is not an official NASA product. NASA PSI data are used under CC0 and cited by DOI.
+**NASA branding:** InfoFlame uses no NASA logos, flags or mission insignia, and it is not an official NASA product. NASA PSI data are used under CC0 and cited by DOI.

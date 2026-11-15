@@ -1,4 +1,4 @@
-# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+# Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 import json,requests,sys,pathlib
 B="https://psi.nasa.gov/geode-py/ws"
 want={"PSI-26":["PSI-26_Reports_BASS_FinalReport.pdf","PSI-26_Presentations_BASS_Overview of Recent ISS Results.pdf"],

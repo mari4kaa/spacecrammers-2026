@@ -148,7 +148,7 @@ vite.config.ts.timestamp-*
 # Turbo Repo
 .turbo
 
-# FireSight
+# InfoFlame
 raw/
 worker/node_modules/
 worker/.wrangler/

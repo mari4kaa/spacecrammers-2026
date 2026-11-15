@@ -1,4 +1,4 @@
-# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+# Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Normalize PSI combustion Experimental Tables into one test matrix.
 
 Usage: python3 normalize.py <raw_tables_dir> <out_dir>

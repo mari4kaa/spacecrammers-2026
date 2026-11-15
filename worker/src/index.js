@@ -1,12 +1,12 @@
-// Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
-// FireSight AI proxy (Cloudflare Worker) for the Gemini API.
+// Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+// InfoFlame AI proxy (Cloudflare Worker) for the Gemini API.
 // Keeps the Gemini API key secret, so the public GitHub Pages site can use the model.
 // The browser runs the tool loop on its own embedded data; this worker only forwards
 // generateContent calls with server-side limits (model, output size, request size, origin, rate).
 
 const API = "https://generativelanguage.googleapis.com/v1beta/models/";
 const SYSTEM_PREFIX =
-  "You are the assistant inside FireSight, a dashboard of NASA PSI microgravity combustion data for spacecraft and habitat fire safety. " +
+  "You are the assistant inside InfoFlame, a dashboard of NASA PSI microgravity combustion data for spacecraft and habitat fire safety. " +
   "Only answer questions about that data and fire safety in crewed spacecraft, habitats and related Earth analogs, using the provided tools. " +
   "Politely decline anything unrelated in one sentence.";
 

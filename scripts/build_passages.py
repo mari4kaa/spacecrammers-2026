@@ -1,4 +1,4 @@
-# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+# Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 """Build docs/passages.json: searchable text passages from the report files the cards were written from.
 The live assistant's search_reports tool loads this file on demand and quotes passages with page numbers.
 Usage: python3 scripts/build_passages.py <text_dir> docs/passages.json
@@ -77,5 +77,5 @@ for fn, ids, title, url in MANIFEST:
         if buf and good(buf): passages.append([k, pno, buf[:900], 1 if (key or (pno == 1 and fn.startswith("ntrs-"))) else 0])
     docs.append({"title": title, "short": SHORT.get(fn, title), "psi": ids, "url": url, "paged": "\f" in raw})
 # re-index docs to the ones kept
-OUT.write_text(json.dumps({"about": "Text passages from public-use report files behind the FireSight cards, for the assistant's search_reports tool. [doc index, page, text, 1 if in an abstract/results/conclusions section].", "docs": docs, "passages": passages}, separators=(",", ":"), ensure_ascii=False))
+OUT.write_text(json.dumps({"about": "Text passages from public-use report files behind the InfoFlame cards, for the assistant's search_reports tool. [doc index, page, text, 1 if in an abstract/results/conclusions section].", "docs": docs, "passages": passages}, separators=(",", ":"), ensure_ascii=False))
 print(len(docs), "docs,", len(passages), "passages,", round(OUT.stat().st_size / 1e6, 2), "MB")

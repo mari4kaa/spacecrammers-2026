@@ -1,4 +1,4 @@
-# Written with AI assistance (Claude, Anthropic) for FireSight, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
+# Written with AI assistance (Claude, Anthropic) for InfoFlame, NASA Space Apps Challenge 2026, team Spacecrammers. See AI_USE.md.
 import json, sys, urllib.parse, requests, pathlib
 B="https://psi.nasa.gov/geode-py/ws"
 IDS=["PSI-26","PSI-25","PSI-98","PSI-99","PSI-100","PSI-102","PSI-101","PSI-47","PSI-69","PSI-20",
