@@ -6,7 +6,7 @@ InfoFlame ranks and explains the combustion investigations in NASA's Physical Sc
 
 - **Live site:** https://mari4kaa.github.io/spacecrammers-2026/
 - **Data:** 24 PSI investigations, 1,958 cleaned test rows from 19 PSI experiment tables, 157 logged data-quality issues
-- **AI:** built with AI assistance. The code, data-cleaning rules, digitized boundary points, evidence tables and investigation summaries were produced with Claude (Anthropic); the live assistant ("Ask the data") uses Google Gemini and answers only with lookups into the dataset. Full disclosure: [AI_USE.md](AI_USE.md).
+- **AI:** built with AI assistance. The code, data-cleaning rules, digitized boundary points, evidence tables and investigation summaries were produced with Claude (Anthropic); the live assistant ("Ask the data") uses Google Gemini and answers only with lookups into the dataset. The demo video's voice-over was generated with ElevenLabs. Full disclosure: [AI_USE.md](AI_USE.md).
 
 ## What's in the repo
 
