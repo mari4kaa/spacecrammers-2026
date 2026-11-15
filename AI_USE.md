@@ -1,6 +1,6 @@
 # How AI was used in InfoFlame
 
-NASA Space Apps Challenge 2026, team Spacecrammers. This file is the project's AI-use disclosure, as required by the Space Apps rules for SI (AI) tools. The same statement appears on the dashboard (header, footer and **Method → How AI was used**), in the page's `<meta name="ai-disclosure">` tag, in the header of every script and in the data READMEs.
+NASA Space Apps Challenge 2026, team Spacecrammers. This file is the project's AI-use disclosure, as required by the Space Apps rules for SI (AI) tools. A short version appears on the dashboard (header, footer and **Method → AI use**); the full statement is also in the page's `<meta name="ai-disclosure">` tag, in the header of every script and in the data READMEs.
 
 **What the team did:** chose the challenge approach and the dashboard features, supplied papers, reviewed the results, asked for corrections, and deployed and published the site.
 
